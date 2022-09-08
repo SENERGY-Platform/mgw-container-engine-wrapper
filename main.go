@@ -40,8 +40,13 @@ func main() {
 		os.Exit(1)
 	}
 	logger.InitLogger(config.Logger.Level, "[DM] ", false, config.Logger.Utc)
+	dockerCli, err := handler.NewDocker()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	dmApi := api.NewApi(dockerCli)
 	engine := api_engine.NewEngine(config.StaticOrigins, config.Logger.Level)
-	api.SetRoutes(engine)
+	api.SetRoutes(engine, dmApi)
 	server := http.Server{
 		Handler: engine,
 	}
