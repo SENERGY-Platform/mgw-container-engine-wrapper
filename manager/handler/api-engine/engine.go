@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package gin_engine
+package api_engine
 
 import (
 	"deployment-manager/util/logger"
