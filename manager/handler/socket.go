@@ -46,7 +46,7 @@ func NewUnixListener(path string) (listener *net.UnixListener, err error) {
 		}
 	}()
 	if os.Getuid() == 0 {
-		if err = os.Chown(path, os.Getuid(), 101); err != nil {
+		if err = os.Chown(path, 0, 101); err != nil {
 			return
 		}
 		if err = os.Chmod(path, 0660); err != nil {
