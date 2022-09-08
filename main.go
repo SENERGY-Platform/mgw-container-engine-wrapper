@@ -47,12 +47,12 @@ func main() {
 	dmApi := api.NewApi(dockerCli)
 	engine := api_engine.NewEngine(config.StaticOrigins, config.Logger.Level)
 	api.SetRoutes(engine, dmApi)
-	server := http.Server{
-		Handler: engine,
-	}
 	listener, err := handler.NewUnixListener(config.SocketPath)
 	if err != nil {
 		logger.Fatal(err)
+	}
+	server := http.Server{
+		Handler: engine,
 	}
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
