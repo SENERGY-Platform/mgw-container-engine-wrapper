@@ -64,6 +64,7 @@ func main() {
 	logger.Info("starting server ...")
 	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
 		logger.Fatal("starting server failed: ", err)
+	} else {
+		logger.Info("shutdown complete")
 	}
-	logger.Info("shutdown complete")
 }
