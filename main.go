@@ -32,6 +32,8 @@ import (
 	"time"
 )
 
+var version string
+
 func main() {
 	flags := util.NewFlags()
 	config, err := configuration.NewConfig(flags.ConfPath)
@@ -39,6 +41,7 @@ func main() {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	util.PrintInfo("mgw-deployment-manager", version)
 	logger.InitLogger(config.Logger.Level, "[DM] ", false, config.Logger.Utc)
 	dockerCli, err := handler.NewDocker()
 	if err != nil {
