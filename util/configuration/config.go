@@ -18,6 +18,9 @@ package configuration
 
 import (
 	"deployment-manager/util/logger"
+	"encoding/json"
+	envldr "github.com/y-du/go-env-loader"
+	"os"
 )
 
 type LoggerConfig struct {
@@ -29,4 +32,27 @@ type Config struct {
 	SocketPath    string       `json:"socket_path" env_var:"SOCKET_PATH"`
 	StaticOrigins []string     `json:"static_origins" env_var:"STATIC_ORIGINS"`
 	Logger        LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+}
+
+func NewConfig(path *string) (cfg *Config, err error) {
+	cfg = &Config{
+		SocketPath: "/opt/deployment-manager/manager.sock",
+		Logger: LoggerConfig{
+			Level: logger.WarningLvl,
+			Utc:   true,
+		},
+	}
+	if path != nil {
+		var file *os.File
+		if file, err = os.Open(*path); err != nil {
+			return
+		}
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		if err = decoder.Decode(cfg); err != nil {
+			return
+		}
+	}
+	err = envldr.LoadEnvUserParser(cfg, typeParsers, nil)
+	return cfg, err
 }
