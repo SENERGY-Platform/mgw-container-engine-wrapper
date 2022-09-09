@@ -20,7 +20,6 @@ import (
 	"context"
 	"deployment-manager/manager/api"
 	"deployment-manager/manager/handler"
-	"deployment-manager/manager/handler/api-engine"
 	"deployment-manager/util"
 	"deployment-manager/util/configuration"
 	"deployment-manager/util/logger"
@@ -47,15 +46,13 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	dmApi := api.NewApi(dockerCli)
-	engine := api_engine.NewEngine(config.StaticOrigins, config.Logger.Level)
-	api.SetRoutes(engine, dmApi)
+	dmApi := api.New(dockerCli, api.Routes, config.StaticOrigins, config.Logger.Level)
 	listener, err := handler.NewUnixListener(config.SocketPath)
 	if err != nil {
 		logger.Fatal(err)
 	}
 	server := http.Server{
-		Handler: engine,
+		Handler: dmApi.GetHandler(),
 	}
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
