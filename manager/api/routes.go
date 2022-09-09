@@ -16,8 +16,8 @@
 
 package api
 
-type routes func(a *Api)
+import "github.com/gin-gonic/gin"
 
-var Routes routes = func(a *Api) {
+func SetRoutes(e *gin.Engine, a *Api) {
 
 }

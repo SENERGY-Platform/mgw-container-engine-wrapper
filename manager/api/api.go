@@ -17,27 +17,15 @@
 package api
 
 import (
-	"deployment-manager/manager/api/engine"
 	"deployment-manager/manager/handler"
-	"deployment-manager/util/logger"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type Api struct {
-	engine        *gin.Engine
 	dockerHandler *handler.Docker
 }
 
-func New(dockerHandler *handler.Docker, routes routes, staticOrigins []string, logLevel logger.Level) *Api {
-	a := &Api{
-		engine:        engine.New(staticOrigins, logLevel),
+func New(dockerHandler *handler.Docker) *Api {
+	return &Api{
 		dockerHandler: dockerHandler,
 	}
-	routes(a)
-	return a
-}
-
-func (a *Api) GetHandler() http.Handler {
-	return a.engine
 }

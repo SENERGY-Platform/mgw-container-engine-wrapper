@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"deployment-manager/manager/api"
+	"deployment-manager/manager/api/engine"
 	"deployment-manager/manager/handler"
 	"deployment-manager/util"
 	"deployment-manager/util/configuration"
@@ -34,28 +35,37 @@ import (
 var version string
 
 func main() {
+	util.PrintInfo("mgw-deployment-manager", version)
+
 	flags := util.NewFlags()
 	config, err := configuration.NewConfig(flags.ConfPath)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	util.PrintInfo("mgw-deployment-manager", version)
-	logger.InitLogger(config.Logger.Level, "[DM] ", false, config.Logger.Utc)
+
+	logger.InitLogger(config.Logger)
+
 	dockerHandler, err := handler.NewDocker()
 	if err != nil {
 		logger.Fatal(err)
 	}
-	dmApi := api.New(dockerHandler, api.Routes, config.StaticOrigins, config.Logger.Level)
+
+	dmApi := api.New(dockerHandler)
+	apiEngine := engine.New(config.ApiEngine)
+	api.SetRoutes(apiEngine, dmApi)
+
 	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
 		logger.Fatal(err)
 	}
 	server := http.Server{
-		Handler: dmApi.GetHandler(),
+		Handler: apiEngine,
 	}
+
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+
 	go func() {
 		sig := <-shutdown
 		logger.WarningF("received signal '%s'", sig)
@@ -66,6 +76,7 @@ func main() {
 			logger.Error("server forced to shutdown: ", err)
 		}
 	}()
+
 	logger.Info("starting server ...")
 	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
 		logger.Fatal("starting server failed: ", err)

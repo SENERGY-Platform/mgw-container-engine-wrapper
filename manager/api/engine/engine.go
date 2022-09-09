@@ -21,11 +21,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(staticOrigins []string, logLevel logger.Level) *gin.Engine {
+type Config struct {
+	StaticOrigins []string `json:"static_origins" env_var:"API_ENGINE_STATIC_ORIGINS"`
+}
+
+func New(config Config) *gin.Engine {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
 	e.ForwardedByClientIP = false
-	e.Use(ginLogger(gin.LoggerConfig{}, logLevel), gin.Recovery(), checkStaticOrigin(staticOrigins))
+	e.Use(ginLogger(gin.LoggerConfig{}, logger.GetLevel()), gin.Recovery(), checkStaticOrigin(config.StaticOrigins))
 	return e
 }

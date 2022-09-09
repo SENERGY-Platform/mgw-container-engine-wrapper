@@ -24,19 +24,22 @@ import (
 	"strings"
 )
 
+type Config struct {
+	Level  Level  `json:"level" env_var:"LOGGER_LEVEL"`
+	Utc    bool   `json:"utc" env_var:"LOGGER_UTC"`
+	Prefix string `json:"prefix" env_var:"LOGGER_PREFIX"`
+}
+
 var level = WarningLvl
 var logger *log.Logger
 
-func InitLogger(lvl Level, prefix string, microSec bool, useUtc bool) {
-	level = lvl
+func InitLogger(config Config) {
+	level = config.Level
 	flags := log.Ldate | log.Ltime | log.Lmsgprefix
-	if microSec {
-		flags = flags | log.Lmicroseconds
-	}
-	if useUtc {
+	if config.Utc {
 		flags = flags | log.LUTC
 	}
-	logger = log.New(os.Stderr, prefix, flags)
+	logger = log.New(os.Stderr, config.Prefix, flags)
 }
 
 func ParseLevel(v string) (Level, error) {

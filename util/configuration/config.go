@@ -17,29 +17,26 @@
 package configuration
 
 import (
+	"deployment-manager/manager/api/engine"
 	"deployment-manager/util/logger"
 	"encoding/json"
 	envldr "github.com/y-du/go-env-loader"
 	"os"
 )
 
-type LoggerConfig struct {
-	Level logger.Level `json:"level" env_var:"LOG_LEVEL"`
-	Utc   bool         `json:"utc" env_var:"LOG_UTC"`
-}
-
 type Config struct {
-	SocketPath    string       `json:"socket_path" env_var:"SOCKET_PATH"`
-	StaticOrigins []string     `json:"static_origins" env_var:"STATIC_ORIGINS"`
-	Logger        LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	SocketPath string        `json:"socket_path" env_var:"SOCKET_PATH"`
+	Logger     logger.Config `json:"logger" env_var:"LOGGER_CONFIG"`
+	ApiEngine  engine.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
 }
 
 func NewConfig(path *string) (cfg *Config, err error) {
 	cfg = &Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
-		Logger: LoggerConfig{
-			Level: logger.WarningLvl,
-			Utc:   true,
+		Logger: logger.Config{
+			Level:  logger.WarningLvl,
+			Utc:    true,
+			Prefix: "[DM] ",
 		},
 	}
 	if path != nil {
