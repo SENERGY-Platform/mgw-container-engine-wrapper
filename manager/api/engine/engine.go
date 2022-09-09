@@ -25,6 +25,7 @@ func New(staticOrigins []string, logLevel logger.Level) *gin.Engine {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
+	e.ForwardedByClientIP = false
 	e.Use(ginLogger(gin.LoggerConfig{}, logLevel), gin.Recovery(), checkStaticOrigin(staticOrigins))
 	return e
 }
