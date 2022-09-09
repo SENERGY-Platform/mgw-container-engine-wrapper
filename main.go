@@ -42,11 +42,11 @@ func main() {
 	}
 	util.PrintInfo("mgw-deployment-manager", version)
 	logger.InitLogger(config.Logger.Level, "[DM] ", false, config.Logger.Utc)
-	dockerCli, err := handler.NewDocker()
+	dockerHandler, err := handler.NewDocker()
 	if err != nil {
 		logger.Fatal(err)
 	}
-	dmApi := api.New(dockerCli, api.Routes, config.StaticOrigins, config.Logger.Level)
+	dmApi := api.New(dockerHandler, api.Routes, config.StaticOrigins, config.Logger.Level)
 	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
 		logger.Fatal(err)

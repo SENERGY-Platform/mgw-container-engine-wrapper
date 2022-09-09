@@ -25,14 +25,14 @@ import (
 )
 
 type Api struct {
-	engine    *gin.Engine
-	dockerCli *handler.Docker
+	engine        *gin.Engine
+	dockerHandler *handler.Docker
 }
 
-func New(dockerCli *handler.Docker, routes routes, staticOrigins []string, logLevel logger.Level) *Api {
+func New(dockerHandler *handler.Docker, routes routes, staticOrigins []string, logLevel logger.Level) *Api {
 	a := &Api{
-		engine:    engine.New(staticOrigins, logLevel),
-		dockerCli: dockerCli,
+		engine:        engine.New(staticOrigins, logLevel),
+		dockerHandler: dockerHandler,
 	}
 	routes(a)
 	return a
