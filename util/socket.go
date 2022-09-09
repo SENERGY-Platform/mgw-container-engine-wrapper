@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package handler
+package util
 
 import (
 	"deployment-manager/util/logger"

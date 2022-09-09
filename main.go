@@ -47,7 +47,7 @@ func main() {
 		logger.Fatal(err)
 	}
 	dmApi := api.New(dockerCli, api.Routes, config.StaticOrigins, config.Logger.Level)
-	listener, err := handler.NewUnixListener(config.SocketPath)
+	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
 		logger.Fatal(err)
 	}
