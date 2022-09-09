@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package configuration
+package util
 
 import (
 	"deployment-manager/manager/api/engine"
@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	envldr "github.com/y-du/go-env-loader"
 	"os"
+	"reflect"
 )
 
 type Config struct {
@@ -30,7 +31,7 @@ type Config struct {
 	ApiEngine  engine.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
 }
 
-func NewConfig(path *string) (cfg *Config, err error) {
+func NewConfig(path *string, typeParsers map[reflect.Type]envldr.Parser, kindParsers map[reflect.Kind]envldr.Parser) (cfg *Config, err error) {
 	cfg = &Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
 		Logger: logger.Config{
@@ -50,6 +51,6 @@ func NewConfig(path *string) (cfg *Config, err error) {
 			return
 		}
 	}
-	err = envldr.LoadEnvUserParser(cfg, typeParsers, nil)
+	err = envldr.LoadEnvUserParser(cfg, typeParsers, kindParsers)
 	return cfg, err
 }

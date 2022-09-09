@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package configuration
+package logger
 
 import (
-	"deployment-manager/util/logger"
 	envldr "github.com/y-du/go-env-loader"
 	"reflect"
 )
 
-var logLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {
-	return logger.ParseLevel(val)
-}
-
-var typeParsers = map[reflect.Type]envldr.Parser{
-	reflect.TypeOf(logger.OffLvl): logLevelParser,
+var LogLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {
+	return ParseLevel(val)
 }

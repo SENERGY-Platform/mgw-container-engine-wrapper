@@ -22,12 +22,13 @@ import (
 	"deployment-manager/manager/api/engine"
 	"deployment-manager/manager/handler"
 	"deployment-manager/util"
-	"deployment-manager/util/configuration"
 	"deployment-manager/util/logger"
 	"fmt"
+	envldr "github.com/y-du/go-env-loader"
 	"net/http"
 	"os"
 	"os/signal"
+	"reflect"
 	"syscall"
 	"time"
 )
@@ -38,7 +39,10 @@ func main() {
 	util.PrintInfo("mgw-deployment-manager", version)
 
 	flags := util.NewFlags()
-	config, err := configuration.NewConfig(flags.ConfPath)
+	typeParsers := map[reflect.Type]envldr.Parser{
+		reflect.TypeOf(logger.OffLvl): logger.LogLevelParser,
+	}
+	config, err := util.NewConfig(flags.ConfPath, typeParsers, nil)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
