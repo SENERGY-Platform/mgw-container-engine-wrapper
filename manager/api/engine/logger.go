@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package api_engine
+package engine
 
 import (
 	"deployment-manager/util/logger"

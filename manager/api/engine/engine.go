@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package api_engine
+package engine
 
 import (
 	"deployment-manager/util/logger"
 	"github.com/gin-gonic/gin"
 )
 
-func NewEngine(staticOrigins []string, logLevel logger.Level) *gin.Engine {
+func New(staticOrigins []string, logLevel logger.Level) *gin.Engine {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
