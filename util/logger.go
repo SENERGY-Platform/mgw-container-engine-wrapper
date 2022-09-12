@@ -33,17 +33,13 @@ type LoggerConfig struct {
 
 var Logger *log_level.Logger
 
-func InitLogger(config LoggerConfig) error {
+func InitLogger(config LoggerConfig) (err error) {
 	flags := log.Ldate | log.Ltime | log.Lmsgprefix
 	if config.Utc {
 		flags = flags | log.LUTC
 	}
-	if l, err := log_level.New(log.New(os.Stderr, config.Prefix, flags), config.Level); err != nil {
-		return err
-	} else {
-		Logger = l
-	}
-	return nil
+	Logger, err = log_level.New(log.New(os.Stderr, config.Prefix, flags), config.Level)
+	return
 }
 
 var LogLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {

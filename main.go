@@ -48,7 +48,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	util.InitLogger(config.Logger)
+	if err = util.InitLogger(config.Logger); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
+	}
 
 	util.Logger.Debugf("config: %+v", *config)
 
