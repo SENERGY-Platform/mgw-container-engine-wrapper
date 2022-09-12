@@ -31,7 +31,7 @@ type Config struct {
 	ApiEngine  engine.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
 }
 
-func NewConfig(path *string, typeParsers map[reflect.Type]envldr.Parser, kindParsers map[reflect.Kind]envldr.Parser) (cfg *Config, err error) {
+func NewConfig(path *string) (cfg *Config, err error) {
 	cfg = &Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
 		Logger: LoggerConfig{
@@ -51,6 +51,14 @@ func NewConfig(path *string, typeParsers map[reflect.Type]envldr.Parser, kindPar
 			return
 		}
 	}
-	err = envldr.LoadEnvUserParser(cfg, typeParsers, kindParsers)
+	err = envldr.LoadEnvUserParser(cfg, typeParsers, nil)
 	return cfg, err
+}
+
+var typeParsers = map[reflect.Type]envldr.Parser{
+	reflect.TypeOf(level.Off): LogLevelParser,
+}
+
+var LogLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {
+	return level.Parse(val)
 }

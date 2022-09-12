@@ -17,21 +17,19 @@
 package util
 
 import (
-	envldr "github.com/y-du/go-env-loader"
 	log_level "github.com/y-du/go-log-level"
 	"github.com/y-du/go-log-level/level"
 	"log"
 	"os"
-	"reflect"
 )
+
+var Logger *log_level.Logger
 
 type LoggerConfig struct {
 	Level  level.Level `json:"level" env_var:"LOGGER_LEVEL"`
 	Utc    bool        `json:"utc" env_var:"LOGGER_UTC"`
 	Prefix string      `json:"prefix" env_var:"LOGGER_PREFIX"`
 }
-
-var Logger *log_level.Logger
 
 func InitLogger(config LoggerConfig) (err error) {
 	flags := log.Ldate | log.Ltime | log.Lmsgprefix
@@ -40,8 +38,4 @@ func InitLogger(config LoggerConfig) (err error) {
 	}
 	Logger, err = log_level.New(log.New(os.Stderr, config.Prefix, flags), config.Level)
 	return
-}
-
-var LogLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {
-	return level.Parse(val)
 }

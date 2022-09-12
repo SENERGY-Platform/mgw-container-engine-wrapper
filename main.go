@@ -23,12 +23,9 @@ import (
 	"deployment-manager/manager/ce-handler"
 	"deployment-manager/util"
 	"fmt"
-	envldr "github.com/y-du/go-env-loader"
-	"github.com/y-du/go-log-level/level"
 	"net/http"
 	"os"
 	"os/signal"
-	"reflect"
 	"syscall"
 	"time"
 )
@@ -39,10 +36,7 @@ func main() {
 	util.PrintInfo("mgw-deployment-manager", version)
 
 	flags := util.NewFlags()
-	typeParsers := map[reflect.Type]envldr.Parser{
-		reflect.TypeOf(level.Off): util.LogLevelParser,
-	}
-	config, err := util.NewConfig(flags.ConfPath, typeParsers, nil)
+	config, err := util.NewConfig(flags.ConfPath)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
