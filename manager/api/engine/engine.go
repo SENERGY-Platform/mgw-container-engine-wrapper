@@ -17,19 +17,19 @@
 package engine
 
 import (
-	"deployment-manager/util/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/y-du/go-log-level/level"
 )
 
 type Config struct {
 	StaticOrigins []string `json:"static_origins" env_var:"API_ENGINE_STATIC_ORIGINS"`
 }
 
-func New(config Config) *gin.Engine {
+func New(config Config, logLevel level.Level) *gin.Engine {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
 	e.ForwardedByClientIP = false
-	e.Use(ginLogger(gin.LoggerConfig{}, logger.GetLevel()), gin.Recovery(), checkStaticOrigin(config.StaticOrigins))
+	e.Use(ginLogger(gin.LoggerConfig{}, logLevel), gin.Recovery(), checkStaticOrigin(config.StaticOrigins))
 	return e
 }

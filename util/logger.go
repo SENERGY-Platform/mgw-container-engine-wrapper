@@ -14,13 +14,38 @@
  * limitations under the License.
  */
 
-package logger
+package util
 
 import (
 	envldr "github.com/y-du/go-env-loader"
+	log_level "github.com/y-du/go-log-level"
+	"github.com/y-du/go-log-level/level"
+	"log"
+	"os"
 	"reflect"
 )
 
+type LoggerConfig struct {
+	Level  level.Level `json:"level" env_var:"LOGGER_LEVEL"`
+	Utc    bool        `json:"utc" env_var:"LOGGER_UTC"`
+	Prefix string      `json:"prefix" env_var:"LOGGER_PREFIX"`
+}
+
+var Logger *log_level.Logger
+
+func InitLogger(config LoggerConfig) error {
+	flags := log.Ldate | log.Ltime | log.Lmsgprefix
+	if config.Utc {
+		flags = flags | log.LUTC
+	}
+	if l, err := log_level.New(log.New(os.Stderr, config.Prefix, flags), config.Level); err != nil {
+		return err
+	} else {
+		Logger = l
+	}
+	return nil
+}
+
 var LogLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {
-	return ParseLevel(val)
+	return level.Parse(val)
 }

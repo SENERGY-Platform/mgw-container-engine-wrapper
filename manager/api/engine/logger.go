@@ -17,9 +17,9 @@
 package engine
 
 import (
-	"deployment-manager/util/logger"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/y-du/go-log-level/level"
 	"os"
 	"time"
 )
@@ -39,7 +39,7 @@ func logFormatter(param gin.LogFormatterParams) string {
 	)
 }
 
-func ginLogger(conf gin.LoggerConfig, lvl logger.Level) gin.HandlerFunc {
+func ginLogger(conf gin.LoggerConfig, lvl level.Level) gin.HandlerFunc {
 	formatter := conf.Formatter
 	if formatter == nil {
 		formatter = logFormatter
@@ -77,9 +77,9 @@ func ginLogger(conf gin.LoggerConfig, lvl logger.Level) gin.HandlerFunc {
 				path = path + "?" + raw
 			}
 			param.Path = path
-			if lvl > logger.InfoLvl {
+			if lvl > level.Info {
 				fmt.Fprint(out, formatter(param))
-			} else if lvl <= logger.InfoLvl && len(c.Errors) > 0 {
+			} else if lvl <= level.Info && len(c.Errors) > 0 {
 				fmt.Fprint(out, formatter(param))
 			}
 		}

@@ -18,24 +18,24 @@ package util
 
 import (
 	"deployment-manager/manager/api/engine"
-	"deployment-manager/util/logger"
 	"encoding/json"
 	envldr "github.com/y-du/go-env-loader"
+	"github.com/y-du/go-log-level/level"
 	"os"
 	"reflect"
 )
 
 type Config struct {
 	SocketPath string        `json:"socket_path" env_var:"SOCKET_PATH"`
-	Logger     logger.Config `json:"logger" env_var:"LOGGER_CONFIG"`
+	Logger     LoggerConfig  `json:"logger" env_var:"LOGGER_CONFIG"`
 	ApiEngine  engine.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
 }
 
 func NewConfig(path *string, typeParsers map[reflect.Type]envldr.Parser, kindParsers map[reflect.Kind]envldr.Parser) (cfg *Config, err error) {
 	cfg = &Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
-		Logger: logger.Config{
-			Level:  logger.WarningLvl,
+		Logger: LoggerConfig{
+			Level:  level.Warning,
 			Utc:    true,
 			Prefix: "[DM] ",
 		},

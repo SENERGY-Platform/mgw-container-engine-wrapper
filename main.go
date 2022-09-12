@@ -22,9 +22,9 @@ import (
 	"deployment-manager/manager/api/engine"
 	"deployment-manager/manager/handler"
 	"deployment-manager/util"
-	"deployment-manager/util/logger"
 	"fmt"
 	envldr "github.com/y-du/go-env-loader"
+	"github.com/y-du/go-log-level/level"
 	"net/http"
 	"os"
 	"os/signal"
@@ -40,7 +40,7 @@ func main() {
 
 	flags := util.NewFlags()
 	typeParsers := map[reflect.Type]envldr.Parser{
-		reflect.TypeOf(logger.OffLvl): logger.LogLevelParser,
+		reflect.TypeOf(level.Off): util.LogLevelParser,
 	}
 	config, err := util.NewConfig(flags.ConfPath, typeParsers, nil)
 	if err != nil {
@@ -48,20 +48,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger.InitLogger(config.Logger)
+	util.InitLogger(config.Logger)
 
-	dockerHandler, err := handler.NewDocker()
+	util.Logger.Debugf("config: %+v", *config)
+
+	dockerHandler, err := ce_handler.NewDocker()
 	if err != nil {
-		logger.Fatal(err)
+		util.Logger.Fatal(err)
 	}
 
 	dmApi := api.New(dockerHandler)
-	apiEngine := engine.New(config.ApiEngine)
+	apiEngine := engine.New(config.ApiEngine, config.Logger.Level)
 	api.SetRoutes(apiEngine, dmApi)
 
 	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
-		logger.Fatal(err)
+		util.Logger.Fatal(err)
 	}
 	server := http.Server{
 		Handler: apiEngine,
@@ -72,19 +74,19 @@ func main() {
 
 	go func() {
 		sig := <-shutdown
-		logger.WarningF("received signal '%s'", sig)
-		logger.Info("initiating shutdown ...")
+		util.Logger.Warningf("received signal '%s'", sig)
+		util.Logger.Info("initiating shutdown ...")
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := server.Shutdown(ctx); err != nil {
-			logger.Error("server forced to shutdown: ", err)
+			util.Logger.Error("server forced to shutdown: ", err)
 		}
 	}()
 
-	logger.Info("starting server ...")
+	util.Logger.Info("starting server ...")
 	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
-		logger.Fatal("starting server failed: ", err)
+		util.Logger.Fatal("starting server failed: ", err)
 	} else {
-		logger.Info("shutdown complete")
+		util.Logger.Info("shutdown complete")
 	}
 }
