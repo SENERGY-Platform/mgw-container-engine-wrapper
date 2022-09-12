@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package handler
+package ce_handler
 
 import (
 	"github.com/docker/docker/client"

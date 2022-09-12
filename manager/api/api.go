@@ -17,15 +17,15 @@
 package api
 
 import (
-	"deployment-manager/manager/handler"
+	"deployment-manager/manager/ce-handler"
 )
 
 type Api struct {
-	dockerHandler *handler.Docker
+	ceHandler ce_handler.ContainerEngineHandler
 }
 
-func New(dockerHandler *handler.Docker) *Api {
+func New(ceHandler ce_handler.ContainerEngineHandler) *Api {
 	return &Api{
-		dockerHandler: dockerHandler,
+		ceHandler: ceHandler,
 	}
 }
