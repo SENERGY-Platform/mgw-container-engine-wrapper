@@ -21,13 +21,13 @@ import (
 )
 
 type Docker struct {
-	cli *client.Client
+	client *client.Client
 }
 
 func NewDocker() (*Docker, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, err
 	}
-	return &Docker{cli: cli}, nil
+	return &Docker{client: c}, nil
 }
