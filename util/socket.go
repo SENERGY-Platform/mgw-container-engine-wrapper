@@ -40,9 +40,8 @@ func NewUnixListener(path string) (listener *net.UnixListener, err error) {
 	}
 	defer func() {
 		if err != nil {
-			if err = listener.Close(); err != nil {
-				logger.Error(err)
-			}
+			_ = listener.Close()
+			_ = clean(path)
 		}
 	}()
 	if os.Getuid() == 0 {
