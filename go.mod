@@ -6,7 +6,7 @@ require (
 	github.com/docker/docker v20.10.17+incompatible
 	github.com/gin-gonic/gin v1.8.1
 	github.com/y-du/go-env-loader v0.4.0
-	github.com/y-du/go-log-level v0.2.0
+	github.com/y-du/go-log-level v0.2.1
 	gotest.tools/v3 v3.3.0
 )
 
