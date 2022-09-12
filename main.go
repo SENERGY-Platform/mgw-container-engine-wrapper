@@ -20,7 +20,7 @@ import (
 	"context"
 	"deployment-manager/manager/api"
 	"deployment-manager/manager/api/engine"
-	"deployment-manager/manager/handler"
+	"deployment-manager/manager/ce-handler"
 	"deployment-manager/util"
 	"fmt"
 	envldr "github.com/y-du/go-env-loader"
