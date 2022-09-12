@@ -17,7 +17,6 @@
 package util
 
 import (
-	"deployment-manager/util/logger"
 	"net"
 	"os"
 )
