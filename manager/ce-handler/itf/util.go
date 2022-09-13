@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package ce_handler
+package itf
 
-type ContainerEngineHandler interface {
+import "fmt"
+
+func (p Port) String() string {
+	return fmt.Sprintf("%d/%s", p.Number, p.Protocol)
 }

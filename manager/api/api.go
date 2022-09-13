@@ -17,14 +17,14 @@
 package api
 
 import (
-	"deployment-manager/manager/ce-handler"
+	"deployment-manager/manager/ce-handler/itf"
 )
 
 type Api struct {
-	ceHandler ce_handler.ContainerEngineHandler
+	ceHandler itf.ContainerEngineHandler
 }
 
-func New(ceHandler ce_handler.ContainerEngineHandler) *Api {
+func New(ceHandler itf.ContainerEngineHandler) *Api {
 	return &Api{
 		ceHandler: ceHandler,
 	}
