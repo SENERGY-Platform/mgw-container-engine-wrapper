@@ -27,7 +27,7 @@ import (
 
 type Config struct {
 	SocketPath string        `json:"socket_path" env_var:"SOCKET_PATH"`
-	Logger     LoggerConfig  `json:"logger" env_var:"LOGGER_CONFIG"`
+	Logger     LoggerConfig  `json:"logger" env_var:"LOG_CONFIG"`
 	ApiEngine  engine.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
 }
 
@@ -35,9 +35,11 @@ func NewConfig(path *string) (cfg *Config, err error) {
 	cfg = &Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
 		Logger: LoggerConfig{
-			Level:  level.Warning,
-			Utc:    true,
-			Prefix: "[DM] ",
+			Level:    level.Warning,
+			Utc:      true,
+			Prefix:   "[DM] ",
+			Path:     "/var/log/",
+			FileName: "mgw-deployment-manager",
 		},
 	}
 	if path != nil {

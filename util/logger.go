@@ -17,25 +17,49 @@
 package util
 
 import (
+	"fmt"
 	log_level "github.com/y-du/go-log-level"
 	"github.com/y-du/go-log-level/level"
 	"log"
 	"os"
+	"path"
 )
 
 var Logger *log_level.Logger
 
 type LoggerConfig struct {
-	Level  level.Level `json:"level" env_var:"LOGGER_LEVEL"`
-	Utc    bool        `json:"utc" env_var:"LOGGER_UTC"`
-	Prefix string      `json:"prefix" env_var:"LOGGER_PREFIX"`
+	Level    level.Level `json:"level" env_var:"LOG_LEVEL"`
+	Utc      bool        `json:"utc" env_var:"LOG_UTC"`
+	Prefix   string      `json:"prefix" env_var:"LOG_PREFIX"`
+	Path     string      `json:"path" env_var:"LOG_PATH"`
+	FileName string      `json:"file_name" env_var:"LOG_FILE_NAME"`
+	Terminal bool        `json:"terminal" env_var:"LOG_TERMINAL"`
 }
 
-func InitLogger(config LoggerConfig) (err error) {
+type LogFileError struct {
+	msg string
+}
+
+func (e LogFileError) Error() string {
+	return e.msg
+}
+
+func InitLogger(config LoggerConfig) (out *os.File, err error) {
 	flags := log.Ldate | log.Ltime | log.Lmsgprefix
 	if config.Utc {
 		flags = flags | log.LUTC
 	}
-	Logger, err = log_level.New(log.New(os.Stderr, config.Prefix, flags), config.Level)
+	if config.Terminal {
+		out = os.Stderr
+	} else {
+		out, err = os.OpenFile(path.Join(config.Path, fmt.Sprintf("%s.log", config.FileName)), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			err = &LogFileError{
+				msg: err.Error(),
+			}
+			return
+		}
+	}
+	Logger, err = log_level.New(log.New(out, config.Prefix, flags), config.Level)
 	return
 }

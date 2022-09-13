@@ -42,15 +42,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = util.InitLogger(config.Logger); err != nil {
+	logFile, err := util.InitLogger(config.Logger)
+	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
+		var logFileError *util.LogFileError
+		if errors.As(err, &logFileError) {
+			os.Exit(1)
+		}
+	}
+	if logFile != nil {
+		defer logFile.Close()
 	}
 
 	util.Logger.Debugf("config: %+v", *config)
 
 	dockerHandler, err := ce_handler.NewDocker()
 	if err != nil {
-		util.Logger.Fatal(err)
+		util.Logger.Error(err)
+		return
 	}
 
 	dmApi := api.New(dockerHandler)
@@ -59,7 +68,8 @@ func main() {
 
 	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
-		util.Logger.Fatal(err)
+		util.Logger.Error(err)
+		return
 	}
 	server := http.Server{
 		Handler: apiEngine,
@@ -81,7 +91,8 @@ func main() {
 
 	util.Logger.Info("starting server ...")
 	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
-		util.Logger.Fatal("starting server failed: ", err)
+		util.Logger.Error("starting server failed: ", err)
+		return
 	} else {
 		util.Logger.Info("shutdown complete")
 	}
