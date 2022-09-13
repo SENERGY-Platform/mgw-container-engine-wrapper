@@ -22,6 +22,7 @@ import (
 	"deployment-manager/manager/api/engine"
 	"deployment-manager/manager/ce-handler"
 	"deployment-manager/util"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
