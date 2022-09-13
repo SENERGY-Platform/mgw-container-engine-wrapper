@@ -48,11 +48,11 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (*itf.Container, 
 			CreatedAt:   c.Created,
 			StartedAt:   c.State.StartedAt,
 			Hostname:    c.Config.Hostname,
-			Env:         parseContainerEnv(c.Config.Env),
+			Env:         parseContainerEnvVars(c.Config.Env),
 			Mounts:      parseContainerMounts(c.Mounts),
 			Labels:      c.Config.Labels,
 			Ports:       parseContainerPorts(c.Config.ExposedPorts, c.NetworkSettings.Ports),
-			Networks:    parseNetworks(c.NetworkSettings.Networks),
+			Networks:    parseContainerNetworks(c.NetworkSettings.Networks),
 		}, nil
 	}
 }

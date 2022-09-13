@@ -26,7 +26,7 @@ import (
 	"strings"
 )
 
-func parseNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo map[string]itf.NetworkInfo) {
+func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo map[string]itf.NetworkInfo) {
 	if len(endptSettings) > 0 {
 		netInfo = make(map[string]itf.NetworkInfo, len(endptSettings))
 		for _, val := range endptSettings {
@@ -91,7 +91,7 @@ func parseContainerMounts(mountPoints []types.MountPoint) (mounts map[string]itf
 	return
 }
 
-func parseContainerEnv(ev []string) (env map[string]string) {
+func parseContainerEnvVars(ev []string) (env map[string]string) {
 	if len(ev) > 0 {
 		env = make(map[string]string, len(ev))
 		for _, s := range ev {
