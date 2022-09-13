@@ -21,6 +21,7 @@ import (
 )
 
 type ContainerEngineHandler interface {
+	ListContainers(ctx context.Context, filter map[string]string) (map[string]*Container, error)
 	ContainerInfo(ctx context.Context, id string) (*Container, error)
 	ImageInfo(ctx context.Context, id string) (*Image, error)
 }
