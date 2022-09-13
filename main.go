@@ -20,7 +20,7 @@ import (
 	"context"
 	"deployment-manager/manager/api"
 	"deployment-manager/manager/api/engine"
-	"deployment-manager/manager/ce-handler"
+	"deployment-manager/manager/ce-handler/docker"
 	"deployment-manager/util"
 	"errors"
 	"fmt"
@@ -57,7 +57,7 @@ func main() {
 
 	util.Logger.Debugf("config: %+v", *config)
 
-	dockerHandler, err := ce_handler.NewDocker()
+	dockerHandler, err := docker.New()
 	if err != nil {
 		util.Logger.Error(err)
 		return
