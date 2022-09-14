@@ -54,7 +54,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter map[string]string) (
 				ID:       c.ID,
 				ImageID:  c.ImageID,
 				Image:    c.Image,
-				Status:   c.State,
+				State:    stateMap[c.State],
 				Mounts:   parseContainerMounts(c.Mounts),
 				Labels:   c.Labels,
 				Networks: parseContainerNetworks(c.NetworkSettings.Networks),
@@ -63,9 +63,9 @@ func (d *Docker) ListContainers(ctx context.Context, filter map[string]string) (
 				util.Logger.Error(err)
 			} else {
 				container.Name = ci.Name
-				container.StartPolicy = ci.HostConfig.RestartPolicy.Name
-				container.CreatedAt = ci.Created
-				container.StartedAt = ci.State.StartedAt
+				container.RestartConfig = parseRestartPolicy(ci.HostConfig.RestartPolicy)
+				container.Created = ci.Created
+				container.Started = ci.State.StartedAt
 				container.Hostname = ci.Config.Hostname
 				container.Env = parseContainerEnvVars(ci.Config.Env)
 				container.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
@@ -82,20 +82,20 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (*itf.Container, 
 		return nil, err
 	} else {
 		return &itf.Container{
-			ID:          c.ID,
-			Name:        c.Name,
-			ImageID:     c.Image,
-			Image:       c.Config.Image,
-			Status:      c.State.Status,
-			StartPolicy: c.HostConfig.RestartPolicy.Name,
-			CreatedAt:   c.Created,
-			StartedAt:   c.State.StartedAt,
-			Hostname:    c.Config.Hostname,
-			Env:         parseContainerEnvVars(c.Config.Env),
-			Mounts:      parseContainerMounts(c.Mounts),
-			Labels:      c.Config.Labels,
-			Ports:       parseContainerPorts(c.Config.ExposedPorts, c.NetworkSettings.Ports),
-			Networks:    parseContainerNetworks(c.NetworkSettings.Networks),
+			ID:            c.ID,
+			Name:          c.Name,
+			ImageID:       c.Image,
+			Image:         c.Config.Image,
+			State:         stateMap[c.State.Status],
+			RestartConfig: parseRestartPolicy(c.HostConfig.RestartPolicy),
+			Created:       c.Created,
+			Started:       c.State.StartedAt,
+			Hostname:      c.Config.Hostname,
+			Env:           parseContainerEnvVars(c.Config.Env),
+			Mounts:        parseContainerMounts(c.Mounts),
+			Labels:        c.Config.Labels,
+			Ports:         parseContainerPorts(c.Config.ExposedPorts, c.NetworkSettings.Ports),
+			Networks:      parseContainerNetworks(c.NetworkSettings.Networks),
 		}, nil
 	}
 }
