@@ -55,7 +55,7 @@ func main() {
 		defer logFile.Close()
 	}
 
-	util.Logger.Debugf("config: %+v", *config)
+	util.Logger.Debugf("config: %+v", util.ToJsonStr(config))
 
 	dockerHandler, err := docker.New()
 	if err != nil {

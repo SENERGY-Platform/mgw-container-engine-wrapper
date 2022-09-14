@@ -17,6 +17,7 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -38,4 +39,13 @@ func PrintInfo(items ...string) {
 		}
 	}
 	_, _ = fmt.Fprintln(os.Stderr, line)
+}
+
+func ToJsonStr(v any) (str string) {
+	if b, err := json.Marshal(v); err != nil {
+		str = err.Error()
+	} else {
+		str = string(b)
+	}
+	return
 }
