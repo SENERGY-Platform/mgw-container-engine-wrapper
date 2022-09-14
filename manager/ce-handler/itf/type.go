@@ -67,19 +67,26 @@ type Mount struct {
 	Mode   string `json:"mode"`
 }
 
+type RestartStrategy int
+
+type RestartConfig struct {
+	Strategy RestartStrategy `json:"strategy"`
+	Retries  int             `json:"retries"`
+}
+
 type Container struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	ImageID     string                 `json:"image_id"`
-	Image       string                 `json:"image"`
-	Status      string                 `json:"status"`
-	StartPolicy string                 `json:"start_policy"`
-	CreatedAt   string                 `json:"created_at"`
-	StartedAt   string                 `json:"started_at"`
-	Hostname    string                 `json:"hostname"`
-	Env         map[string]string      `json:"env"`
-	Mounts      map[string]Mount       `json:"mounts"`
-	Labels      map[string]string      `json:"labels"`
-	Ports       map[string]Port        `json:"ports"`
-	Networks    map[string]NetworkInfo `json:"networks"`
+	ID            string                 `json:"id"`
+	Name          string                 `json:"name"`
+	ImageID       string                 `json:"image_id"`
+	Image         string                 `json:"image"`
+	State         string                 `json:"state"`
+	RestartConfig RestartConfig          `json:"restart_config"`
+	Created       string                 `json:"created"`
+	Started       string                 `json:"started"`
+	Hostname      string                 `json:"hostname"`
+	Env           map[string]string      `json:"env"`
+	Mounts        map[string]Mount       `json:"mounts"`
+	Labels        map[string]string      `json:"labels"`
+	Ports         map[string]Port        `json:"ports"`
+	Networks      map[string]NetworkInfo `json:"networks"`
 }

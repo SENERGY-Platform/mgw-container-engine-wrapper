@@ -16,8 +16,34 @@
 
 package itf
 
-import "fmt"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+)
 
 func (p Port) String() string {
 	return fmt.Sprintf("%d/%s", p.Number, p.Protocol)
+}
+
+func ParseRestartStrategy(v string) (RestartStrategy, error) {
+	for i := 0; i < len(restartStrategyStr); i++ {
+		if restartStrategyStr[i] == v {
+			return RestartStrategy(i), nil
+		}
+	}
+	return 0, errors.New(fmt.Sprintf("unknown restart strategy '%s'", v))
+}
+
+func (s RestartStrategy) MarshalJSON() ([]byte, error) {
+	return json.Marshal(restartStrategyStr[s])
+}
+
+func (s *RestartStrategy) UnmarshalJSON(data []byte) (err error) {
+	var v string
+	if err = json.Unmarshal(data, &v); err != nil {
+		return
+	}
+	*s, err = ParseRestartStrategy(v)
+	return
 }
