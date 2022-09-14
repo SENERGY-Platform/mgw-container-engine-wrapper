@@ -20,6 +20,7 @@ import (
 	"deployment-manager/manager/ce-handler/itf"
 	"deployment-manager/util"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
 	"strconv"
@@ -100,4 +101,11 @@ func parseContainerEnvVars(ev []string) (env map[string]string) {
 		}
 	}
 	return
+}
+
+func parseRestartPolicy(rp container.RestartPolicy) itf.RestartConfig {
+	return itf.RestartConfig{
+		Strategy: restartPolicyMap[rp.Name],
+		Retries:  rp.MaximumRetryCount,
+	}
 }
