@@ -37,7 +37,7 @@ func New() (*Docker, error) {
 	return &Docker{client: c}, nil
 }
 
-func (d *Docker) GetDockerInfo(ctx context.Context) (map[string]string, error) {
+func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	srvVer, err := d.client.ServerVersion(ctx)
 	if err != nil {
 		return nil, err

@@ -62,7 +62,7 @@ func main() {
 		util.Logger.Error(err)
 		return
 	}
-	dockerInfo, err := dockerHandler.GetDockerInfo(context.Background())
+	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
 		util.Logger.Error(err)
 		return
