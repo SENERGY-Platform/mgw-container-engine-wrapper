@@ -37,15 +37,15 @@ func New() (*Docker, error) {
 	return &Docker{client: c}, nil
 }
 
-func (d *Docker) ListContainers(ctx context.Context, filter map[string]string) (map[string]*itf.Container, error) {
+func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[string]*itf.Container, error) {
 	var f filters.Args
 	if filter != nil && len(filter) > 0 {
 		f = filters.NewArgs()
-		for k, v := range filter {
-			f.Add(k, v)
+		for _, i := range filter {
+			f.Add(i[0], i[1])
 		}
 	}
-	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{Filters: f}); err != nil {
+	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: f}); err != nil {
 		return nil, err
 	} else {
 		cm := make(map[string]*itf.Container, len(cl))
