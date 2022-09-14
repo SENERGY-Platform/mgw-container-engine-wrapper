@@ -93,8 +93,8 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/ugorji/go v1.2.7/go.mod h1:nF9osbDWLy6bDVv/Rtoh6QgnvNDpmCalQV5urGCCS6M=
 github.com/ugorji/go/codec v1.2.7 h1:YPXUKf7fYbp/y8xloBqZOw2qaVggbfwMlI8WM3wZUJ0=
 github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95kRgeqEY=
-github.com/y-du/go-env-loader v0.4.0 h1:GFkwSwFXeHqCPxLaso3YsF6uZuvWHYFYIFMiTt1rphk=
-github.com/y-du/go-env-loader v0.4.0/go.mod h1:SpA7QyUc4hztbbZ8INg/RP3saTEbHHhsNlR0Jmxu/rc=
+github.com/y-du/go-env-loader v0.5.0 h1:qyjwYYsHj6nlYUWaPSW/PzyoOB2QwyL21JP2rt6MkBc=
+github.com/y-du/go-env-loader v0.5.0/go.mod h1:SpA7QyUc4hztbbZ8INg/RP3saTEbHHhsNlR0Jmxu/rc=
 github.com/y-du/go-log-level v0.2.1 h1:B9FvQRHL4rEfGt89Z8MWw9DLkbzTXvT1cEPoQZr7rOk=
 github.com/y-du/go-log-level v0.2.1/go.mod h1:h0g0vjThWO1jNO3x8/t/hRc6KY7TYcuwbi5FzrS7ots=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
