@@ -64,7 +64,7 @@ func main() {
 	}
 
 	dmApi := api.New(dockerHandler)
-	apiEngine := engine.New(config.ApiEngine, config.Logger.Level)
+	apiEngine := engine.New(config.ApiEngine, config.Logger.Level, logFile)
 	api.SetRoutes(apiEngine, dmApi)
 
 	listener, err := util.NewUnixListener(config.SocketPath)
