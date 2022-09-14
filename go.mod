@@ -7,7 +7,7 @@ require (
 	github.com/docker/go-connections v0.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/y-du/go-env-loader v0.5.0
-	github.com/y-du/go-log-level v0.2.1
+	github.com/y-du/go-log-level v0.2.2
 	gotest.tools/v3 v3.3.0
 )
 
