@@ -53,7 +53,7 @@ func NewConfig(path *string) (cfg *Config, err error) {
 			return
 		}
 	}
-	err = envldr.LoadEnvUserParser(cfg, typeParsers, nil)
+	err = envldr.LoadEnvUserParser(cfg, nil, typeParsers, nil)
 	return cfg, err
 }
 
