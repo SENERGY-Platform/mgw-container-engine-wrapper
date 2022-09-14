@@ -62,6 +62,12 @@ func main() {
 		util.Logger.Error(err)
 		return
 	}
+	dockerInfo, err := dockerHandler.GetDockerInfo(context.Background())
+	if err != nil {
+		util.Logger.Error(err)
+		return
+	}
+	util.Logger.Debugf("docker: %s", util.ToJsonStr(dockerInfo))
 
 	dmApi := api.New(dockerHandler)
 	apiEngine := engine.New(config.ApiEngine, config.Logger.Level, logFile)
