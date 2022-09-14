@@ -37,6 +37,18 @@ func New() (*Docker, error) {
 	return &Docker{client: c}, nil
 }
 
+func (d *Docker) GetDockerInfo(ctx context.Context) (map[string]string, error) {
+	srvVer, err := d.client.ServerVersion(ctx)
+	if err != nil {
+		return nil, err
+	}
+	info := make(map[string]string, len(srvVer.Components))
+	for i := 0; i < len(srvVer.Components); i++ {
+		info[srvVer.Components[i].Name] = srvVer.Components[i].Version
+	}
+	return info, nil
+}
+
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[string]*itf.Container, error) {
 	var f filters.Args
 	if filter != nil && len(filter) > 0 {
