@@ -17,22 +17,33 @@
 package itf
 
 const (
-	RunningState   = "running"
-	StoppedState   = "stopped"
-	UnhealthyState = "unhealthy"
-	UnknownState   = "unknown"
+	TcpPort  PortType = "tcp"
+	UdpPort  PortType = "udp"
+	SctpPort PortType = "sctp"
 )
 
 const (
-	RestartNever RestartStrategy = iota
-	RestartAlways
-	RestartNotStopped
-	RestartOnFail
+	BridgeNet  NetworkType = "bridge"
+	MACVlanNet NetworkType = "macvlan"
+	HostNet    NetworkType = "host"
 )
 
-var restartStrategyStr = []string{
-	"never",
-	"always",
-	"not-stopped",
-	"on-fail",
-}
+const (
+	RunningState   ContainerState = "running"
+	StoppedState   ContainerState = "stopped"
+	UnhealthyState ContainerState = "unhealthy"
+	UnknownState   ContainerState = "unknown"
+)
+
+const (
+	RestartNever      RestartStrategy = "never"
+	RestartAlways     RestartStrategy = "always"
+	RestartNotStopped RestartStrategy = "not-stopped"
+	RestartOnFail     RestartStrategy = "on-fail"
+)
+
+const (
+	BindMount   MountType = "bind"
+	VolumeMount MountType = "volume"
+	TmpfsMount  MountType = "tmpfs"
+)

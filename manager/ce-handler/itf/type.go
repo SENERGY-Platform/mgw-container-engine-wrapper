@@ -18,6 +18,7 @@ package itf
 
 import (
 	"context"
+	"io/fs"
 )
 
 type ContainerEngineHandler interface {
@@ -25,6 +26,7 @@ type ContainerEngineHandler interface {
 	ContainerCreate(ctx context.Context) (id string, err error)
 	ContainerInfo(ctx context.Context, id string) (*Container, error)
 	ImageInfo(ctx context.Context, id string) (*Image, error)
+	Dummy(ctx context.Context) (interface{}, error)
 }
 
 type Image struct {
@@ -36,15 +38,19 @@ type Image struct {
 	Digests []string `json:"digests"`
 }
 
+type NetworkType string
+
 type Network struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
+	ID   string      `json:"id"`
+	Name string      `json:"name"`
+	Type NetworkType `json:"type"`
 }
 
+type PortType string
+
 type Port struct {
-	Number   int    `json:"number"`
-	Protocol string `json:"protocol"`
+	Number   int      `json:"number"`
+	Protocol PortType `json:"protocol"`
 	Bindings []PortBinding
 }
 
@@ -54,40 +60,46 @@ type PortBinding struct {
 }
 
 type NetworkInfo struct {
-	NetworkID   string   `json:"network_id"`
+	Network     Network  `json:"network"`
 	IPAddress   string   `json:"ip_address"`
 	Gateway     string   `json:"gateway"`
 	DomainNames []string `json:"domain_names"`
 	MacAddress  string   `json:"mac_address"`
 }
 
+type MountType string
+
 type Mount struct {
-	Type     string `json:"type"`
-	Source   string `json:"source"`
-	Target   string `json:"target"`
-	ReadOnly bool   `json:"read_only"`
+	Type     MountType         `json:"type"`
+	Source   string            `json:"source"`
+	Target   string            `json:"target"`
+	ReadOnly bool              `json:"read_only"`
+	Labels   map[string]string `json:"labels,omitempty"`
+	Size     int64             `json:"size,omitempty"`
+	Mode     fs.FileMode       `json:"mode,omitempty"`
 }
 
-type RestartStrategy int
+type RestartStrategy string
 
 type RestartConfig struct {
 	Strategy RestartStrategy `json:"strategy"`
 	Retries  int             `json:"retries"`
 }
 
+type ContainerState string
+
 type Container struct {
-	ID            string                 `json:"id"`
-	Name          string                 `json:"name"`
-	ImageID       string                 `json:"image_id"`
-	Image         string                 `json:"image"`
-	State         string                 `json:"state"`
-	RestartConfig RestartConfig          `json:"restart_config"`
-	Created       string                 `json:"created"`
-	Started       string                 `json:"started"`
-	Hostname      string                 `json:"hostname"`
-	Env           map[string]string      `json:"env"`
-	Mounts        map[string]Mount       `json:"mounts"`
-	Labels        map[string]string      `json:"labels"`
-	Ports         map[string]Port        `json:"ports"`
-	Networks      map[string]NetworkInfo `json:"networks"`
+	ID            string            `json:"id"`
+	Name          string            `json:"name"`
+	ImageID       string            `json:"image_id"`
+	State         ContainerState    `json:"state"`
+	RestartConfig RestartConfig     `json:"restart_config"`
+	Created       string            `json:"created"`
+	Started       string            `json:"started"`
+	Hostname      string            `json:"hostname"`
+	Env           map[string]string `json:"env"`
+	Mounts        []Mount           `json:"mounts"`
+	Labels        map[string]string `json:"labels"`
+	Ports         []Port            `json:"ports"`
+	Networks      []NetworkInfo     `json:"networks"`
 }
