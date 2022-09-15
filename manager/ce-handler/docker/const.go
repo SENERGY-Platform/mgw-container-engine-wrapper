@@ -16,9 +16,12 @@
 
 package docker
 
-import "deployment-manager/manager/ce-handler/itf"
+import (
+	"deployment-manager/manager/ce-handler/itf"
+	"github.com/docker/docker/api/types/mount"
+)
 
-var stateMap = map[string]string{
+var stateMap = map[string]itf.ContainerState{
 	"created":    itf.UnknownState,
 	"running":    itf.RunningState,
 	"paused":     itf.UnknownState,
@@ -33,4 +36,16 @@ var restartPolicyMap = map[string]itf.RestartStrategy{
 	"on-failure":     itf.RestartOnFail,
 	"always":         itf.RestartAlways,
 	"unless-stopped": itf.RestartNotStopped,
+}
+
+var mountTypeMap = map[mount.Type]itf.MountType{
+	mount.TypeBind:   itf.BindMount,
+	mount.TypeVolume: itf.VolumeMount,
+	mount.TypeTmpfs:  itf.TmpfsMount,
+}
+
+var portTypeMap = map[string]itf.PortType{
+	"tcp":  itf.TcpPort,
+	"udp":  itf.UdpPort,
+	"sctp": itf.SctpPort,
 }
