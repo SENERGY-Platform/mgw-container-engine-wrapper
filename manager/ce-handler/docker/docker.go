@@ -62,7 +62,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[st
 	} else {
 		cm := make(map[string]*itf.Container, len(cl))
 		for _, c := range cl {
-			container := &itf.Container{
+			ctr := &itf.Container{
 				ID:       c.ID,
 				ImageID:  c.ImageID,
 				Image:    c.Image,
@@ -74,16 +74,16 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[st
 			if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
 				util.Logger.Error(err)
 			} else {
-				container.Name = ci.Name
-				container.RestartConfig = parseRestartPolicy(ci.HostConfig.RestartPolicy)
-				container.Created = ci.Created
-				container.Started = ci.State.StartedAt
-				container.Hostname = ci.Config.Hostname
-				container.Env = parseContainerEnvVars(ci.Config.Env)
-				container.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
-				container.Ports = parseContainerPorts(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
+				ctr.Name = ci.Name
+				ctr.RestartConfig = parseRestartPolicy(ci.HostConfig.RestartPolicy)
+				ctr.Created = ci.Created
+				ctr.Started = ci.State.StartedAt
+				ctr.Hostname = ci.Config.Hostname
+				ctr.Env = parseContainerEnvVars(ci.Config.Env)
+				ctr.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
+				ctr.Ports = parseContainerPorts(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
 			}
-			cm[c.ID] = container
+			cm[c.ID] = ctr
 		}
 		return cm, nil
 	}
