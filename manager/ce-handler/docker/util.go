@@ -81,10 +81,10 @@ func parseContainerMounts(mountPoints []types.MountPoint) (mounts map[string]itf
 		mounts = make(map[string]itf.Mount, len(mountPoints))
 		for _, mp := range mountPoints {
 			m := itf.Mount{
-				Type:   string(mp.Type),
-				Source: mp.Source,
-				Target: mp.Destination,
-				Mode:   mp.Mode,
+				Type:     string(mp.Type),
+				Source:   mp.Source,
+				Target:   mp.Destination,
+				ReadOnly: !mp.RW,
 			}
 			mounts[m.Target] = m
 		}

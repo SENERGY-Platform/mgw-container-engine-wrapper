@@ -61,10 +61,10 @@ type NetworkInfo struct {
 }
 
 type Mount struct {
-	Type   string `json:"type"`
-	Source string `json:"source"`
-	Target string `json:"target"`
-	Mode   string `json:"mode"`
+	Type     string `json:"type"`
+	Source   string `json:"source"`
+	Target   string `json:"target"`
+	ReadOnly bool   `json:"read_only"`
 }
 
 type RestartStrategy int
