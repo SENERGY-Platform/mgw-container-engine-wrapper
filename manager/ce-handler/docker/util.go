@@ -27,29 +27,31 @@ import (
 	"strings"
 )
 
-func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo map[string]itf.NetworkInfo) {
+func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.NetworkInfo) {
 	if len(endptSettings) > 0 {
-		netInfo = make(map[string]itf.NetworkInfo, len(endptSettings))
-		for _, val := range endptSettings {
-			netInfo[val.NetworkID] = itf.NetworkInfo{
-				NetworkID:   val.NetworkID,
+		for key, val := range endptSettings {
+			netInfo = append(netInfo, itf.NetworkInfo{
+				Network: itf.Network{
+					ID:   val.NetworkID,
+					Name: key,
+				},
 				IPAddress:   val.IPAddress,
 				Gateway:     val.Gateway,
 				DomainNames: val.Aliases,
 				MacAddress:  val.MacAddress,
-			}
+			})
 		}
 	}
 	return
 }
 
-func parseContainerPorts(portSet nat.PortSet, portMap nat.PortMap) (ports map[string]itf.Port) {
+func parseContainerPorts(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.Port) {
 	if len(portSet) > 0 || len(portMap) > 0 {
-		ports = make(map[string]itf.Port, len(portSet))
+		set := make(map[string]struct{})
 		for port, bindings := range portMap {
 			p := itf.Port{
 				Number:   port.Int(),
-				Protocol: port.Proto(),
+				Protocol: portTypeMap[port.Proto()],
 			}
 			for _, binding := range bindings {
 				num, err := strconv.ParseInt(binding.HostPort, 10, 0)
@@ -61,32 +63,32 @@ func parseContainerPorts(portSet nat.PortSet, portMap nat.PortMap) (ports map[st
 					Interface: binding.HostIP,
 				})
 			}
-			ports[p.String()] = p
+			ports = append(ports, p)
+			set[p.String()] = struct{}{}
 		}
 		for port, _ := range portSet {
-			if _, ok := ports[string(port)]; !ok {
-				p := itf.Port{
+			if _, ok := set[string(port)]; !ok {
+				ports = append(ports, itf.Port{
 					Number:   port.Int(),
-					Protocol: port.Proto(),
-				}
-				ports[p.String()] = p
+					Protocol: portTypeMap[port.Proto()],
+				})
 			}
 		}
 	}
 	return
 }
 
-func parseContainerMounts(mountPoints []types.MountPoint) (mounts map[string]itf.Mount) {
+func parseContainerMounts(mountPoints []types.MountPoint) (mounts []itf.Mount) {
 	if len(mountPoints) > 0 {
-		mounts = make(map[string]itf.Mount, len(mountPoints))
 		for _, mp := range mountPoints {
-			m := itf.Mount{
-				Type:     string(mp.Type),
-				Source:   mp.Source,
-				Target:   mp.Destination,
-				ReadOnly: !mp.RW,
+			if mType, ok := mountTypeMap[mp.Type]; ok {
+				mounts = append(mounts, itf.Mount{
+					Type:     mType,
+					Source:   mp.Source,
+					Target:   mp.Destination,
+					ReadOnly: !mp.RW,
+				})
 			}
-			mounts[m.Target] = m
 		}
 	}
 	return
