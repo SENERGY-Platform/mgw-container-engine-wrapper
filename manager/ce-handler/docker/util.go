@@ -17,7 +17,7 @@
 package docker
 
 import (
-	"deployment-manager/manager/ce-handler/itf"
+	"deployment-manager/manager/itf"
 	"deployment-manager/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"

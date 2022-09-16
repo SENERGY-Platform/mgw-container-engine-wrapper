@@ -18,7 +18,7 @@ package docker
 
 import (
 	"context"
-	"deployment-manager/manager/ce-handler/itf"
+	"deployment-manager/manager/itf"
 	"deployment-manager/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -49,7 +49,7 @@ func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	return info, nil
 }
 
-func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[string]*itf.Container, error) {
+func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
 	var f filters.Args
 	if filter != nil && len(filter) > 0 {
 		f = filters.NewArgs()
@@ -60,9 +60,9 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[st
 	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: f}); err != nil {
 		return nil, err
 	} else {
-		cm := make(map[string]*itf.Container, len(cl))
+		var csl []itf.Container
 		for _, c := range cl {
-			ctr := &itf.Container{
+			ctr := itf.Container{
 				ID:      c.ID,
 				State:   stateMap[c.State],
 				ImageID: c.ImageID,
@@ -87,17 +87,18 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[st
 					StopTimeout:     parseStopTimeout(ci.Config.StopTimeout),
 				}
 			}
-			cm[c.ID] = ctr
+			csl = append(csl, ctr)
 		}
-		return cm, nil
+		return csl, nil
 	}
 }
 
-func (d *Docker) ContainerInfo(ctx context.Context, id string) (*itf.Container, error) {
+func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, error) {
+	var ctr itf.Container
 	if c, err := d.client.ContainerInspect(ctx, id); err != nil {
-		return nil, err
+		return ctr, err
 	} else {
-		return &itf.Container{
+		ctr = itf.Container{
 			ID:       c.ID,
 			Name:     c.Name,
 			State:    stateMap[c.State.Status],
@@ -116,21 +117,24 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (*itf.Container, 
 				RemoveAfterRun:  c.HostConfig.AutoRemove,
 				StopTimeout:     parseStopTimeout(c.Config.StopTimeout),
 			},
-		}, nil
+		}
 	}
+	return ctr, nil
 }
 
-func (d *Docker) ImageInfo(ctx context.Context, id string) (*itf.Image, error) {
+func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
+	var img itf.Image
 	if i, _, err := d.client.ImageInspectWithRaw(ctx, id); err != nil {
-		return nil, err
+		return img, err
 	} else {
-		return &itf.Image{
+		img = itf.Image{
 			ID:      i.ID,
 			Created: i.Created,
 			Size:    i.Size,
 			Arch:    i.Architecture,
 			Tags:    i.RepoTags,
 			Digests: i.RepoDigests,
-		}, nil
+		}
 	}
+	return img, nil
 }

@@ -23,11 +23,10 @@ import (
 )
 
 type ContainerEngineHandler interface {
-	ListContainers(ctx context.Context, filter [][2]string) (map[string]*Container, error)
+	ListContainers(ctx context.Context, filter [][2]string) ([]Container, error)
 	ContainerCreate(ctx context.Context, ctrConf Container) (id string, err error)
-	ContainerInfo(ctx context.Context, id string) (*Container, error)
-	ImageInfo(ctx context.Context, id string) (*Image, error)
-	Dummy(ctx context.Context) (interface{}, error)
+	ContainerInfo(ctx context.Context, id string) (Container, error)
+	ImageInfo(ctx context.Context, id string) (Image, error)
 }
 
 type Image struct {
