@@ -64,22 +64,28 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[st
 		for _, c := range cl {
 			ctr := &itf.Container{
 				ID:      c.ID,
-				ImageID: c.ImageID,
 				State:   stateMap[c.State],
-				Mounts:  parseContainerMounts(c.Mounts),
+				ImageID: c.ImageID,
 				Labels:  c.Labels,
+				Mounts:  parseContainerMounts(c.Mounts),
 			}
 			if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
 				util.Logger.Error(err)
 			} else {
+
 				ctr.Name = ci.Name
-				ctr.Image = ci.Config.Image
-				ctr.RestartConfig = parseRestartPolicy(ci.HostConfig.RestartPolicy)
 				ctr.Created = ci.Created
 				ctr.Started = ci.State.StartedAt
-				ctr.Env = parseContainerEnvVars(ci.Config.Env)
-				ctr.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
+				ctr.Image = ci.Config.Image
+				ctr.EnvVars = parseContainerEnvVars(ci.Config.Env)
 				ctr.Ports = parseContainerPorts(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
+				ctr.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
+				ctr.RunConfig = itf.RunConfig{
+					RestartStrategy: restartPolicyMap[ci.HostConfig.RestartPolicy.Name],
+					Retries:         ci.HostConfig.RestartPolicy.MaximumRetryCount,
+					RemoveAfterRun:  ci.HostConfig.AutoRemove,
+					StopTimeout:     parseStopTimeout(ci.Config.StopTimeout),
+				}
 			}
 			cm[c.ID] = ctr
 		}
@@ -92,19 +98,24 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (*itf.Container, 
 		return nil, err
 	} else {
 		return &itf.Container{
-			ID:            c.ID,
-			Name:          c.Name,
-			Image:         c.Config.Image,
-			ImageID:       c.Image,
-			State:         stateMap[c.State.Status],
-			RestartConfig: parseRestartPolicy(c.HostConfig.RestartPolicy),
-			Created:       c.Created,
-			Started:       c.State.StartedAt,
-			Env:           parseContainerEnvVars(c.Config.Env),
-			Mounts:        parseContainerMounts(c.Mounts),
-			Labels:        c.Config.Labels,
-			Ports:         parseContainerPorts(c.Config.ExposedPorts, c.NetworkSettings.Ports),
-			Networks:      parseContainerNetworks(c.NetworkSettings.Networks),
+			ID:       c.ID,
+			Name:     c.Name,
+			State:    stateMap[c.State.Status],
+			Created:  c.Created,
+			Started:  c.State.StartedAt,
+			Image:    c.Config.Image,
+			ImageID:  c.Image,
+			EnvVars:  parseContainerEnvVars(c.Config.Env),
+			Labels:   c.Config.Labels,
+			Mounts:   parseContainerMounts(c.Mounts),
+			Ports:    parseContainerPorts(c.Config.ExposedPorts, c.NetworkSettings.Ports),
+			Networks: parseContainerNetworks(c.NetworkSettings.Networks),
+			RunConfig: itf.RunConfig{
+				RestartStrategy: restartPolicyMap[c.HostConfig.RestartPolicy.Name],
+				Retries:         c.HostConfig.RestartPolicy.MaximumRetryCount,
+				RemoveAfterRun:  c.HostConfig.AutoRemove,
+				StopTimeout:     parseStopTimeout(c.Config.StopTimeout),
+			},
 		}, nil
 	}
 }
