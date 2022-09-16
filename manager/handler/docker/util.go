@@ -62,7 +62,7 @@ func parseContainerPorts(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.
 				})
 			}
 			ports = append(ports, p)
-			set[p.String()] = struct{}{}
+			set[p.KeyStr()] = struct{}{}
 		}
 		for port, _ := range portSet {
 			if _, ok := set[string(port)]; !ok {

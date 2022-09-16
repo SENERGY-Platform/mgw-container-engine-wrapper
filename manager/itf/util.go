@@ -20,10 +20,10 @@ import (
 	"fmt"
 )
 
-func (p Port) String() string {
+func (p Port) KeyStr() string {
 	return fmt.Sprintf("%d/%s", p.Number, p.Protocol)
 }
 
-func (m Mount) String() string {
+func (m Mount) KeyStr() string {
 	return fmt.Sprintf("%s:%s", m.Source, m.Target)
 }
