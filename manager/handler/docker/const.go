@@ -38,14 +38,38 @@ var restartPolicyMap = map[string]itf.RestartStrategy{
 	"unless-stopped": itf.RestartNotStopped,
 }
 
+var restartPolicyRMap = func() map[itf.RestartStrategy]string {
+	m := make(map[itf.RestartStrategy]string)
+	for k, v := range restartPolicyMap {
+		m[v] = k
+	}
+	return m
+}()
+
 var mountTypeMap = map[mount.Type]itf.MountType{
 	mount.TypeBind:   itf.BindMount,
 	mount.TypeVolume: itf.VolumeMount,
 	mount.TypeTmpfs:  itf.TmpfsMount,
 }
 
+var mountTypeRMap = func() map[itf.MountType]mount.Type {
+	m := make(map[itf.MountType]mount.Type)
+	for k, v := range mountTypeMap {
+		m[v] = k
+	}
+	return m
+}()
+
 var portTypeMap = map[string]itf.PortType{
 	"tcp":  itf.TcpPort,
 	"udp":  itf.UdpPort,
 	"sctp": itf.SctpPort,
 }
+
+var portTypeRMap = func() map[itf.PortType]string {
+	m := make(map[itf.PortType]string)
+	for k, v := range portTypeMap {
+		m[v] = k
+	}
+	return m
+}()
