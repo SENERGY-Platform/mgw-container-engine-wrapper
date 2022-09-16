@@ -83,19 +83,19 @@ type RunConfig struct {
 type ContainerState string
 
 type Container struct {
-	ID          string            `json:"id"`
-	Name        string            `json:"name"`
-	State       ContainerState    `json:"state"`
-	Created     string            `json:"created"`
-	Started     string            `json:"started"`
-	Image       string            `json:"image"`
-	ImageID     string            `json:"image_id"`
-	Environment map[string]string `json:"environment"`
-	Labels      map[string]string `json:"labels"`
-	Mounts      []Mount           `json:"mounts"`
-	Ports       []Port            `json:"ports"`
-	Networks    []ContainerNet    `json:"networks"`
-	RunConfig   RunConfig         `json:"run_config"`
+	ID        string            `json:"id"`
+	Name      string            `json:"name"`
+	State     ContainerState    `json:"state"`
+	Created   string            `json:"created"`
+	Started   string            `json:"started"`
+	Image     string            `json:"image"`
+	ImageID   string            `json:"image_id"`
+	EnvVars   map[string]string `json:"env_vars"`
+	Labels    map[string]string `json:"labels"`
+	Mounts    []Mount           `json:"mounts"`
+	Ports     []Port            `json:"ports"`
+	Networks  []ContainerNet    `json:"networks"`
+	RunConfig RunConfig         `json:"run_config"`
 }
 
 type ContainerNet struct {
