@@ -20,11 +20,11 @@ import (
 	"deployment-manager/manager/ce-handler/itf"
 	"deployment-manager/util"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
@@ -103,9 +103,10 @@ func parseContainerEnvVars(ev []string) (env map[string]string) {
 	return
 }
 
-func parseRestartPolicy(rp container.RestartPolicy) itf.RestartConfig {
-	return itf.RestartConfig{
-		Strategy: restartPolicyMap[rp.Name],
-		Retries:  rp.MaximumRetryCount,
+func parseStopTimeout(t *int) *time.Duration {
+	if t != nil {
+		d := time.Duration(*t * int(time.Second))
+		return &d
 	}
+	return nil
 }
