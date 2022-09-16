@@ -20,7 +20,7 @@ import (
 	"context"
 	"deployment-manager/manager/api"
 	"deployment-manager/manager/api/engine"
-	"deployment-manager/manager/ce-handler/docker"
+	"deployment-manager/manager/handler/docker"
 	"deployment-manager/util"
 	"errors"
 	"fmt"
