@@ -59,14 +59,6 @@ type PortBinding struct {
 	Interface string `json:"interface"`
 }
 
-type NetworkInfo struct {
-	Network     Network  `json:"network"`
-	IPAddress   string   `json:"ip_address"`
-	Gateway     string   `json:"gateway"`
-	DomainNames []string `json:"domain_names"`
-	MacAddress  string   `json:"mac_address"`
-}
-
 type MountType string
 
 type Mount struct {
@@ -91,15 +83,24 @@ type ContainerState string
 type Container struct {
 	ID            string            `json:"id"`
 	Name          string            `json:"name"`
+	Image         string            `json:"image"`
 	ImageID       string            `json:"image_id"`
 	State         ContainerState    `json:"state"`
 	RestartConfig RestartConfig     `json:"restart_config"`
 	Created       string            `json:"created"`
 	Started       string            `json:"started"`
-	Hostname      string            `json:"hostname"`
 	Env           map[string]string `json:"env"`
 	Mounts        []Mount           `json:"mounts"`
 	Labels        map[string]string `json:"labels"`
 	Ports         []Port            `json:"ports"`
-	Networks      []NetworkInfo     `json:"networks"`
+	Networks      []ContainerNet    `json:"networks"`
+}
+
+type ContainerNet struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	IPAddress   string   `json:"ip_address"`
+	Gateway     string   `json:"gateway"`
+	DomainNames []string `json:"domain_names"`
+	MacAddress  string   `json:"mac_address"`
 }

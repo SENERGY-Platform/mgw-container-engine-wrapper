@@ -63,21 +63,20 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) (map[st
 		cm := make(map[string]*itf.Container, len(cl))
 		for _, c := range cl {
 			ctr := &itf.Container{
-				ID:       c.ID,
-				ImageID:  c.ImageID,
-				State:    stateMap[c.State],
-				Mounts:   parseContainerMounts(c.Mounts),
-				Labels:   c.Labels,
-				Networks: parseContainerNetworks(c.NetworkSettings.Networks),
+				ID:      c.ID,
+				ImageID: c.ImageID,
+				State:   stateMap[c.State],
+				Mounts:  parseContainerMounts(c.Mounts),
+				Labels:  c.Labels,
 			}
 			if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
 				util.Logger.Error(err)
 			} else {
 				ctr.Name = ci.Name
+				ctr.Image = ci.Config.Image
 				ctr.RestartConfig = parseRestartPolicy(ci.HostConfig.RestartPolicy)
 				ctr.Created = ci.Created
 				ctr.Started = ci.State.StartedAt
-				ctr.Hostname = ci.Config.Hostname
 				ctr.Env = parseContainerEnvVars(ci.Config.Env)
 				ctr.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
 				ctr.Ports = parseContainerPorts(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
@@ -95,12 +94,12 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (*itf.Container, 
 		return &itf.Container{
 			ID:            c.ID,
 			Name:          c.Name,
+			Image:         c.Config.Image,
 			ImageID:       c.Image,
 			State:         stateMap[c.State.Status],
 			RestartConfig: parseRestartPolicy(c.HostConfig.RestartPolicy),
 			Created:       c.Created,
 			Started:       c.State.StartedAt,
-			Hostname:      c.Config.Hostname,
 			Env:           parseContainerEnvVars(c.Config.Env),
 			Mounts:        parseContainerMounts(c.Mounts),
 			Labels:        c.Config.Labels,

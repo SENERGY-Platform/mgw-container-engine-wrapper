@@ -27,14 +27,12 @@ import (
 	"strings"
 )
 
-func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.NetworkInfo) {
+func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
 	if len(endptSettings) > 0 {
 		for key, val := range endptSettings {
-			netInfo = append(netInfo, itf.NetworkInfo{
-				Network: itf.Network{
-					ID:   val.NetworkID,
-					Name: key,
-				},
+			netInfo = append(netInfo, itf.ContainerNet{
+				ID:          val.NetworkID,
+				Name:        key,
 				IPAddress:   val.IPAddress,
 				Gateway:     val.Gateway,
 				DomainNames: val.Aliases,
