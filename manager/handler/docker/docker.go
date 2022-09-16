@@ -164,7 +164,9 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 	if err != nil {
 		return "", err
 	}
-	util.Logger.Warning(res.Warnings)
+	if res.Warnings != nil && len(res.Warnings) > 0 {
+		util.Logger.Warning(res.Warnings)
+	}
 	if len(ctrConf.Networks) > 1 {
 		for i := 1; i < len(ctrConf.Networks); i++ {
 			err := d.client.NetworkConnect(ctx, ctrConf.Networks[i].Name, res.ID, &network.EndpointSettings{
