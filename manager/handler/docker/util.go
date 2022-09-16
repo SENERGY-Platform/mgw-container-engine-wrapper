@@ -30,7 +30,7 @@ import (
 	"time"
 )
 
-func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
+func parseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
 	if len(endptSettings) > 0 {
 		for key, val := range endptSettings {
 			netInfo = append(netInfo, itf.ContainerNet{
@@ -46,7 +46,7 @@ func parseContainerNetworks(endptSettings map[string]*network.EndpointSettings) 
 	return
 }
 
-func parseContainerPorts(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.Port) {
+func parsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.Port) {
 	if len(portSet) > 0 || len(portMap) > 0 {
 		set := make(map[string]struct{})
 		for port, bindings := range portMap {
@@ -79,7 +79,7 @@ func parseContainerPorts(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.
 	return
 }
 
-func parseContainerMounts(mountPoints []types.MountPoint) (mounts []itf.Mount) {
+func parseMountPoints(mountPoints []types.MountPoint) (mounts []itf.Mount) {
 	if len(mountPoints) > 0 {
 		for _, mp := range mountPoints {
 			if mType, ok := mountTypeMap[mp.Type]; ok {
@@ -95,7 +95,7 @@ func parseContainerMounts(mountPoints []types.MountPoint) (mounts []itf.Mount) {
 	return
 }
 
-func parseContainerEnvVars(ev []string) (env map[string]string) {
+func parseEnv(ev []string) (env map[string]string) {
 	if len(ev) > 0 {
 		env = make(map[string]string, len(ev))
 		for _, s := range ev {
@@ -106,7 +106,7 @@ func parseContainerEnvVars(ev []string) (env map[string]string) {
 	return
 }
 
-func genContainerEnvVars(ev map[string]string) (env []string) {
+func genEnv(ev map[string]string) (env []string) {
 	if len(ev) > 0 {
 		for key, val := range ev {
 			env = append(env, fmt.Sprintf("%s=%s", key, val))
@@ -123,7 +123,7 @@ func parseStopTimeout(t *int) *time.Duration {
 	return nil
 }
 
-func getStopTimeout(d *time.Duration) *int {
+func genStopTimeout(d *time.Duration) *int {
 	if d != nil {
 		t := int(d.Seconds())
 		return &t
@@ -131,7 +131,7 @@ func getStopTimeout(d *time.Duration) *int {
 	return nil
 }
 
-func getPorts(ports []itf.Port) (nat.PortMap, error) {
+func genPortMap(ports []itf.Port) (nat.PortMap, error) {
 	pm := make(nat.PortMap)
 	set := make(map[string]struct{})
 	for _, p := range ports {
@@ -155,7 +155,7 @@ func getPorts(ports []itf.Port) (nat.PortMap, error) {
 	return pm, nil
 }
 
-func getMounts(mounts []itf.Mount) ([]mount.Mount, error) {
+func genMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 	var msl []mount.Mount
 	set := make(map[string]struct{})
 	for i := 0; i < len(mounts); i++ {

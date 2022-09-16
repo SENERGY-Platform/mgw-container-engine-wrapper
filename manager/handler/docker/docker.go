@@ -65,23 +65,23 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.
 		var csl []itf.Container
 		for _, c := range cl {
 			ctr := itf.Container{
-				ID:      c.ID,
-				State:   stateMap[c.State],
-				ImageID: c.ImageID,
-				Labels:  c.Labels,
-				Mounts:  parseContainerMounts(c.Mounts),
+				ID:       c.ID,
+				State:    stateMap[c.State],
+				ImageID:  c.ImageID,
+				Labels:   c.Labels,
+				Mounts:   parseMountPoints(c.Mounts),
+				Networks: parseEndpointSettings(c.NetworkSettings.Networks),
 			}
 			if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
 				util.Logger.Error(err)
 			} else {
-
 				ctr.Name = ci.Name
 				ctr.Created = ci.Created
 				ctr.Started = ci.State.StartedAt
 				ctr.Image = ci.Config.Image
-				ctr.EnvVars = parseContainerEnvVars(ci.Config.Env)
-				ctr.Ports = parseContainerPorts(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
-				ctr.Networks = parseContainerNetworks(ci.NetworkSettings.Networks)
+				ctr.EnvVars = parseEnv(ci.Config.Env)
+				ctr.Ports = parsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
+				ctr.Networks = parseEndpointSettings(ci.NetworkSettings.Networks)
 				ctr.RunConfig = itf.RunConfig{
 					RestartStrategy: restartPolicyMap[ci.HostConfig.RestartPolicy.Name],
 					Retries:         ci.HostConfig.RestartPolicy.MaximumRetryCount,
@@ -108,11 +108,11 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 			Started:  c.State.StartedAt,
 			Image:    c.Config.Image,
 			ImageID:  c.Image,
-			EnvVars:  parseContainerEnvVars(c.Config.Env),
+			EnvVars:  parseEnv(c.Config.Env),
 			Labels:   c.Config.Labels,
-			Mounts:   parseContainerMounts(c.Mounts),
-			Ports:    parseContainerPorts(c.Config.ExposedPorts, c.NetworkSettings.Ports),
-			Networks: parseContainerNetworks(c.NetworkSettings.Networks),
+			Mounts:   parseMountPoints(c.Mounts),
+			Ports:    parsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports),
+			Networks: parseEndpointSettings(c.NetworkSettings.Networks),
 			RunConfig: itf.RunConfig{
 				RestartStrategy: restartPolicyMap[c.HostConfig.RestartPolicy.Name],
 				Retries:         c.HostConfig.RestartPolicy.MaximumRetryCount,
@@ -126,16 +126,16 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 
 func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (string, error) {
 	cConfig := &container.Config{
-		Env:         genContainerEnvVars(ctrConf.EnvVars),
+		Env:         genEnv(ctrConf.EnvVars),
 		Image:       ctrConf.Image,
 		Labels:      ctrConf.Labels,
-		StopTimeout: getStopTimeout(ctrConf.RunConfig.StopTimeout),
+		StopTimeout: genStopTimeout(ctrConf.RunConfig.StopTimeout),
 	}
-	bindings, err := getPorts(ctrConf.Ports)
+	bindings, err := genPortMap(ctrConf.Ports)
 	if err != nil {
 		return "", err
 	}
-	mts, err := getMounts(ctrConf.Mounts)
+	mts, err := genMounts(ctrConf.Mounts)
 	if err != nil {
 		return "", err
 	}
