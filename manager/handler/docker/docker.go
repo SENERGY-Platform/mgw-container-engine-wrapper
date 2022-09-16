@@ -21,7 +21,9 @@ import (
 	"deployment-manager/manager/itf"
 	"deployment-manager/util"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 )
 
@@ -120,6 +122,66 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 		}
 	}
 	return ctr, nil
+}
+
+func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (string, error) {
+	cConfig := &container.Config{
+		Env:         genContainerEnvVars(ctrConf.EnvVars),
+		Image:       ctrConf.Image,
+		Labels:      ctrConf.Labels,
+		StopTimeout: getStopTimeout(ctrConf.RunConfig.StopTimeout),
+	}
+	bindings, err := getPorts(ctrConf.Ports)
+	if err != nil {
+		return "", err
+	}
+	mts, err := getMounts(ctrConf.Mounts)
+	if err != nil {
+		return "", err
+	}
+	hConfig := &container.HostConfig{
+		PortBindings: bindings,
+		RestartPolicy: container.RestartPolicy{
+			Name:              restartPolicyRMap[ctrConf.RunConfig.RestartStrategy],
+			MaximumRetryCount: ctrConf.RunConfig.Retries,
+		},
+		AutoRemove: ctrConf.RunConfig.RemoveAfterRun,
+		Mounts:     mts,
+	}
+	err = checkNetworks(ctrConf.Networks)
+	if err != nil {
+		return "", err
+	}
+	var nConfig *network.NetworkingConfig
+	if len(ctrConf.Networks) > 0 {
+		nConfig = &network.NetworkingConfig{EndpointsConfig: map[string]*network.EndpointSettings{
+			ctrConf.Networks[0].Name: {
+				Aliases: ctrConf.Networks[0].DomainNames,
+			},
+		}}
+	}
+	res, err := d.client.ContainerCreate(ctx, cConfig, hConfig, nConfig, nil, ctrConf.Name)
+	if err != nil {
+		return "", err
+	}
+	util.Logger.Warning(res.Warnings)
+	if len(ctrConf.Networks) > 1 {
+		for i := 1; i < len(ctrConf.Networks); i++ {
+			err := d.client.NetworkConnect(ctx, ctrConf.Networks[i].Name, res.ID, &network.EndpointSettings{
+				Aliases: ctrConf.Networks[i].DomainNames,
+			})
+			if err != nil {
+				err2 := d.client.ContainerRemove(ctx, res.ID, types.ContainerRemoveOptions{
+					Force: true,
+				})
+				if err2 != nil {
+					util.Logger.Error(err2)
+				}
+				return "", err
+			}
+		}
+	}
+	return res.ID, nil
 }
 
 func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
