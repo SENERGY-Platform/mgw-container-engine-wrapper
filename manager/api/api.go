@@ -17,7 +17,7 @@
 package api
 
 import (
-	"deployment-manager/manager/ce-handler/itf"
+	"deployment-manager/manager/itf"
 )
 
 type Api struct {

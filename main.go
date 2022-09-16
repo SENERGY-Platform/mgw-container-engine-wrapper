@@ -19,8 +19,8 @@ package main
 import (
 	"context"
 	"deployment-manager/manager/api"
-	"deployment-manager/manager/api/engine"
 	"deployment-manager/manager/handler/docker"
+	"deployment-manager/manager/handler/gin-web"
 	"deployment-manager/util"
 	"errors"
 	"fmt"
@@ -70,7 +70,7 @@ func main() {
 	util.Logger.Debugf("docker: %s", util.ToJsonStr(dockerInfo))
 
 	dmApi := api.New(dockerHandler)
-	apiEngine := engine.New(config.ApiEngine, config.Logger.Level, logFile)
+	apiEngine := gin_web.New(config.ApiEngine, config.Logger.Level, logFile)
 	api.SetRoutes(apiEngine, dmApi)
 
 	listener, err := util.NewUnixListener(config.SocketPath)
