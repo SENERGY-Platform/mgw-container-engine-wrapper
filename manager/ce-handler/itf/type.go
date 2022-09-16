@@ -73,27 +73,29 @@ type Mount struct {
 
 type RestartStrategy string
 
-type RestartConfig struct {
-	Strategy RestartStrategy `json:"strategy"`
-	Retries  int             `json:"retries"`
+type RunConfig struct {
+	RestartStrategy RestartStrategy `json:"strategy"`
+	Retries         int             `json:"retries"`
+	RemoveAfterRun  bool            `json:"remove_after_run"`
+	StopTimeout     time.Duration   `json:"stop_timeout"`
 }
 
 type ContainerState string
 
 type Container struct {
-	ID            string            `json:"id"`
-	Name          string            `json:"name"`
-	Image         string            `json:"image"`
-	ImageID       string            `json:"image_id"`
-	State         ContainerState    `json:"state"`
-	RestartConfig RestartConfig     `json:"restart_config"`
-	Created       string            `json:"created"`
-	Started       string            `json:"started"`
-	Env           map[string]string `json:"env"`
-	Mounts        []Mount           `json:"mounts"`
-	Labels        map[string]string `json:"labels"`
-	Ports         []Port            `json:"ports"`
-	Networks      []ContainerNet    `json:"networks"`
+	ID        string            `json:"id"`
+	Name      string            `json:"name"`
+	Image     string            `json:"image"`
+	ImageID   string            `json:"image_id"`
+	State     ContainerState    `json:"state"`
+	RunConfig RunConfig         `json:"run_config"`
+	Created   string            `json:"created"`
+	Started   string            `json:"started"`
+	Env       map[string]string `json:"env"`
+	Mounts    []Mount           `json:"mounts"`
+	Labels    map[string]string `json:"labels"`
+	Ports     []Port            `json:"ports"`
+	Networks  []ContainerNet    `json:"networks"`
 }
 
 type ContainerNet struct {
