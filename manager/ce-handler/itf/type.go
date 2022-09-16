@@ -85,24 +85,24 @@ type ContainerState string
 type Container struct {
 	ID        string            `json:"id"`
 	Name      string            `json:"name"`
-	Image     string            `json:"image"`
-	ImageID   string            `json:"image_id"`
 	State     ContainerState    `json:"state"`
-	RunConfig RunConfig         `json:"run_config"`
 	Created   string            `json:"created"`
 	Started   string            `json:"started"`
+	Image     string            `json:"image"`
+	ImageID   string            `json:"image_id"`
 	Env       map[string]string `json:"env"`
-	Mounts    []Mount           `json:"mounts"`
 	Labels    map[string]string `json:"labels"`
+	Mounts    []Mount           `json:"mounts"`
 	Ports     []Port            `json:"ports"`
 	Networks  []ContainerNet    `json:"networks"`
+	RunConfig RunConfig         `json:"run_config"`
 }
 
 type ContainerNet struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
-	IPAddress   string   `json:"ip_address"`
-	Gateway     string   `json:"gateway"`
 	DomainNames []string `json:"domain_names"`
+	Gateway     string   `json:"gateway"`
+	IPAddress   string   `json:"ip_address"`
 	MacAddress  string   `json:"mac_address"`
 }
