@@ -182,9 +182,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 				Aliases: ctrConf.Networks[i].DomainNames,
 			})
 			if err != nil {
-				err2 := d.client.ContainerRemove(ctx, res.ID, types.ContainerRemoveOptions{
-					Force: true,
-				})
+				err2 := d.ContainerRemove(ctx, res.ID)
 				if err2 != nil {
 					util.Logger.Error(err2)
 				}
@@ -193,6 +191,12 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 		}
 	}
 	return res.ID, nil
+}
+
+func (d *Docker) ContainerRemove(ctx context.Context, id string) error {
+	return d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+	})
 }
 
 func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
