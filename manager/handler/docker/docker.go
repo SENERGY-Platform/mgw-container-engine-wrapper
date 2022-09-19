@@ -199,6 +199,18 @@ func (d *Docker) ContainerRemove(ctx context.Context, id string) error {
 	})
 }
 
+func (d *Docker) ContainerStart(ctx context.Context, id string) error {
+	return d.client.ContainerStart(ctx, id, types.ContainerStartOptions{})
+}
+
+func (d *Docker) ContainerStop(ctx context.Context, id string) error {
+	return d.client.ContainerStop(ctx, id, nil)
+}
+
+func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
+	return d.client.ContainerRestart(ctx, id, nil)
+}
+
 func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	var img itf.Image
 	if i, _, err := d.client.ImageInspectWithRaw(ctx, id); err != nil {
