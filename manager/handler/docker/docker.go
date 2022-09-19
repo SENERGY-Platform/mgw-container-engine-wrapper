@@ -81,6 +81,9 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.
 				ctr.Image = ci.Config.Image
 				ctr.EnvVars = parseEnv(ci.Config.Env)
 				ctr.Ports = parsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
+				if len(ci.HostConfig.Mounts) > 0 {
+					ctr.Mounts = parseMounts(ci.HostConfig.Mounts)
+				}
 				ctr.Networks = parseEndpointSettings(ci.NetworkSettings.Networks)
 				ctr.RunConfig = itf.RunConfig{
 					RestartStrategy: restartPolicyMap[ci.HostConfig.RestartPolicy.Name],
@@ -100,6 +103,12 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 	if c, err := d.client.ContainerInspect(ctx, id); err != nil {
 		return ctr, err
 	} else {
+		var mts []itf.Mount
+		if len(c.HostConfig.Mounts) > 0 {
+			mts = parseMounts(c.HostConfig.Mounts)
+		} else {
+			mts = parseMountPoints(c.Mounts)
+		}
 		ctr = itf.Container{
 			ID:       c.ID,
 			Name:     c.Name,
@@ -110,7 +119,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 			ImageID:  c.Image,
 			EnvVars:  parseEnv(c.Config.Env),
 			Labels:   c.Config.Labels,
-			Mounts:   parseMountPoints(c.Mounts),
+			Mounts:   mts,
 			Ports:    parsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports),
 			Networks: parseEndpointSettings(c.NetworkSettings.Networks),
 			RunConfig: itf.RunConfig{
