@@ -20,11 +20,14 @@ import (
 	"context"
 	"deployment-manager/manager/itf"
 	"deployment-manager/util"
+	"encoding/json"
+	"errors"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"io"
 )
 
 type Docker struct {
@@ -263,4 +266,28 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 		}
 	}
 	return img, nil
+}
+
+func (d *Docker) ImagePull(ctx context.Context, id string) error {
+	if resp, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{}); err != nil {
+		return err
+	} else {
+		defer resp.Close()
+		jd := json.NewDecoder(resp)
+		var msg ImgPullResp
+		for {
+			if err := jd.Decode(&msg); err != nil {
+				if err == io.EOF {
+					break
+				} else {
+					return err
+				}
+			}
+			util.Logger.Debug(msg)
+		}
+		if msg.Message != "" {
+			return errors.New(msg.Message)
+		}
+	}
+	return nil
 }

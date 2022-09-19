@@ -17,6 +17,7 @@
 package docker
 
 import (
+	"bytes"
 	"deployment-manager/manager/itf"
 	"deployment-manager/util"
 	"errors"
@@ -217,4 +218,31 @@ func checkNetworks(n []itf.ContainerNet) error {
 		set[net.Name] = struct{}{}
 	}
 	return nil
+}
+
+type ImgPullResp struct {
+	Status         string `json:"status"`
+	Message        string `json:"message"`
+	ID             string `json:"id"`
+	ProgressDetail struct {
+		Current int `json:"current"`
+		Total   int `json:"total"`
+	} `json:"progressDetail"`
+}
+
+func (r ImgPullResp) String() string {
+	var b bytes.Buffer
+	if r.Status != "" {
+		b.WriteString(r.Status)
+	}
+	if r.ID != "" {
+		b.WriteString(" " + r.ID)
+	}
+	if r.Message != "" {
+		b.WriteString(" " + r.Message)
+	}
+	if strings.Contains(r.Status, "Downloading") {
+		b.WriteString(fmt.Sprintf(" %d/%d", r.ProgressDetail.Current, r.ProgressDetail.Total))
+	}
+	return b.String()
 }
