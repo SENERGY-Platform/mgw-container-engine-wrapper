@@ -48,6 +48,7 @@ func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	for i := 0; i < len(srvVer.Components); i++ {
 		info[srvVer.Components[i].Name] = srvVer.Components[i].Version
 	}
+	info["api"] = d.client.ClientVersion()
 	return info, nil
 }
 
