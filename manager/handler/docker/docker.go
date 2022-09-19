@@ -211,6 +211,38 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return d.client.ContainerRestart(ctx, id, nil)
 }
 
+func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
+	var f filters.Args
+	if filter != nil && len(filter) > 0 {
+		f = filters.NewArgs()
+		for _, i := range filter {
+			f.Add(i[0], i[1])
+		}
+	}
+	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: f}); err != nil {
+		return nil, err
+	} else {
+		var images []itf.Image
+		for _, is := range il {
+			img := itf.Image{
+				ID: is.ID,
+				//Created: is.Created,
+				Size:    is.Size,
+				Tags:    is.RepoTags,
+				Digests: is.RepoDigests,
+			}
+			if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
+				util.Logger.Error(err)
+			} else {
+				img.Created = i.Created
+				img.Arch = i.Architecture
+			}
+			images = append(images, img)
+		}
+		return images, nil
+	}
+}
+
 func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	var img itf.Image
 	if i, _, err := d.client.ImageInspectWithRaw(ctx, id); err != nil {
