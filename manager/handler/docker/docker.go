@@ -52,6 +52,10 @@ func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	return info, nil
 }
 
+func (d *Docker) Close() error {
+	return d.client.Close()
+}
+
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
 	var f filters.Args
 	if filter != nil && len(filter) > 0 {

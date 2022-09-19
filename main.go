@@ -62,6 +62,7 @@ func main() {
 		util.Logger.Error(err)
 		return
 	}
+	defer dockerHandler.Close()
 	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
 		util.Logger.Error(err)
