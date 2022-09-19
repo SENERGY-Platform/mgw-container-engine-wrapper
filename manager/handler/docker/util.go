@@ -95,6 +95,30 @@ func parseMountPoints(mountPoints []types.MountPoint) (mounts []itf.Mount) {
 	return
 }
 
+func parseMounts(mts []mount.Mount) (mounts []itf.Mount) {
+	if len(mts) > 0 {
+		for _, mt := range mts {
+			if mType, ok := mountTypeMap[mt.Type]; ok {
+				m := itf.Mount{
+					Type:     mType,
+					Source:   mt.Source,
+					Target:   mt.Target,
+					ReadOnly: mt.ReadOnly,
+				}
+				if mt.VolumeOptions != nil {
+					m.Labels = mt.VolumeOptions.Labels
+				}
+				if mt.TmpfsOptions != nil {
+					m.Size = mt.TmpfsOptions.SizeBytes
+					m.Mode = mt.TmpfsOptions.Mode
+				}
+				mounts = append(mounts, m)
+			}
+		}
+	}
+	return
+}
+
 func parseEnv(ev []string) (env map[string]string) {
 	if len(ev) > 0 {
 		env = make(map[string]string, len(ev))
