@@ -30,6 +30,7 @@ type ContainerEngineHandler interface {
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
 	ContainerInfo(ctx context.Context, id string) (Container, error)
+	ListImages(ctx context.Context, filter [][2]string) ([]Image, error)
 	ImageInfo(ctx context.Context, id string) (Image, error)
 }
 
