@@ -28,6 +28,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
+	"net"
 )
 
 type Docker struct {
@@ -85,9 +86,8 @@ func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 		CheckDuplicate: true,
 		Driver:         netTypeRMap[net.Type],
 		Attachable:     true,
-		Options: map[string]string{
-			"subnet":  net.Subnet.KeyStr(),
-			"gateway": net.Gateway.String(),
+		IPAM: &network.IPAM{
+			Config: genNetIPAMConfig(net),
 		},
 	}); err != nil {
 		return err
