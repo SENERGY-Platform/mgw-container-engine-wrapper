@@ -80,6 +80,23 @@ func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Ne
 	}
 }
 
+func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
+	if res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
+		CheckDuplicate: true,
+		Driver:         netTypeRMap[net.Type],
+		Attachable:     true,
+		Options: map[string]string{
+			"subnet":  net.Subnet.KeyStr(),
+			"gateway": net.Gateway.String(),
+		},
+	}); err != nil {
+		return err
+	} else {
+		util.Logger.Debug(res)
+	}
+	return nil
+}
+
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
 	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
 		return nil, err
