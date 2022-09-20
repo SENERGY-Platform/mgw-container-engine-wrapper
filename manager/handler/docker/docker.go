@@ -59,6 +59,24 @@ func (d *Docker) Close() error {
 	return d.client.Close()
 }
 
+func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
+	if nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: genFilterArgs(filter)}); err != nil {
+		return nil, err
+	} else {
+		var n []itf.Network
+		for _, r := range nr {
+			if nType, ok := netTypeMap[r.Driver]; ok {
+				n = append(n, itf.Network{
+					ID:   r.ID,
+					Name: r.Name,
+					Type: nType,
+				})
+			}
+		}
+		return n, nil
+	}
+}
+
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
 	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
 		return nil, err
