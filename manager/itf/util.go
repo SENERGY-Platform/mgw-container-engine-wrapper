@@ -31,6 +31,10 @@ func (m Mount) KeyStr() string {
 	return fmt.Sprintf("%s:%s", m.Source, m.Target)
 }
 
+func (s Subnet) KeyStr() string {
+	return fmt.Sprintf("%s/%d", s.RoutingPrefix.String(), s.BitLength)
+}
+
 func (p *PortType) UnmarshalJSON(b []byte) (err error) {
 	var s string
 	if err = json.Unmarshal(b, &s); err != nil {
