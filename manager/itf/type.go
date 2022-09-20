@@ -40,7 +40,6 @@ type ContainerEngineHandler interface {
 	ImageInfo(ctx context.Context, id string) (Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
-	ImageInfo(ctx context.Context, id string) (Image, error)
 }
 
 type Image struct {
