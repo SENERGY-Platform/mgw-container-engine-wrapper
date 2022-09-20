@@ -113,6 +113,10 @@ func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 	return nil
 }
 
+func (d *Docker) NetworkRemove(ctx context.Context, id string) error {
+	return d.client.NetworkRemove(ctx, id)
+}
+
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
 	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
 		return nil, err
