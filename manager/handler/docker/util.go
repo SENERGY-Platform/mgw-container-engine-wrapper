@@ -142,15 +142,14 @@ func genEnv(ev map[string]string) (env []string) {
 	return
 }
 
-func parseStopTimeout(t *int) *time.Duration {
+func parseStopTimeout(t *int) *itf.Duration {
 	if t != nil {
-		d := time.Duration(*t * int(time.Second))
-		return &d
+		return &itf.Duration{Duration: time.Duration(*t * int(time.Second))}
 	}
 	return nil
 }
 
-func genStopTimeout(d *time.Duration) *int {
+func genStopTimeout(d *itf.Duration) *int {
 	if d != nil {
 		t := int(d.Seconds())
 		return &t
