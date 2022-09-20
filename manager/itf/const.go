@@ -22,11 +22,23 @@ const (
 	SctpPort PortType = "sctp"
 )
 
+var PortTypeMap = map[string]PortType{
+	string(TcpPort):  TcpPort,
+	string(UdpPort):  UdpPort,
+	string(SctpPort): SctpPort,
+}
+
 const (
 	BridgeNet  NetworkType = "bridge"
 	MACVlanNet NetworkType = "macvlan"
 	HostNet    NetworkType = "host"
 )
+
+var NetworkTypeMap = map[string]NetworkType{
+	string(BridgeNet):  BridgeNet,
+	string(MACVlanNet): MACVlanNet,
+	string(HostNet):    HostNet,
+}
 
 const (
 	RunningState   ContainerState = "running"
@@ -42,8 +54,21 @@ const (
 	RestartOnFail     RestartStrategy = "on-fail"
 )
 
+var RestartStrategyMap = map[string]RestartStrategy{
+	string(RestartNever):      RestartNever,
+	string(RestartAlways):     RestartAlways,
+	string(RestartNotStopped): RestartNotStopped,
+	string(RestartOnFail):     RestartOnFail,
+}
+
 const (
 	BindMount   MountType = "bind"
 	VolumeMount MountType = "volume"
 	TmpfsMount  MountType = "tmpfs"
 )
+
+var MountTypeMap = map[string]MountType{
+	string(BindMount):   BindMount,
+	string(VolumeMount): VolumeMount,
+	string(TmpfsMount):  TmpfsMount,
+}

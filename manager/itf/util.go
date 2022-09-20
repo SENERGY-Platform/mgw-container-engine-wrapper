@@ -17,6 +17,8 @@
 package itf
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -26,4 +28,56 @@ func (p Port) KeyStr() string {
 
 func (m Mount) KeyStr() string {
 	return fmt.Sprintf("%s:%s", m.Source, m.Target)
+}
+
+func (p *PortType) UnmarshalJSON(b []byte) (err error) {
+	var s string
+	if err = json.Unmarshal(b, &s); err != nil {
+		return
+	}
+	if t, ok := PortTypeMap[s]; ok {
+		*p = t
+	} else {
+		err = errors.New(fmt.Sprintf("unknown port type '%s'", s))
+	}
+	return
+}
+
+func (n *NetworkType) UnmarshalJSON(b []byte) (err error) {
+	var s string
+	if err = json.Unmarshal(b, &s); err != nil {
+		return
+	}
+	if t, ok := NetworkTypeMap[s]; ok {
+		*n = t
+	} else {
+		err = errors.New(fmt.Sprintf("unknown network type '%s'", s))
+	}
+	return
+}
+
+func (r *RestartStrategy) UnmarshalJSON(b []byte) (err error) {
+	var s string
+	if err = json.Unmarshal(b, &s); err != nil {
+		return
+	}
+	if st, ok := RestartStrategyMap[s]; ok {
+		*r = st
+	} else {
+		err = errors.New(fmt.Sprintf("unknown restart strategy '%s'", s))
+	}
+	return
+}
+
+func (m *MountType) UnmarshalJSON(b []byte) (err error) {
+	var s string
+	if err = json.Unmarshal(b, &s); err != nil {
+		return
+	}
+	if t, ok := MountTypeMap[s]; ok {
+		*m = t
+	} else {
+		err = errors.New(fmt.Sprintf("unknown mount type '%s'", s))
+	}
+	return
 }
