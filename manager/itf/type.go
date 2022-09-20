@@ -25,6 +25,7 @@ import (
 
 type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context, filter [][2]string) ([]Network, error)
+	NetworkCreate(ctx context.Context, net Network) error
 	ListContainers(ctx context.Context, filter [][2]string) ([]Container, error)
 	ContainerCreate(ctx context.Context, ctrConf Container) (id string, err error)
 	ContainerRemove(ctx context.Context, id string) error
