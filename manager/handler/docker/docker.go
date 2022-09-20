@@ -66,10 +66,13 @@ func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Ne
 		var n []itf.Network
 		for _, r := range nr {
 			if nType, ok := netTypeMap[r.Driver]; ok {
+				s, gw := parseNetIPAMConfig(r.IPAM.Config)
 				n = append(n, itf.Network{
-					ID:   r.ID,
-					Name: r.Name,
-					Type: nType,
+					ID:      r.ID,
+					Name:    r.Name,
+					Type:    nType,
+					Subnet:  s,
+					Gateway: gw,
 				})
 			}
 		}
