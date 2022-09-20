@@ -24,6 +24,7 @@ import (
 	"errors"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
@@ -279,6 +280,15 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 
 func (d *Docker) ImageRemove(ctx context.Context, id string) error {
 	if res, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
+		return err
+	} else {
+		util.Logger.Debug(res)
+	}
+	return nil
+}
+
+func (d *Docker) PruneImages(ctx context.Context) error {
+	if res, err := d.client.ImagesPrune(ctx, filters.Args{}); err != nil {
 		return err
 	} else {
 		util.Logger.Debug(res)
