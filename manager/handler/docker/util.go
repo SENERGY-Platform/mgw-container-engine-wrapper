@@ -221,6 +221,19 @@ func genFilterArgs(filter [][2]string) (f filters.Args) {
 	return
 }
 
+func parseNetIPAMConfig(c []network.IPAMConfig) (s itf.Subnet, gw itf.IPAddr) {
+	if c != nil && len(c) > 0 {
+		sp := strings.Split(c[0].Subnet, "/")
+		if len(sp) == 2 {
+			s.Prefix.IP = net.ParseIP(sp[0])
+			i, _ := strconv.ParseInt(sp[1], 10, 0)
+			s.Bits = int(i)
+		}
+		gw.IP = net.ParseIP(c[0].Gateway)
+	}
+	return
+}
+
 func checkNetworks(n []itf.ContainerNet) error {
 	set := make(map[string]struct{})
 	for _, net := range n {
