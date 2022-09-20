@@ -54,8 +54,8 @@ type IPAddr struct {
 }
 
 type Subnet struct {
-	RoutingPrefix IPAddr `json:"routing_prefix"`
-	BitLength     int    `json:"bit_length"`
+	Prefix IPAddr `json:"prefix"`
+	Bits   int    `json:"bits"`
 }
 
 type Network struct {
