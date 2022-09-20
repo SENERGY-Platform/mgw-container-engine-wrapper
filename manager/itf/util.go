@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"time"
 )
 
 func (p Port) KeyStr() string {
@@ -98,4 +99,21 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 		err = errors.New(fmt.Sprintf("invalid IP address '%s'", s))
 	}
 	return
+}
+
+func (d *Duration) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	if dur, err := time.ParseDuration(s); err != nil {
+		return err
+	} else {
+		d.Duration = dur
+	}
+	return nil
+}
+
+func (d Duration) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
 }

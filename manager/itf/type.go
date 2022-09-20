@@ -97,11 +97,15 @@ type Mount struct {
 
 type RestartStrategy string
 
+type Duration struct {
+	time.Duration
+}
+
 type RunConfig struct {
 	RestartStrategy RestartStrategy `json:"restart_strategy"`
 	Retries         int             `json:"retries"`
 	RemoveAfterRun  bool            `json:"remove_after_run"`
-	StopTimeout     *time.Duration  `json:"stop_timeout"`
+	StopTimeout     *Duration       `json:"stop_timeout"`
 }
 
 type ContainerState string
