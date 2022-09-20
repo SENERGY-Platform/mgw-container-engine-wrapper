@@ -73,3 +73,17 @@ var portTypeRMap = func() map[itf.PortType]string {
 	}
 	return m
 }()
+
+var netTypeMap = map[string]itf.NetworkType{
+	"bridge":  itf.BridgeNet,
+	"macvlan": itf.MACVlanNet,
+	"host":    itf.HostNet,
+}
+
+var netTypeRMap = func() map[itf.NetworkType]string {
+	m := make(map[itf.NetworkType]string)
+	for k, v := range netTypeMap {
+		m[v] = k
+	}
+	return m
+}()
