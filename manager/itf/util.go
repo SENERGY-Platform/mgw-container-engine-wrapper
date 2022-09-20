@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 )
 
 func (p Port) KeyStr() string {
@@ -78,6 +79,19 @@ func (m *MountType) UnmarshalJSON(b []byte) (err error) {
 		*m = t
 	} else {
 		err = errors.New(fmt.Sprintf("unknown mount type '%s'", s))
+	}
+	return
+}
+
+func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
+	var s string
+	if err = json.Unmarshal(b, &s); err != nil {
+		return
+	}
+	if ip := net.ParseIP(s); ip != nil {
+		i.IP = ip
+	} else {
+		err = errors.New(fmt.Sprintf("invalid IP address '%s'", s))
 	}
 	return
 }

@@ -27,6 +27,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -38,8 +39,8 @@ func parseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (
 			netInfo = append(netInfo, itf.ContainerNet{
 				ID:          val.NetworkID,
 				Name:        key,
-				IPAddress:   val.IPAddress,
-				Gateway:     val.Gateway,
+				IPAddress:   itf.IPAddr{IP: net.ParseIP(val.IPAddress)},
+				Gateway:     itf.IPAddr{IP: net.ParseIP(val.Gateway)},
 				DomainNames: val.Aliases,
 				MacAddress:  val.MacAddress,
 			})
@@ -63,7 +64,7 @@ func parsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.P
 				}
 				p.Bindings = append(p.Bindings, itf.PortBinding{
 					Number:    int(num),
-					Interface: binding.HostIP,
+					Interface: itf.IPAddr{IP: net.ParseIP(binding.HostIP)},
 				})
 			}
 			ports = append(ports, p)
@@ -172,7 +173,7 @@ func genPortMap(ports []itf.Port) (nat.PortMap, error) {
 		var bindings []nat.PortBinding
 		for _, binding := range p.Bindings {
 			bindings = append(bindings, nat.PortBinding{
-				HostIP:   binding.Interface,
+				HostIP:   binding.Interface.String(),
 				HostPort: strconv.FormatInt(int64(binding.Number), 10),
 			})
 		}

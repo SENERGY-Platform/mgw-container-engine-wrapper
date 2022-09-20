@@ -19,6 +19,7 @@ package itf
 import (
 	"context"
 	"io/fs"
+	"net"
 	"time"
 )
 
@@ -48,10 +49,21 @@ type Image struct {
 
 type NetworkType string
 
+type IPAddr struct {
+	net.IP
+}
+
+type Subnet struct {
+	RoutingPrefix IPAddr `json:"routing_prefix"`
+	BitLength     int    `json:"bit_length"`
+}
+
 type Network struct {
-	ID   string      `json:"id"`
-	Name string      `json:"name"`
-	Type NetworkType `json:"type"`
+	ID      string      `json:"id"`
+	Name    string      `json:"name"`
+	Type    NetworkType `json:"type"`
+	Subnet  Subnet      `json:"subnet"`
+	Gateway IPAddr      `json:"gateway"`
 }
 
 type PortType string
@@ -64,7 +76,7 @@ type Port struct {
 
 type PortBinding struct {
 	Number    int    `json:"number"`
-	Interface string `json:"interface"`
+	Interface IPAddr `json:"interface"`
 }
 
 type MountType string
@@ -110,7 +122,7 @@ type ContainerNet struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
 	DomainNames []string `json:"domain_names"`
-	Gateway     string   `json:"gateway"`
-	IPAddress   string   `json:"ip_address"`
+	Gateway     IPAddr   `json:"gateway"`
+	IPAddress   IPAddr   `json:"ip_address"`
 	MacAddress  string   `json:"mac_address"`
 }
