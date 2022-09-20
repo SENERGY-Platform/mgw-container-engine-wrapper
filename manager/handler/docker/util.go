@@ -234,6 +234,14 @@ func parseNetIPAMConfig(c []network.IPAMConfig) (s itf.Subnet, gw itf.IPAddr) {
 	return
 }
 
+func genNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
+	c = append(c, network.IPAMConfig{
+		Subnet:  n.Subnet.KeyStr(),
+		Gateway: n.Gateway.String(),
+	})
+	return
+}
+
 func checkNetworks(n []itf.ContainerNet) error {
 	set := make(map[string]struct{})
 	for _, net := range n {
