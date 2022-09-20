@@ -28,7 +28,6 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
-	"net"
 )
 
 type Docker struct {
@@ -79,6 +78,23 @@ func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Ne
 		}
 		return n, nil
 	}
+}
+
+func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
+	var n itf.Network
+	if nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{}); err != nil {
+		return n, err
+	} else {
+		s, gw := parseNetIPAMConfig(nr.IPAM.Config)
+		n = itf.Network{
+			ID:      nr.ID,
+			Name:    nr.Name,
+			Type:    netTypeMap[nr.Driver],
+			Subnet:  s,
+			Gateway: gw,
+		}
+	}
+	return n, nil
 }
 
 func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
