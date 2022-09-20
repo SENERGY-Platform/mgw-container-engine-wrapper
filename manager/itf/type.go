@@ -98,7 +98,7 @@ type Mount struct {
 type RestartStrategy string
 
 type RunConfig struct {
-	RestartStrategy RestartStrategy `json:"strategy"`
+	RestartStrategy RestartStrategy `json:"restart_strategy"`
 	Retries         int             `json:"retries"`
 	RemoveAfterRun  bool            `json:"remove_after_run"`
 	StopTimeout     *time.Duration  `json:"stop_timeout"`
