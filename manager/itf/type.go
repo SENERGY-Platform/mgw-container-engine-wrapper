@@ -57,9 +57,9 @@ type Network struct {
 type PortType string
 
 type Port struct {
-	Number   int      `json:"number"`
-	Protocol PortType `json:"protocol"`
-	Bindings []PortBinding
+	Number   int           `json:"number"`
+	Protocol PortType      `json:"protocol"`
+	Bindings []PortBinding `json:"bindings"`
 }
 
 type PortBinding struct {
