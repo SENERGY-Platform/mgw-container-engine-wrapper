@@ -25,17 +25,18 @@ import (
 
 type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context, filter [][2]string) ([]Network, error)
+	ListContainers(ctx context.Context, filter [][2]string) ([]Container, error)
+	ListImages(ctx context.Context, filter [][2]string) ([]Image, error)
 	NetworkInfo(ctx context.Context, id string) (Network, error)
 	NetworkCreate(ctx context.Context, net Network) error
 	NetworkRemove(ctx context.Context, id string) error
-	ListContainers(ctx context.Context, filter [][2]string) ([]Container, error)
+	ContainerInfo(ctx context.Context, id string) (Container, error)
 	ContainerCreate(ctx context.Context, ctrConf Container) (id string, err error)
 	ContainerRemove(ctx context.Context, id string) error
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerInfo(ctx context.Context, id string) (Container, error)
-	ListImages(ctx context.Context, filter [][2]string) ([]Image, error)
+	ImageInfo(ctx context.Context, id string) (Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
 	ImageInfo(ctx context.Context, id string) (Image, error)
