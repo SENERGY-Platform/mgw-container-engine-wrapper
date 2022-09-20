@@ -24,7 +24,6 @@ import (
 	"errors"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
@@ -60,14 +59,7 @@ func (d *Docker) Close() error {
 }
 
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
-	var f filters.Args
-	if filter != nil && len(filter) > 0 {
-		f = filters.NewArgs()
-		for _, i := range filter {
-			f.Add(i[0], i[1])
-		}
-	}
-	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: f}); err != nil {
+	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
 		return nil, err
 	} else {
 		var csl []itf.Container
@@ -220,14 +212,7 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 }
 
 func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
-	var f filters.Args
-	if filter != nil && len(filter) > 0 {
-		f = filters.NewArgs()
-		for _, i := range filter {
-			f.Add(i[0], i[1])
-		}
-	}
-	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: f}); err != nil {
+	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
 		return nil, err
 	} else {
 		var images []itf.Image

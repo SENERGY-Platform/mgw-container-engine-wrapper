@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
@@ -207,6 +208,16 @@ func genMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 		msl = append(msl, mnt)
 	}
 	return msl, nil
+}
+
+func genFilterArgs(filter [][2]string) (f filters.Args) {
+	if filter != nil && len(filter) > 0 {
+		f = filters.NewArgs()
+		for _, i := range filter {
+			f.Add(i[0], i[1])
+		}
+	}
+	return
 }
 
 func checkNetworks(n []itf.ContainerNet) error {
