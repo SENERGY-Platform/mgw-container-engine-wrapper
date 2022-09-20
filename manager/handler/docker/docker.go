@@ -28,6 +28,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
+	"time"
 )
 
 type Docker struct {
@@ -286,7 +287,11 @@ func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Imag
 			if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
 				util.Logger.Error(err)
 			} else {
-				img.Created = i.Created
+				if ti, err := time.Parse(time.RFC3339Nano, i.Created); err != nil {
+					util.Logger.Error(err)
+				} else {
+					img.Created = ti
+				}
 				img.Arch = i.Architecture
 			}
 			images = append(images, img)
@@ -302,11 +307,15 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	} else {
 		img = itf.Image{
 			ID:      i.ID,
-			Created: i.Created,
 			Size:    i.Size,
 			Arch:    i.Architecture,
 			Tags:    i.RepoTags,
 			Digests: i.RepoDigests,
+		}
+		if ti, err := time.Parse(time.RFC3339Nano, i.Created); err != nil {
+			util.Logger.Error(err)
+		} else {
+			img.Created = ti
 		}
 	}
 	return img, nil

@@ -43,12 +43,12 @@ type ContainerEngineHandler interface {
 }
 
 type Image struct {
-	ID      string   `json:"id"`
-	Created string   `json:"created"`
-	Size    int64    `json:"size"`
-	Arch    string   `json:"arch"`
-	Tags    []string `json:"tags"`
-	Digests []string `json:"digests"`
+	ID      string    `json:"id"`
+	Created time.Time `json:"created"`
+	Size    int64     `json:"size"`
+	Arch    string    `json:"arch"`
+	Tags    []string  `json:"tags"`
+	Digests []string  `json:"digests"`
 }
 
 type NetworkType string
