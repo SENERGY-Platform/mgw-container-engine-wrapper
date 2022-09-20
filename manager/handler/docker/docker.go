@@ -276,3 +276,12 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+func (d *Docker) ImageRemove(ctx context.Context, id string) error {
+	if res, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
+		return err
+	} else {
+		util.Logger.Debug(res)
+	}
+	return nil
+}
