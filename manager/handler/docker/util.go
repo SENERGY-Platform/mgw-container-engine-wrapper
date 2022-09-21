@@ -241,6 +241,10 @@ func genNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
 	return
 }
 
+func parseTimestamp(s string) (time.Time, error) {
+	return time.Parse(time.RFC3339Nano, s)
+}
+
 func checkNetworks(n []itf.ContainerNet) error {
 	set := make(map[string]struct{})
 	for _, net := range n {

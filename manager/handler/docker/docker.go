@@ -28,7 +28,6 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
-	"time"
 )
 
 type Docker struct {
@@ -136,13 +135,13 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.
 				util.Logger.Error(err)
 			} else {
 				ctr.Name = ci.Name
-				if tc, err := time.Parse(time.RFC3339Nano, ci.Created); err != nil {
+				if tc, err := parseTimestamp(ci.Created); err != nil {
 					util.Logger.Error(err)
 				} else {
 					ctr.Created = tc
 				}
 				if c.State == "running" {
-					if ts, err := time.Parse(time.RFC3339Nano, ci.State.StartedAt); err != nil {
+					if ts, err := parseTimestamp(ci.State.StartedAt); err != nil {
 						util.Logger.Error(err)
 					} else {
 						ctr.Started = &ts
@@ -197,13 +196,13 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 				StopTimeout:     parseStopTimeout(c.Config.StopTimeout),
 			},
 		}
-		if tc, err := time.Parse(time.RFC3339Nano, c.Created); err != nil {
+		if tc, err := parseTimestamp(c.Created); err != nil {
 			util.Logger.Error(err)
 		} else {
 			ctr.Created = tc
 		}
 		if c.State.Status == "running" {
-			if ts, err := time.Parse(time.RFC3339Nano, c.State.StartedAt); err != nil {
+			if ts, err := parseTimestamp(c.State.StartedAt); err != nil {
 				util.Logger.Error(err)
 			} else {
 				ctr.Started = &ts
@@ -307,7 +306,7 @@ func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Imag
 			if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
 				util.Logger.Error(err)
 			} else {
-				if ti, err := time.Parse(time.RFC3339Nano, i.Created); err != nil {
+				if ti, err := parseTimestamp(i.Created); err != nil {
 					util.Logger.Error(err)
 				} else {
 					img.Created = ti
@@ -332,7 +331,7 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 			Tags:    i.RepoTags,
 			Digests: i.RepoDigests,
 		}
-		if ti, err := time.Parse(time.RFC3339Nano, i.Created); err != nil {
+		if ti, err := parseTimestamp(i.Created); err != nil {
 			util.Logger.Error(err)
 		} else {
 			img.Created = ti
