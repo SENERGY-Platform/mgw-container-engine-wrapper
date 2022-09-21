@@ -290,6 +290,24 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return d.client.ContainerRestart(ctx, id, nil)
 }
 
+func (d *Docker) ContainerLog(ctx context.Context, id string) (io.ReadCloser, error) {
+	var lr LogReader
+	rc, err := d.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Since:      "",
+		Until:      "",
+		Timestamps: false,
+		Follow:     false,
+		Tail:       "", // num of lines
+		Details:    true,
+	})
+	if err != nil {
+		return &lr, err
+	}
+	return NewLogReader(rc), nil
+}
+
 func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
 	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
 		return nil, err

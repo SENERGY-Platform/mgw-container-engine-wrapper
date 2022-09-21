@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"deployment-manager/manager/itf"
 	"deployment-manager/util"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"github.com/docker/docker/api/types"
@@ -27,6 +28,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
+	"io"
 	"net"
 	"strconv"
 	"strings"
@@ -281,4 +283,67 @@ func (r ImgPullResp) String() string {
 		b.WriteString(fmt.Sprintf(" %d/%d", r.ProgressDetail.Current, r.ProgressDetail.Total))
 	}
 	return b.String()
+}
+
+type LogReader struct {
+	rc     io.ReadCloser
+	remain int
+}
+
+func NewLogReader(rc io.ReadCloser) *LogReader {
+	return &LogReader{
+		rc: rc,
+	}
+}
+
+func (r *LogReader) Read(p []byte) (n int, err error) {
+	pSize := len(p)
+	var pRemain int
+	for n < pSize {
+		pRemain = pSize - n
+		var size int
+		var iType byte
+		if r.remain == 0 {
+			var head = make([]byte, 8)
+			if _, err = r.rc.Read(head); err != nil {
+				if err == io.EOF {
+					break
+				}
+				return 0, err
+			}
+			iType = head[0]
+			if iType < 1 || iType > 2 {
+				return n, fmt.Errorf("unkown input type '%d'", iType)
+			}
+			oSize := int(binary.BigEndian.Uint32(head[4:]))
+			if oSize < pRemain {
+				size = oSize
+			} else {
+				size = pRemain
+				r.remain = oSize - pRemain
+			}
+		} else {
+			if r.remain < pRemain {
+				size = r.remain
+				r.remain = 0
+			} else {
+				size = pRemain
+				r.remain = r.remain - pRemain
+			}
+		}
+		var n2 int
+		n2, err = r.rc.Read(p[n : n+size])
+		n += n2
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return 0, err
+		}
+	}
+	return
+}
+
+func (r *LogReader) Close() error {
+	return r.rc.Close()
 }
