@@ -115,8 +115,8 @@ type Container struct {
 	ID        string            `json:"id"`
 	Name      string            `json:"name"`
 	State     ContainerState    `json:"state"`
-	Created   string            `json:"created"`
-	Started   string            `json:"started"`
+	Created   time.Time         `json:"created"`
+	Started   *time.Time        `json:"started"`
 	Image     string            `json:"image"`
 	ImageID   string            `json:"image_id"`
 	EnvVars   map[string]string `json:"env_vars"`

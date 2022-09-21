@@ -136,8 +136,18 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.
 				util.Logger.Error(err)
 			} else {
 				ctr.Name = ci.Name
-				ctr.Created = ci.Created
-				ctr.Started = ci.State.StartedAt
+				if tc, err := time.Parse(time.RFC3339Nano, ci.Created); err != nil {
+					util.Logger.Error(err)
+				} else {
+					ctr.Created = tc
+				}
+				if c.State == "running" {
+					if ts, err := time.Parse(time.RFC3339Nano, ci.State.StartedAt); err != nil {
+						util.Logger.Error(err)
+					} else {
+						ctr.Started = &ts
+					}
+				}
 				ctr.Image = ci.Config.Image
 				ctr.EnvVars = parseEnv(ci.Config.Env)
 				ctr.Ports = parsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
@@ -173,8 +183,6 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 			ID:       c.ID,
 			Name:     c.Name,
 			State:    stateMap[c.State.Status],
-			Created:  c.Created,
-			Started:  c.State.StartedAt,
 			Image:    c.Config.Image,
 			ImageID:  c.Image,
 			EnvVars:  parseEnv(c.Config.Env),
@@ -188,6 +196,18 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 				RemoveAfterRun:  c.HostConfig.AutoRemove,
 				StopTimeout:     parseStopTimeout(c.Config.StopTimeout),
 			},
+		}
+		if tc, err := time.Parse(time.RFC3339Nano, c.Created); err != nil {
+			util.Logger.Error(err)
+		} else {
+			ctr.Created = tc
+		}
+		if c.State.Status == "running" {
+			if ts, err := time.Parse(time.RFC3339Nano, c.State.StartedAt); err != nil {
+				util.Logger.Error(err)
+			} else {
+				ctr.Started = &ts
+			}
 		}
 	}
 	return ctr, nil
