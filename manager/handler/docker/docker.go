@@ -214,10 +214,12 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 
 func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (string, error) {
 	cConfig := &container.Config{
-		Env:         genEnv(ctrConf.EnvVars),
-		Image:       ctrConf.Image,
-		Labels:      ctrConf.Labels,
-		StopTimeout: genStopTimeout(ctrConf.RunConfig.StopTimeout),
+		AttachStdout: true,
+		AttachStderr: true,
+		Env:          genEnv(ctrConf.EnvVars),
+		Image:        ctrConf.Image,
+		Labels:       ctrConf.Labels,
+		StopTimeout:  genStopTimeout(ctrConf.RunConfig.StopTimeout),
 	}
 	bindings, err := genPortMap(ctrConf.Ports)
 	if err != nil {
