@@ -18,6 +18,7 @@ package itf
 
 import (
 	"context"
+	"io"
 	"io/fs"
 	"net"
 	"time"
@@ -36,7 +37,7 @@ type ContainerEngineHandler interface {
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string) ([]string, error)
+	ContainerLog(ctx context.Context, id string) (io.ReadCloser, error)
 	ImageInfo(ctx context.Context, id string) (Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
