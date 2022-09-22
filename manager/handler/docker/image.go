@@ -22,7 +22,7 @@ import (
 	"deployment-manager/manager/itf"
 	dmUtil "deployment-manager/util"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"io"
@@ -96,7 +96,7 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 			dmUtil.Logger.Debug(msg)
 		}
 		if msg.Message != "" {
-			return errors.New(msg.Message)
+			return fmt.Errorf("pulling image failed: %s", msg.Message)
 		}
 	}
 	return nil

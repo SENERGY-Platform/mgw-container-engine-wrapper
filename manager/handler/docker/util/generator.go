@@ -18,7 +18,6 @@ package util
 
 import (
 	"deployment-manager/manager/itf"
-	"errors"
 	"fmt"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
@@ -52,7 +51,7 @@ func GenPortMap(ports []itf.Port) (nat.PortMap, error) {
 	set := make(map[string]struct{})
 	for _, p := range ports {
 		if _, ok := set[p.KeyStr()]; ok {
-			return pm, errors.New("port duplicate")
+			return pm, fmt.Errorf("port duplicate '%s'", p.KeyStr())
 		}
 		set[p.KeyStr()] = struct{}{}
 		port, err := nat.NewPort(PortTypeRMap[p.Protocol], strconv.FormatInt(int64(p.Number), 10))
@@ -77,7 +76,7 @@ func GenMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 	for i := 0; i < len(mounts); i++ {
 		m := mounts[i]
 		if _, ok := set[m.KeyStr()]; ok {
-			return msl, errors.New("mount duplicate")
+			return msl, fmt.Errorf("mount duplicate '%s'", m.KeyStr())
 		}
 		set[m.KeyStr()] = struct{}{}
 		mnt := mount.Mount{
@@ -138,7 +137,7 @@ func CheckNetworks(n []itf.ContainerNet) error {
 	set := make(map[string]struct{})
 	for _, net := range n {
 		if _, ok := set[net.Name]; ok {
-			return errors.New("network duplicate")
+			return fmt.Errorf("network duplicate '%s'", net.Name)
 		}
 		set[net.Name] = struct{}{}
 	}

@@ -18,7 +18,6 @@ package itf
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"time"
@@ -44,7 +43,7 @@ func (p *PortType) UnmarshalJSON(b []byte) (err error) {
 	if t, ok := PortTypeMap[s]; ok {
 		*p = t
 	} else {
-		err = errors.New(fmt.Sprintf("unknown port type '%s'", s))
+		err = fmt.Errorf("unknown port type '%s'", s)
 	}
 	return
 }
@@ -57,7 +56,7 @@ func (n *NetworkType) UnmarshalJSON(b []byte) (err error) {
 	if t, ok := NetworkTypeMap[s]; ok {
 		*n = t
 	} else {
-		err = errors.New(fmt.Sprintf("unknown network type '%s'", s))
+		err = fmt.Errorf("unknown network type '%s'", s)
 	}
 	return
 }
@@ -70,7 +69,7 @@ func (r *RestartStrategy) UnmarshalJSON(b []byte) (err error) {
 	if st, ok := RestartStrategyMap[s]; ok {
 		*r = st
 	} else {
-		err = errors.New(fmt.Sprintf("unknown restart strategy '%s'", s))
+		err = fmt.Errorf("unknown restart strategy '%s'", s)
 	}
 	return
 }
@@ -83,7 +82,7 @@ func (m *MountType) UnmarshalJSON(b []byte) (err error) {
 	if t, ok := MountTypeMap[s]; ok {
 		*m = t
 	} else {
-		err = errors.New(fmt.Sprintf("unknown mount type '%s'", s))
+		err = fmt.Errorf("unknown mount type '%s'", s)
 	}
 	return
 }
@@ -96,7 +95,7 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 	if ip := net.ParseIP(s); ip != nil {
 		i.IP = ip
 	} else {
-		err = errors.New(fmt.Sprintf("invalid IP address '%s'", s))
+		err = fmt.Errorf("invalid IP address '%s'", s)
 	}
 	return
 }
