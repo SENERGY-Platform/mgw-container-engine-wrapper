@@ -306,14 +306,12 @@ func (r *LogReader) Read(p []byte) (n int, err error) {
 		if r.remain == 0 {
 			var head = make([]byte, 8)
 			if _, err = r.rc.Read(head); err != nil {
-				if err == io.EOF {
-					break
-				}
-				return 0, err
+				break
 			}
 			iType = head[0]
 			if iType < 1 || iType > 2 {
-				return n, fmt.Errorf("unkown input type '%d'", iType)
+				err = fmt.Errorf("unkown input type '%d'", iType)
+				break
 			}
 			oSize := int(binary.BigEndian.Uint32(head[4:]))
 			if oSize < pRemain {
@@ -335,10 +333,7 @@ func (r *LogReader) Read(p []byte) (n int, err error) {
 		n2, err = r.rc.Read(p[n : n+size])
 		n += n2
 		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return 0, err
+			break
 		}
 	}
 	return
