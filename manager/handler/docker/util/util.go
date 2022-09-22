@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package docker
+package util
 
 import (
 	"bytes"
@@ -36,7 +36,7 @@ import (
 	"unicode/utf8"
 )
 
-func parseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
+func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
 	if len(endptSettings) > 0 {
 		for key, val := range endptSettings {
 			netInfo = append(netInfo, itf.ContainerNet{
@@ -52,13 +52,13 @@ func parseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (
 	return
 }
 
-func parsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.Port) {
+func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.Port) {
 	if len(portSet) > 0 || len(portMap) > 0 {
 		set := make(map[string]struct{})
 		for port, bindings := range portMap {
 			p := itf.Port{
 				Number:   port.Int(),
-				Protocol: portTypeMap[port.Proto()],
+				Protocol: PortTypeMap[port.Proto()],
 			}
 			for _, binding := range bindings {
 				num, err := strconv.ParseInt(binding.HostPort, 10, 0)
@@ -77,7 +77,7 @@ func parsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.P
 			if _, ok := set[string(port)]; !ok {
 				ports = append(ports, itf.Port{
 					Number:   port.Int(),
-					Protocol: portTypeMap[port.Proto()],
+					Protocol: PortTypeMap[port.Proto()],
 				})
 			}
 		}
@@ -85,10 +85,10 @@ func parsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.P
 	return
 }
 
-func parseMountPoints(mountPoints []types.MountPoint) (mounts []itf.Mount) {
+func ParseMountPoints(mountPoints []types.MountPoint) (mounts []itf.Mount) {
 	if len(mountPoints) > 0 {
 		for _, mp := range mountPoints {
-			if mType, ok := mountTypeMap[mp.Type]; ok {
+			if mType, ok := MountTypeMap[mp.Type]; ok {
 				mounts = append(mounts, itf.Mount{
 					Type:     mType,
 					Source:   mp.Source,
@@ -101,10 +101,10 @@ func parseMountPoints(mountPoints []types.MountPoint) (mounts []itf.Mount) {
 	return
 }
 
-func parseMounts(mts []mount.Mount) (mounts []itf.Mount) {
+func ParseMounts(mts []mount.Mount) (mounts []itf.Mount) {
 	if len(mts) > 0 {
 		for _, mt := range mts {
-			if mType, ok := mountTypeMap[mt.Type]; ok {
+			if mType, ok := MountTypeMap[mt.Type]; ok {
 				m := itf.Mount{
 					Type:     mType,
 					Source:   mt.Source,
@@ -125,7 +125,7 @@ func parseMounts(mts []mount.Mount) (mounts []itf.Mount) {
 	return
 }
 
-func parseEnv(ev []string) (env map[string]string) {
+func ParseEnv(ev []string) (env map[string]string) {
 	if len(ev) > 0 {
 		env = make(map[string]string, len(ev))
 		for _, s := range ev {
@@ -136,7 +136,7 @@ func parseEnv(ev []string) (env map[string]string) {
 	return
 }
 
-func genEnv(ev map[string]string) (env []string) {
+func GenEnv(ev map[string]string) (env []string) {
 	if len(ev) > 0 {
 		for key, val := range ev {
 			env = append(env, fmt.Sprintf("%s=%s", key, val))
@@ -145,14 +145,14 @@ func genEnv(ev map[string]string) (env []string) {
 	return
 }
 
-func parseStopTimeout(t *int) *itf.Duration {
+func ParseStopTimeout(t *int) *itf.Duration {
 	if t != nil {
 		return &itf.Duration{Duration: time.Duration(*t * int(time.Second))}
 	}
 	return nil
 }
 
-func genStopTimeout(d *itf.Duration) *int {
+func GenStopTimeout(d *itf.Duration) *int {
 	if d != nil {
 		t := int(d.Seconds())
 		return &t
@@ -160,7 +160,7 @@ func genStopTimeout(d *itf.Duration) *int {
 	return nil
 }
 
-func genPortMap(ports []itf.Port) (nat.PortMap, error) {
+func GenPortMap(ports []itf.Port) (nat.PortMap, error) {
 	pm := make(nat.PortMap)
 	set := make(map[string]struct{})
 	for _, p := range ports {
@@ -168,7 +168,7 @@ func genPortMap(ports []itf.Port) (nat.PortMap, error) {
 			return pm, errors.New("port duplicate")
 		}
 		set[p.KeyStr()] = struct{}{}
-		port, err := nat.NewPort(portTypeRMap[p.Protocol], strconv.FormatInt(int64(p.Number), 10))
+		port, err := nat.NewPort(PortTypeRMap[p.Protocol], strconv.FormatInt(int64(p.Number), 10))
 		if err != nil {
 			return pm, err
 		}
@@ -184,7 +184,7 @@ func genPortMap(ports []itf.Port) (nat.PortMap, error) {
 	return pm, nil
 }
 
-func genMounts(mounts []itf.Mount) ([]mount.Mount, error) {
+func GenMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 	var msl []mount.Mount
 	set := make(map[string]struct{})
 	for i := 0; i < len(mounts); i++ {
@@ -194,7 +194,7 @@ func genMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 		}
 		set[m.KeyStr()] = struct{}{}
 		mnt := mount.Mount{
-			Type:     mountTypeRMap[m.Type],
+			Type:     MountTypeRMap[m.Type],
 			Source:   m.Source,
 			Target:   m.Target,
 			ReadOnly: m.ReadOnly,
@@ -213,7 +213,7 @@ func genMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 	return msl, nil
 }
 
-func genFilterArgs(filter [][2]string) (f filters.Args) {
+func GenFilterArgs(filter [][2]string) (f filters.Args) {
 	if filter != nil && len(filter) > 0 {
 		f = filters.NewArgs()
 		for _, i := range filter {
@@ -223,7 +223,7 @@ func genFilterArgs(filter [][2]string) (f filters.Args) {
 	return
 }
 
-func parseNetIPAMConfig(c []network.IPAMConfig) (s itf.Subnet, gw itf.IPAddr) {
+func ParseNetIPAMConfig(c []network.IPAMConfig) (s itf.Subnet, gw itf.IPAddr) {
 	if c != nil && len(c) > 0 {
 		sp := strings.Split(c[0].Subnet, "/")
 		if len(sp) == 2 {
@@ -236,7 +236,7 @@ func parseNetIPAMConfig(c []network.IPAMConfig) (s itf.Subnet, gw itf.IPAddr) {
 	return
 }
 
-func genNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
+func GenNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
 	c = append(c, network.IPAMConfig{
 		Subnet:  n.Subnet.KeyStr(),
 		Gateway: n.Gateway.String(),
@@ -244,11 +244,11 @@ func genNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
 	return
 }
 
-func parseTimestamp(s string) (time.Time, error) {
+func ParseTimestamp(s string) (time.Time, error) {
 	return time.Parse(time.RFC3339Nano, s)
 }
 
-func genTimestamp(t time.Time) string {
+func GenTimestamp(t time.Time) string {
 	tp := strings.Split(t.Format(time.RFC3339Nano), ":")
 	s := strings.TrimSuffix(tp[2], "Z")
 	var ns string
@@ -264,7 +264,7 @@ func genTimestamp(t time.Time) string {
 	return fmt.Sprintf("%s:%s:%s.%sZ", tp[0], tp[1], s, ns)
 }
 
-func checkNetworks(n []itf.ContainerNet) error {
+func CheckNetworks(n []itf.ContainerNet) error {
 	set := make(map[string]struct{})
 	for _, net := range n {
 		if _, ok := set[net.Name]; ok {

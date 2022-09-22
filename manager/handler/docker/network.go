@@ -18,20 +18,21 @@ package docker
 
 import (
 	"context"
+	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	"deployment-manager/util"
+	dmUtil "deployment-manager/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 )
 
 func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
-	if nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: genFilterArgs(filter)}); err != nil {
+	if nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: util.GenFilterArgs(filter)}); err != nil {
 		return nil, err
 	} else {
 		var n []itf.Network
 		for _, r := range nr {
-			if nType, ok := netTypeMap[r.Driver]; ok {
-				s, gw := parseNetIPAMConfig(r.IPAM.Config)
+			if nType, ok := util.NetTypeMap[r.Driver]; ok {
+				s, gw := util.ParseNetIPAMConfig(r.IPAM.Config)
 				n = append(n, itf.Network{
 					ID:      r.ID,
 					Name:    r.Name,
@@ -50,11 +51,11 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error
 	if nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{}); err != nil {
 		return n, err
 	} else {
-		s, gw := parseNetIPAMConfig(nr.IPAM.Config)
+		s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
 		n = itf.Network{
 			ID:      nr.ID,
 			Name:    nr.Name,
-			Type:    netTypeMap[nr.Driver],
+			Type:    util.NetTypeMap[nr.Driver],
 			Subnet:  s,
 			Gateway: gw,
 		}
@@ -65,15 +66,15 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error
 func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 	if res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
-		Driver:         netTypeRMap[net.Type],
+		Driver:         util.NetTypeRMap[net.Type],
 		Attachable:     true,
 		IPAM: &network.IPAM{
-			Config: genNetIPAMConfig(net),
+			Config: util.GenNetIPAMConfig(net),
 		},
 	}); err != nil {
 		return err
 	} else {
-		util.Logger.Debug(res)
+		dmUtil.Logger.Debug(res)
 	}
 	return nil
 }

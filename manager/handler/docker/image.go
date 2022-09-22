@@ -18,8 +18,9 @@ package docker
 
 import (
 	"context"
+	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	"deployment-manager/util"
+	dmUtil "deployment-manager/util"
 	"encoding/json"
 	"errors"
 	"github.com/docker/docker/api/types"
@@ -28,7 +29,7 @@ import (
 )
 
 func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
-	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
+	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: util.GenFilterArgs(filter)}); err != nil {
 		return nil, err
 	} else {
 		var images []itf.Image
@@ -41,10 +42,10 @@ func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Imag
 				Digests: is.RepoDigests,
 			}
 			if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
-				util.Logger.Error(err)
+				dmUtil.Logger.Error(err)
 			} else {
-				if ti, err := parseTimestamp(i.Created); err != nil {
-					util.Logger.Error(err)
+				if ti, err := util.ParseTimestamp(i.Created); err != nil {
+					dmUtil.Logger.Error(err)
 				} else {
 					img.Created = ti
 				}
@@ -68,8 +69,8 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 			Tags:    i.RepoTags,
 			Digests: i.RepoDigests,
 		}
-		if ti, err := parseTimestamp(i.Created); err != nil {
-			util.Logger.Error(err)
+		if ti, err := util.ParseTimestamp(i.Created); err != nil {
+			dmUtil.Logger.Error(err)
 		} else {
 			img.Created = ti
 		}
@@ -83,7 +84,7 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 	} else {
 		defer rc.Close()
 		jd := json.NewDecoder(rc)
-		var msg ImgPullResp
+		var msg util.ImgPullResp
 		for {
 			if err := jd.Decode(&msg); err != nil {
 				if err == io.EOF {
@@ -92,7 +93,7 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 					return err
 				}
 			}
-			util.Logger.Debug(msg)
+			dmUtil.Logger.Debug(msg)
 		}
 		if msg.Message != "" {
 			return errors.New(msg.Message)
@@ -105,7 +106,7 @@ func (d *Docker) ImageRemove(ctx context.Context, id string) error {
 	if res, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
 		return err
 	} else {
-		util.Logger.Debug(res)
+		dmUtil.Logger.Debug(res)
 	}
 	return nil
 }
@@ -114,7 +115,7 @@ func (d *Docker) PruneImages(ctx context.Context) error {
 	if res, err := d.client.ImagesPrune(ctx, filters.Args{}); err != nil {
 		return err
 	} else {
-		util.Logger.Debug(res)
+		dmUtil.Logger.Debug(res)
 	}
 	return nil
 }

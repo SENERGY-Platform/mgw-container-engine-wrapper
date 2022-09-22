@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package docker
+package util
 
 import (
 	"deployment-manager/manager/itf"
 	"github.com/docker/docker/api/types/mount"
 )
 
-var stateMap = map[string]itf.ContainerState{
+var StateMap = map[string]itf.ContainerState{
 	"created":    itf.UnknownState,
 	"running":    itf.RunningState,
 	"paused":     itf.UnknownState,
@@ -31,58 +31,58 @@ var stateMap = map[string]itf.ContainerState{
 	"dead":       itf.UnhealthyState,
 }
 
-var restartPolicyMap = map[string]itf.RestartStrategy{
+var RestartPolicyMap = map[string]itf.RestartStrategy{
 	"no":             itf.RestartNever,
 	"on-failure":     itf.RestartOnFail,
 	"always":         itf.RestartAlways,
 	"unless-stopped": itf.RestartNotStopped,
 }
 
-var restartPolicyRMap = func() map[itf.RestartStrategy]string {
+var RestartPolicyRMap = func() map[itf.RestartStrategy]string {
 	m := make(map[itf.RestartStrategy]string)
-	for k, v := range restartPolicyMap {
+	for k, v := range RestartPolicyMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var mountTypeMap = map[mount.Type]itf.MountType{
+var MountTypeMap = map[mount.Type]itf.MountType{
 	mount.TypeBind:   itf.BindMount,
 	mount.TypeVolume: itf.VolumeMount,
 	mount.TypeTmpfs:  itf.TmpfsMount,
 }
 
-var mountTypeRMap = func() map[itf.MountType]mount.Type {
+var MountTypeRMap = func() map[itf.MountType]mount.Type {
 	m := make(map[itf.MountType]mount.Type)
-	for k, v := range mountTypeMap {
+	for k, v := range MountTypeMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var portTypeMap = map[string]itf.PortType{
+var PortTypeMap = map[string]itf.PortType{
 	"tcp":  itf.TcpPort,
 	"udp":  itf.UdpPort,
 	"sctp": itf.SctpPort,
 }
 
-var portTypeRMap = func() map[itf.PortType]string {
+var PortTypeRMap = func() map[itf.PortType]string {
 	m := make(map[itf.PortType]string)
-	for k, v := range portTypeMap {
+	for k, v := range PortTypeMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var netTypeMap = map[string]itf.NetworkType{
+var NetTypeMap = map[string]itf.NetworkType{
 	"bridge":  itf.BridgeNet,
 	"macvlan": itf.MACVlanNet,
 	"host":    itf.HostNet,
 }
 
-var netTypeRMap = func() map[itf.NetworkType]string {
+var NetTypeRMap = func() map[itf.NetworkType]string {
 	m := make(map[itf.NetworkType]string)
-	for k, v := range netTypeMap {
+	for k, v := range NetTypeMap {
 		m[v] = k
 	}
 	return m

@@ -18,8 +18,9 @@ package docker
 
 import (
 	"context"
+	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	"deployment-manager/util"
+	dmUtil "deployment-manager/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -28,47 +29,47 @@ import (
 )
 
 func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
-	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: genFilterArgs(filter)}); err != nil {
+	if cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenFilterArgs(filter)}); err != nil {
 		return nil, err
 	} else {
 		var csl []itf.Container
 		for _, c := range cl {
 			ctr := itf.Container{
 				ID:       c.ID,
-				State:    stateMap[c.State],
+				State:    util.StateMap[c.State],
 				ImageID:  c.ImageID,
 				Labels:   c.Labels,
-				Mounts:   parseMountPoints(c.Mounts),
-				Networks: parseEndpointSettings(c.NetworkSettings.Networks),
+				Mounts:   util.ParseMountPoints(c.Mounts),
+				Networks: util.ParseEndpointSettings(c.NetworkSettings.Networks),
 			}
 			if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
-				util.Logger.Error(err)
+				dmUtil.Logger.Error(err)
 			} else {
 				ctr.Name = ci.Name
-				if tc, err := parseTimestamp(ci.Created); err != nil {
-					util.Logger.Error(err)
+				if tc, err := util.ParseTimestamp(ci.Created); err != nil {
+					dmUtil.Logger.Error(err)
 				} else {
 					ctr.Created = tc
 				}
 				if c.State == "running" {
-					if ts, err := parseTimestamp(ci.State.StartedAt); err != nil {
-						util.Logger.Error(err)
+					if ts, err := util.ParseTimestamp(ci.State.StartedAt); err != nil {
+						dmUtil.Logger.Error(err)
 					} else {
 						ctr.Started = &ts
 					}
 				}
 				ctr.Image = ci.Config.Image
-				ctr.EnvVars = parseEnv(ci.Config.Env)
-				ctr.Ports = parsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
+				ctr.EnvVars = util.ParseEnv(ci.Config.Env)
+				ctr.Ports = util.ParsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports)
 				if len(ci.HostConfig.Mounts) > 0 {
-					ctr.Mounts = parseMounts(ci.HostConfig.Mounts)
+					ctr.Mounts = util.ParseMounts(ci.HostConfig.Mounts)
 				}
-				ctr.Networks = parseEndpointSettings(ci.NetworkSettings.Networks)
+				ctr.Networks = util.ParseEndpointSettings(ci.NetworkSettings.Networks)
 				ctr.RunConfig = itf.RunConfig{
-					RestartStrategy: restartPolicyMap[ci.HostConfig.RestartPolicy.Name],
+					RestartStrategy: util.RestartPolicyMap[ci.HostConfig.RestartPolicy.Name],
 					Retries:         ci.HostConfig.RestartPolicy.MaximumRetryCount,
 					RemoveAfterRun:  ci.HostConfig.AutoRemove,
-					StopTimeout:     parseStopTimeout(ci.Config.StopTimeout),
+					StopTimeout:     util.ParseStopTimeout(ci.Config.StopTimeout),
 				}
 			}
 			csl = append(csl, ctr)
@@ -84,36 +85,36 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 	} else {
 		var mts []itf.Mount
 		if len(c.HostConfig.Mounts) > 0 {
-			mts = parseMounts(c.HostConfig.Mounts)
+			mts = util.ParseMounts(c.HostConfig.Mounts)
 		} else {
-			mts = parseMountPoints(c.Mounts)
+			mts = util.ParseMountPoints(c.Mounts)
 		}
 		ctr = itf.Container{
 			ID:       c.ID,
 			Name:     c.Name,
-			State:    stateMap[c.State.Status],
+			State:    util.StateMap[c.State.Status],
 			Image:    c.Config.Image,
 			ImageID:  c.Image,
-			EnvVars:  parseEnv(c.Config.Env),
+			EnvVars:  util.ParseEnv(c.Config.Env),
 			Labels:   c.Config.Labels,
 			Mounts:   mts,
-			Ports:    parsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports),
-			Networks: parseEndpointSettings(c.NetworkSettings.Networks),
+			Ports:    util.ParsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports),
+			Networks: util.ParseEndpointSettings(c.NetworkSettings.Networks),
 			RunConfig: itf.RunConfig{
-				RestartStrategy: restartPolicyMap[c.HostConfig.RestartPolicy.Name],
+				RestartStrategy: util.RestartPolicyMap[c.HostConfig.RestartPolicy.Name],
 				Retries:         c.HostConfig.RestartPolicy.MaximumRetryCount,
 				RemoveAfterRun:  c.HostConfig.AutoRemove,
-				StopTimeout:     parseStopTimeout(c.Config.StopTimeout),
+				StopTimeout:     util.ParseStopTimeout(c.Config.StopTimeout),
 			},
 		}
-		if tc, err := parseTimestamp(c.Created); err != nil {
-			util.Logger.Error(err)
+		if tc, err := util.ParseTimestamp(c.Created); err != nil {
+			dmUtil.Logger.Error(err)
 		} else {
 			ctr.Created = tc
 		}
 		if c.State.Status == "running" {
-			if ts, err := parseTimestamp(c.State.StartedAt); err != nil {
-				util.Logger.Error(err)
+			if ts, err := util.ParseTimestamp(c.State.StartedAt); err != nil {
+				dmUtil.Logger.Error(err)
 			} else {
 				ctr.Started = &ts
 			}
@@ -126,29 +127,29 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 	cConfig := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
-		Env:          genEnv(ctrConf.EnvVars),
+		Env:          util.GenEnv(ctrConf.EnvVars),
 		Image:        ctrConf.Image,
 		Labels:       ctrConf.Labels,
-		StopTimeout:  genStopTimeout(ctrConf.RunConfig.StopTimeout),
+		StopTimeout:  util.GenStopTimeout(ctrConf.RunConfig.StopTimeout),
 	}
-	bindings, err := genPortMap(ctrConf.Ports)
+	bindings, err := util.GenPortMap(ctrConf.Ports)
 	if err != nil {
 		return "", err
 	}
-	mts, err := genMounts(ctrConf.Mounts)
+	mts, err := util.GenMounts(ctrConf.Mounts)
 	if err != nil {
 		return "", err
 	}
 	hConfig := &container.HostConfig{
 		PortBindings: bindings,
 		RestartPolicy: container.RestartPolicy{
-			Name:              restartPolicyRMap[ctrConf.RunConfig.RestartStrategy],
+			Name:              util.RestartPolicyRMap[ctrConf.RunConfig.RestartStrategy],
 			MaximumRetryCount: ctrConf.RunConfig.Retries,
 		},
 		AutoRemove: ctrConf.RunConfig.RemoveAfterRun,
 		Mounts:     mts,
 	}
-	err = checkNetworks(ctrConf.Networks)
+	err = util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
 		return "", err
 	}
@@ -165,7 +166,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 		return "", err
 	}
 	if res.Warnings != nil && len(res.Warnings) > 0 {
-		util.Logger.Warning(res.Warnings)
+		dmUtil.Logger.Warning(res.Warnings)
 	}
 	if len(ctrConf.Networks) > 1 {
 		for i := 1; i < len(ctrConf.Networks); i++ {
@@ -175,7 +176,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 			if err != nil {
 				err2 := d.ContainerRemove(ctx, res.ID)
 				if err2 != nil {
-					util.Logger.Error(err2)
+					dmUtil.Logger.Error(err2)
 				}
 				return "", err
 			}
@@ -203,16 +204,16 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 }
 
 func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptions) (io.ReadCloser, error) {
-	var lr LogReader
+	var lr util.LogReader
 	clo := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 	}
 	if logOpt.Since != nil {
-		clo.Since = genTimestamp(*logOpt.Since)
+		clo.Since = util.GenTimestamp(*logOpt.Since)
 	}
 	if logOpt.Until != nil {
-		clo.Until = genTimestamp(*logOpt.Until)
+		clo.Until = util.GenTimestamp(*logOpt.Until)
 	}
 	if logOpt.MaxLines > 0 {
 		clo.Tail = strconv.FormatInt(int64(logOpt.MaxLines), 10)
@@ -221,5 +222,5 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOpti
 	if err != nil {
 		return &lr, err
 	}
-	return NewLogReader(rc), nil
+	return util.NewLogReader(rc), nil
 }
