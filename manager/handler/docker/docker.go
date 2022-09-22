@@ -28,6 +28,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
+	"strconv"
 )
 
 type Docker struct {
@@ -292,18 +293,22 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return d.client.ContainerRestart(ctx, id, nil)
 }
 
-func (d *Docker) ContainerLog(ctx context.Context, id string) (io.ReadCloser, error) {
+func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptions) (io.ReadCloser, error) {
 	var lr LogReader
-	rc, err := d.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+	clo := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
-		Since:      "",
-		Until:      "",
-		Timestamps: false,
-		Follow:     false,
-		Tail:       "", // num of lines
-		Details:    true,
-	})
+	}
+	if logOpt.Since != nil {
+		clo.Since = genTimestamp(*logOpt.Since)
+	}
+	if logOpt.Until != nil {
+		clo.Until = genTimestamp(*logOpt.Until)
+	}
+	if logOpt.MaxLines > 0 {
+		clo.Tail = strconv.FormatInt(int64(logOpt.MaxLines), 10)
+	}
+	rc, err := d.client.ContainerLogs(ctx, id, clo)
 	if err != nil {
 		return &lr, err
 	}
