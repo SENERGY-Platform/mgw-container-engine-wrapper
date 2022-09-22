@@ -25,8 +25,8 @@ type Docker struct {
 	client *client.Client
 }
 
-func New() (*Docker, error) {
-	c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+func New(ops ...client.Opt) (*Docker, error) {
+	c, err := client.NewClientWithOpts(ops...)
 	if err != nil {
 		return nil, err
 	}
