@@ -33,7 +33,7 @@ type ImgPullResp struct {
 }
 
 func (r ImgPullResp) String() string {
-	var b bytes.Buffer
+	b := new(bytes.Buffer)
 	if r.Status != "" {
 		b.WriteString(r.Status)
 	}
