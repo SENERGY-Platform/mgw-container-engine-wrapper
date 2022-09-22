@@ -58,7 +58,12 @@ func main() {
 
 	util.Logger.Debugf("config: %s", util.ToJsonStr(config))
 
-	dockerHandler, err := docker.New(client.FromEnv, client.WithAPIVersionNegotiation())
+	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		util.Logger.Error(err)
+		return
+	}
+	dockerHandler := docker.New(dockerClient)
 	if err != nil {
 		util.Logger.Error(err)
 		return

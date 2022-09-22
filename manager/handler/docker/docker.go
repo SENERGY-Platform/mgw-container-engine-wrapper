@@ -25,12 +25,8 @@ type Docker struct {
 	client *client.Client
 }
 
-func New(ops ...client.Opt) (*Docker, error) {
-	c, err := client.NewClientWithOpts(ops...)
-	if err != nil {
-		return nil, err
-	}
-	return &Docker{client: c}, nil
+func New(c *client.Client) *Docker {
+	return &Docker{client: c}
 }
 
 func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
