@@ -30,11 +30,11 @@ func New(c *client.Client) *Docker {
 }
 
 func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
+	info := map[string]string{}
 	srvVer, err := d.client.ServerVersion(ctx)
 	if err != nil {
-		return nil, err
+		return info, err
 	}
-	info := make(map[string]string, len(srvVer.Components))
 	for i := 0; i < len(srvVer.Components); i++ {
 		info[srvVer.Components[i].Name] = srvVer.Components[i].Version
 	}
