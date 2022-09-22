@@ -31,8 +31,8 @@ type Config struct {
 	ApiEngine  gin_web.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
 }
 
-func NewConfig(path *string) (cfg *Config, err error) {
-	cfg = &Config{
+func NewConfig(path *string) (*Config, error) {
+	cfg := Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
 		Logger: LoggerConfig{
 			Level:    level.Warning,
@@ -43,18 +43,18 @@ func NewConfig(path *string) (cfg *Config, err error) {
 		},
 	}
 	if path != nil {
-		var file *os.File
-		if file, err = os.Open(*path); err != nil {
-			return
+		file, err := os.Open(*path)
+		if err != nil {
+			return &cfg, err
 		}
 		defer file.Close()
 		decoder := json.NewDecoder(file)
-		if err = decoder.Decode(cfg); err != nil {
-			return
+		if err = decoder.Decode(&cfg); err != nil {
+			return &cfg, err
 		}
 	}
-	err = envldr.LoadEnvUserParser(cfg, nil, typeParsers, nil)
-	return cfg, err
+	err := envldr.LoadEnvUserParser(&cfg, nil, typeParsers, nil)
+	return &cfg, err
 }
 
 var typeParsers = map[reflect.Type]envldr.Parser{
