@@ -26,55 +26,55 @@ import (
 )
 
 func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
-	if nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: util.GenFilterArgs(filter)}); err != nil {
-		return nil, err
-	} else {
-		var n []itf.Network
-		for _, r := range nr {
-			if nType, ok := util.NetTypeMap[r.Driver]; ok {
-				s, gw := util.ParseNetIPAMConfig(r.IPAM.Config)
-				n = append(n, itf.Network{
-					ID:      r.ID,
-					Name:    r.Name,
-					Type:    nType,
-					Subnet:  s,
-					Gateway: gw,
-				})
-			}
-		}
-		return n, nil
-	}
-}
-
-func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
-	var n itf.Network
-	if nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{}); err != nil {
+	var n []itf.Network
+	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: util.GenFilterArgs(filter)})
+	if err != nil {
 		return n, err
-	} else {
-		s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
-		n = itf.Network{
-			ID:      nr.ID,
-			Name:    nr.Name,
-			Type:    util.NetTypeMap[nr.Driver],
-			Subnet:  s,
-			Gateway: gw,
+	}
+	for _, r := range nr {
+		if nType, ok := util.NetTypeMap[r.Driver]; ok {
+			s, gw := util.ParseNetIPAMConfig(r.IPAM.Config)
+			n = append(n, itf.Network{
+				ID:      r.ID,
+				Name:    r.Name,
+				Type:    nType,
+				Subnet:  s,
+				Gateway: gw,
+			})
 		}
 	}
 	return n, nil
 }
 
+func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
+	n := itf.Network{}
+	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
+	if err != nil {
+		return n, err
+	}
+	s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
+	n.ID = nr.ID
+	n.Name = nr.Name
+	n.Type = util.NetTypeMap[nr.Driver]
+	n.Subnet = s
+	n.Gateway = gw
+	return n, nil
+}
+
 func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
-	if res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
+	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         util.NetTypeRMap[net.Type],
 		Attachable:     true,
 		IPAM: &network.IPAM{
 			Config: util.GenNetIPAMConfig(net),
 		},
-	}); err != nil {
+	})
+	if err != nil {
 		return err
-	} else {
-		dmUtil.Logger.Debug(res)
+	}
+	if res.Warning != "" {
+		dmUtil.Logger.Warning(res.Warning)
 	}
 	return nil
 }
