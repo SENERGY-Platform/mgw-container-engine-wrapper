@@ -29,93 +29,83 @@ import (
 )
 
 func (d *Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
-	if il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: util.GenFilterArgs(filter)}); err != nil {
-		return nil, err
-	} else {
-		var images []itf.Image
-		for _, is := range il {
-			img := itf.Image{
-				ID: is.ID,
-				//Created: is.Created,
-				Size:    is.Size,
-				Tags:    is.RepoTags,
-				Digests: is.RepoDigests,
-			}
-			if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
+	var images []itf.Image
+	il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: util.GenFilterArgs(filter)})
+	if err != nil {
+		return images, err
+	}
+	for _, is := range il {
+		img := itf.Image{
+			ID: is.ID,
+			//Created: is.Created,
+			Size:    is.Size,
+			Tags:    is.RepoTags,
+			Digests: is.RepoDigests,
+		}
+		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
+			dmUtil.Logger.Error(err)
+		} else {
+			if ti, err := util.ParseTimestamp(i.Created); err != nil {
 				dmUtil.Logger.Error(err)
 			} else {
-				if ti, err := util.ParseTimestamp(i.Created); err != nil {
-					dmUtil.Logger.Error(err)
-				} else {
-					img.Created = ti
-				}
-				img.Arch = i.Architecture
+				img.Created = ti
 			}
-			images = append(images, img)
+			img.Arch = i.Architecture
 		}
-		return images, nil
+		images = append(images, img)
 	}
+	return images, nil
 }
 
 func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
-	var img itf.Image
-	if i, _, err := d.client.ImageInspectWithRaw(ctx, id); err != nil {
+	img := itf.Image{}
+	i, _, err := d.client.ImageInspectWithRaw(ctx, id)
+	if err != nil {
 		return img, err
+	}
+	img.ID = i.ID
+	img.Size = i.Size
+	img.Arch = i.Architecture
+	img.Tags = i.RepoTags
+	img.Digests = i.RepoDigests
+	if ti, err := util.ParseTimestamp(i.Created); err != nil {
+		dmUtil.Logger.Error(err)
 	} else {
-		img = itf.Image{
-			ID:      i.ID,
-			Size:    i.Size,
-			Arch:    i.Architecture,
-			Tags:    i.RepoTags,
-			Digests: i.RepoDigests,
-		}
-		if ti, err := util.ParseTimestamp(i.Created); err != nil {
-			dmUtil.Logger.Error(err)
-		} else {
-			img.Created = ti
-		}
+		img.Created = ti
 	}
 	return img, nil
 }
 
 func (d *Docker) ImagePull(ctx context.Context, id string) error {
-	if rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{}); err != nil {
+	rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{})
+	if err != nil {
 		return err
-	} else {
-		defer rc.Close()
-		jd := json.NewDecoder(rc)
-		var msg util.ImgPullResp
-		for {
-			if err := jd.Decode(&msg); err != nil {
-				if err == io.EOF {
-					break
-				} else {
-					return err
-				}
+	}
+	defer rc.Close()
+	jd := json.NewDecoder(rc)
+	var msg util.ImgPullResp
+	for {
+		if err := jd.Decode(&msg); err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				return err
 			}
-			dmUtil.Logger.Debug(msg)
 		}
-		if msg.Message != "" {
-			return fmt.Errorf("pulling image failed: %s", msg.Message)
-		}
+		dmUtil.Logger.Debug(msg)
+	}
+	if msg.Message != "" {
+		return fmt.Errorf("pulling image failed: %s", msg.Message)
 	}
 	return nil
 }
 
 func (d *Docker) ImageRemove(ctx context.Context, id string) error {
-	if res, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
-		return err
-	} else {
-		dmUtil.Logger.Debug(res)
-	}
-	return nil
+	_, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{})
+	return err
 }
 
 func (d *Docker) PruneImages(ctx context.Context) error {
-	if res, err := d.client.ImagesPrune(ctx, filters.Args{}); err != nil {
-		return err
-	} else {
-		dmUtil.Logger.Debug(res)
-	}
-	return nil
+	_, err := d.client.ImagesPrune(ctx, filters.Args{})
+	return err
 }
