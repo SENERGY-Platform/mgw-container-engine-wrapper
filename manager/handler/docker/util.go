@@ -33,6 +33,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 func parseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []itf.ContainerNet) {
@@ -245,6 +246,22 @@ func genNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
 
 func parseTimestamp(s string) (time.Time, error) {
 	return time.Parse(time.RFC3339Nano, s)
+}
+
+func genTimestamp(t time.Time) string {
+	tp := strings.Split(t.Format(time.RFC3339Nano), ":")
+	s := strings.TrimSuffix(tp[2], "Z")
+	var ns string
+	if strings.Contains(s, ".") {
+		sp := strings.Split(s, ".")
+		s = sp[0]
+		ns = sp[1]
+	}
+	nsLen := utf8.RuneCountInString(ns)
+	if nsLen < 9 {
+		ns += strings.Repeat("0", 9-nsLen)
+	}
+	return fmt.Sprintf("%s:%s:%s.%sZ", tp[0], tp[1], s, ns)
 }
 
 func checkNetworks(n []itf.ContainerNet) error {
