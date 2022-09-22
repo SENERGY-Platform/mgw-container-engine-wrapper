@@ -135,3 +135,9 @@ type ContainerNet struct {
 	IPAddress   IPAddr   `json:"ip_address"`
 	MacAddress  string   `json:"mac_address"`
 }
+
+type LogOptions struct {
+	MaxLines int        `json:"max_lines"`
+	Since    *time.Time `json:"since"`
+	Until    *time.Time `json:"until"`
+}
