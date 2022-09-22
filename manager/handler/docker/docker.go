@@ -366,11 +366,11 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 }
 
 func (d *Docker) ImagePull(ctx context.Context, id string) error {
-	if res, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{}); err != nil {
+	if rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{}); err != nil {
 		return err
 	} else {
-		defer res.Close()
-		jd := json.NewDecoder(res)
+		defer rc.Close()
+		jd := json.NewDecoder(rc)
 		var msg ImgPullResp
 		for {
 			if err := jd.Decode(&msg); err != nil {
