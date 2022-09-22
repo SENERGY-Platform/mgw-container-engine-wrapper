@@ -32,12 +32,12 @@ type ContainerEngineHandler interface {
 	NetworkCreate(ctx context.Context, net Network) error
 	NetworkRemove(ctx context.Context, id string) error
 	ContainerInfo(ctx context.Context, id string) (Container, error)
-	ContainerCreate(ctx context.Context, ctrConf Container) (id string, err error)
+	ContainerCreate(ctx context.Context, container Container) (id string, err error)
 	ContainerRemove(ctx context.Context, id string) error
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string) (io.ReadCloser, error)
+	ContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
 	ImageInfo(ctx context.Context, id string) (Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
