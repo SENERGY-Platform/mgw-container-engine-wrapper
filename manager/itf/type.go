@@ -142,9 +142,8 @@ type LogOptions struct {
 	Until    *time.Time `json:"until"`
 }
 
-type ErrorCode int16
-
 type Error struct {
-	code ErrorCode
+	code uint
 	msg  string
+	err  error
 }
