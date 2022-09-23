@@ -22,17 +22,20 @@ import (
 	"deployment-manager/manager/itf"
 	dmUtil "deployment-manager/util"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
 	"io"
+	"net/http"
 )
 
 func (d Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
 	var images []itf.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: util.GenFilterArgs(filter)})
 	if err != nil {
-		return images, err
+		return images, itf.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
 	for _, is := range il {
 		img := itf.Image{
@@ -43,10 +46,10 @@ func (d Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image
 			Digests: is.RepoDigests,
 		}
 		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
-			dmUtil.Logger.Error(err)
+			dmUtil.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
 		} else {
 			if ti, err := util.ParseTimestamp(i.Created); err != nil {
-				dmUtil.Logger.Error(err)
+				dmUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
 			} else {
 				img.Created = ti
 			}
@@ -61,7 +64,11 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	img := itf.Image{}
 	i, _, err := d.client.ImageInspectWithRaw(ctx, id)
 	if err != nil {
-		return img, err
+		code := http.StatusInternalServerError
+		if client.IsErrNotFound(err) {
+			code = http.StatusNotFound
+		}
+		return img, itf.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
 	}
 	img.ID = i.ID
 	img.Size = i.Size
@@ -79,7 +86,13 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 func (d Docker) ImagePull(ctx context.Context, id string) error {
 	rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{})
 	if err != nil {
-		return err
+		code := http.StatusInternalServerError
+		if client.IsErrNotFound(err) {
+			code = http.StatusNotFound
+		} else if client.IsErrUnauthorized(err) {
+			code = http.StatusUnauthorized
+		}
+		return itf.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
 	}
 	defer rc.Close()
 	jd := json.NewDecoder(rc)
@@ -89,20 +102,26 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 			if err == io.EOF {
 				break
 			} else {
-				return err
+				return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
 			}
 		}
-		dmUtil.Logger.Debug(msg)
+		dmUtil.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
-		return fmt.Errorf("pulling image failed: %s", msg.Message)
+		return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
 	}
 	return nil
 }
 
 func (d Docker) ImageRemove(ctx context.Context, id string) error {
-	_, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{})
-	return err
+	if _, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
+		code := http.StatusInternalServerError
+		if client.IsErrNotFound(err) {
+			code = http.StatusNotFound
+		}
+		return itf.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
+	}
+	return nil
 }
 
 func (d Docker) PruneImages(ctx context.Context) error {
