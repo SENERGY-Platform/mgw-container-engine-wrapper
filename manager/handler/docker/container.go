@@ -199,10 +199,7 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 }
 
 func (d Docker) ContainerRemove(ctx context.Context, id string) error {
-	err := d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{
-		RemoveVolumes: true,
-	})
-	if err != nil {
+	if err := d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{RemoveVolumes: true}); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
@@ -213,8 +210,7 @@ func (d Docker) ContainerRemove(ctx context.Context, id string) error {
 }
 
 func (d Docker) ContainerStart(ctx context.Context, id string) error {
-	err := d.client.ContainerStart(ctx, id, types.ContainerStartOptions{})
-	if err != nil {
+	if err := d.client.ContainerStart(ctx, id, types.ContainerStartOptions{}); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
@@ -225,8 +221,7 @@ func (d Docker) ContainerStart(ctx context.Context, id string) error {
 }
 
 func (d Docker) ContainerStop(ctx context.Context, id string) error {
-	err := d.client.ContainerStop(ctx, id, nil)
-	if err != nil {
+	if err := d.client.ContainerStop(ctx, id, nil); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
@@ -237,8 +232,7 @@ func (d Docker) ContainerStop(ctx context.Context, id string) error {
 }
 
 func (d Docker) ContainerRestart(ctx context.Context, id string) error {
-	err := d.client.ContainerRestart(ctx, id, nil)
-	if err != nil {
+	if err := d.client.ContainerRestart(ctx, id, nil); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
