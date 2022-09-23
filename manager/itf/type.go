@@ -143,7 +143,7 @@ type LogOptions struct {
 }
 
 type Error struct {
-	code uint
+	code int
 	msg  string
 	err  error
 }

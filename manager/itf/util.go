@@ -117,7 +117,7 @@ func (d Duration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.String())
 }
 
-func NewError(code uint, msg string, err error) error {
+func NewError(code int, msg string, err error) error {
 	return &Error{
 		code: code,
 		msg:  msg,
