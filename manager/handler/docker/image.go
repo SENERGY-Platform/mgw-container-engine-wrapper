@@ -76,7 +76,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	img.Tags = i.RepoTags
 	img.Digests = i.RepoDigests
 	if ti, err := util.ParseTimestamp(i.Created); err != nil {
-		dmUtil.Logger.Error(err)
+		dmUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
 	} else {
 		img.Created = ti
 	}
