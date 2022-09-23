@@ -81,7 +81,7 @@ func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 		return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
 	}
 	if res.Warning != "" {
-		dmUtil.Logger.Warning(res.Warning)
+		dmUtil.Logger.Warningf("encountered warnings during creation of network '%s': %s", net.Name, res.Warning)
 	}
 	return nil
 }
