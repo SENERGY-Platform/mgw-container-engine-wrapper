@@ -18,7 +18,6 @@ package util
 
 import (
 	"deployment-manager/manager/itf"
-	"deployment-manager/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
@@ -45,7 +44,8 @@ func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (
 	return
 }
 
-func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.Port) {
+func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]itf.Port, error) {
+	var ports []itf.Port
 	if len(portSet) > 0 || len(portMap) > 0 {
 		set := make(map[string]struct{})
 		for port, bindings := range portMap {
@@ -56,7 +56,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.P
 			for _, binding := range bindings {
 				num, err := strconv.ParseInt(binding.HostPort, 10, 0)
 				if err != nil {
-					util.Logger.Error(err)
+					return ports, err
 				}
 				p.Bindings = append(p.Bindings, itf.PortBinding{
 					Number:    int(num),
@@ -75,7 +75,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) (ports []itf.P
 			}
 		}
 	}
-	return
+	return ports, nil
 }
 
 func ParseMountPoints(mountPoints []types.MountPoint) (mounts []itf.Mount) {
