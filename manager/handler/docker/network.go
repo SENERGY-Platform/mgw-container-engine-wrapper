@@ -21,15 +21,18 @@ import (
 	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
 	dmUtil "deployment-manager/util"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/client"
+	"net/http"
 )
 
 func (d Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
 	var n []itf.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: util.GenFilterArgs(filter)})
 	if err != nil {
-		return n, err
+		return n, itf.NewError(http.StatusInternalServerError, "listing networks failed", err)
 	}
 	for _, r := range nr {
 		if nType, ok := util.NetTypeMap[r.Driver]; ok {
@@ -50,7 +53,11 @@ func (d Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error)
 	n := itf.Network{}
 	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
 	if err != nil {
-		return n, err
+		code := http.StatusInternalServerError
+		if client.IsErrNotFound(err) {
+			code = http.StatusNotFound
+		}
+		return n, itf.NewError(code, fmt.Sprintf("retrieving info for network '%s' failed", id), err)
 	}
 	s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
 	n.ID = nr.ID
@@ -71,7 +78,7 @@ func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 		},
 	})
 	if err != nil {
-		return err
+		return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
 	}
 	if res.Warning != "" {
 		dmUtil.Logger.Warning(res.Warning)
@@ -80,5 +87,12 @@ func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 }
 
 func (d Docker) NetworkRemove(ctx context.Context, id string) error {
-	return d.client.NetworkRemove(ctx, id)
+	if err := d.client.NetworkRemove(ctx, id); err != nil {
+		code := http.StatusInternalServerError
+		if client.IsErrNotFound(err) {
+			code = http.StatusNotFound
+		}
+		return itf.NewError(code, fmt.Sprintf("removing network '%s' failed", id), err)
+	}
+	return nil
 }
