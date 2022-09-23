@@ -41,13 +41,6 @@ var NetworkTypeMap = map[string]NetworkType{
 }
 
 const (
-	RunningState   ContainerState = "running"
-	StoppedState   ContainerState = "stopped"
-	UnhealthyState ContainerState = "unhealthy"
-	UnknownState   ContainerState = "unknown"
-)
-
-const (
 	RestartNever      RestartStrategy = "never"
 	RestartAlways     RestartStrategy = "always"
 	RestartNotStopped RestartStrategy = "not-stopped"
@@ -72,3 +65,10 @@ var MountTypeMap = map[string]MountType{
 	string(VolumeMount): VolumeMount,
 	string(TmpfsMount):  TmpfsMount,
 }
+
+const (
+	RunningState   ContainerState = "running"
+	StoppedState   ContainerState = "stopped"
+	UnhealthyState ContainerState = "unhealthy"
+	UnknownState   ContainerState = "unknown"
+)
