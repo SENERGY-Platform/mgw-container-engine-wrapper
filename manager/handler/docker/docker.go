@@ -29,7 +29,7 @@ func New(c *client.Client) *Docker {
 	return &Docker{client: c}
 }
 
-func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
+func (d Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	info := map[string]string{}
 	srvVer, err := d.client.ServerVersion(ctx)
 	if err != nil {
@@ -42,6 +42,6 @@ func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	return info, nil
 }
 
-func (d *Docker) Close() error {
+func (d Docker) Close() error {
 	return d.client.Close()
 }

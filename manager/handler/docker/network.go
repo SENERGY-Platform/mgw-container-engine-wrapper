@@ -25,7 +25,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 )
 
-func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
+func (d Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
 	var n []itf.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: util.GenFilterArgs(filter)})
 	if err != nil {
@@ -46,7 +46,7 @@ func (d *Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Ne
 	return n, nil
 }
 
-func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
+func (d Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
 	n := itf.Network{}
 	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
 	if err != nil {
@@ -61,7 +61,7 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error
 	return n, nil
 }
 
-func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
+func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         util.NetTypeRMap[net.Type],
@@ -79,6 +79,6 @@ func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 	return nil
 }
 
-func (d *Docker) NetworkRemove(ctx context.Context, id string) error {
+func (d Docker) NetworkRemove(ctx context.Context, id string) error {
 	return d.client.NetworkRemove(ctx, id)
 }

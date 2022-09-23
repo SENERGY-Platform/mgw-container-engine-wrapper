@@ -28,7 +28,7 @@ import (
 	"strconv"
 )
 
-func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
+func (d Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
 	var csl []itf.Container
 	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenFilterArgs(filter)})
 	if err != nil {
@@ -78,7 +78,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.
 	return csl, nil
 }
 
-func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, error) {
+func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, error) {
 	ctr := itf.Container{}
 	c, err := d.client.ContainerInspect(ctx, id)
 	if err != nil {
@@ -121,7 +121,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, e
 	return ctr, nil
 }
 
-func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (string, error) {
+func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (string, error) {
 	cConfig := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -183,25 +183,25 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (st
 	return res.ID, nil
 }
 
-func (d *Docker) ContainerRemove(ctx context.Context, id string) error {
+func (d Docker) ContainerRemove(ctx context.Context, id string) error {
 	return d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{
 		RemoveVolumes: true,
 	})
 }
 
-func (d *Docker) ContainerStart(ctx context.Context, id string) error {
+func (d Docker) ContainerStart(ctx context.Context, id string) error {
 	return d.client.ContainerStart(ctx, id, types.ContainerStartOptions{})
 }
 
-func (d *Docker) ContainerStop(ctx context.Context, id string) error {
+func (d Docker) ContainerStop(ctx context.Context, id string) error {
 	return d.client.ContainerStop(ctx, id, nil)
 }
 
-func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
+func (d Docker) ContainerRestart(ctx context.Context, id string) error {
 	return d.client.ContainerRestart(ctx, id, nil)
 }
 
-func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptions) (io.ReadCloser, error) {
+func (d Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptions) (io.ReadCloser, error) {
 	clo := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
