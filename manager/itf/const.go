@@ -72,3 +72,10 @@ const (
 	UnhealthyState ContainerState = "unhealthy"
 	UnknownState   ContainerState = "unknown"
 )
+
+var ContainerStateMap = map[string]ContainerState{
+	string(RunningState):   RunningState,
+	string(StoppedState):   StoppedState,
+	string(UnhealthyState): UnhealthyState,
+	string(UnknownState):   UnknownState,
+}
