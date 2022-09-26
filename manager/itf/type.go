@@ -26,7 +26,7 @@ import (
 
 type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context, filter [][2]string) ([]Network, error)
-	ListContainers(ctx context.Context, filter [][2]string) ([]Container, error)
+	ListContainers(ctx context.Context, filter ContainerFilter) ([]Container, error)
 	ListImages(ctx context.Context, filter [][2]string) ([]Image, error)
 	NetworkInfo(ctx context.Context, id string) (Network, error)
 	NetworkCreate(ctx context.Context, net Network) error
@@ -134,6 +134,12 @@ type ContainerNet struct {
 	Gateway     IPAddr   `json:"gateway"`
 	IPAddress   IPAddr   `json:"ip_address"`
 	MacAddress  string   `json:"mac_address"`
+}
+
+type ContainerFilter struct {
+	Name   string
+	State  ContainerState
+	Labels map[string]string
 }
 
 type LogOptions struct {
