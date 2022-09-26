@@ -20,7 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetRoutes(e *gin.Engine, a *Api) {
+func (a Api) SetRoutes(e *gin.Engine) {
 	e.GET("/containers", a.GetContainers)
 	e.POST("/containers", a.PostContainer)
 	e.PUT("/containers/:container", a.PutContainer)

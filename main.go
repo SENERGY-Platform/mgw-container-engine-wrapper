@@ -78,7 +78,7 @@ func main() {
 
 	dmApi := api.New(dockerHandler)
 	apiEngine := gin_web.New(config.Logger.Level, logFile)
-	api.SetRoutes(apiEngine, dmApi)
+	dmApi.SetRoutes(apiEngine)
 
 	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
