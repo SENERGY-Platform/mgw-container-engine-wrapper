@@ -31,6 +31,13 @@ var StateMap = map[string]itf.ContainerState{
 	"dead":       itf.UnhealthyState,
 }
 
+var StateRMap = map[itf.ContainerState]string{
+	itf.RunningState:   "running",
+	itf.StoppedState:   "exited",
+	itf.UnhealthyState: "dead",
+	itf.UnknownState:   "created",
+}
+
 var RestartPolicyMap = map[string]itf.RestartStrategy{
 	"no":             itf.RestartNever,
 	"on-failure":     itf.RestartOnFail,
