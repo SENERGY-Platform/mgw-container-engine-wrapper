@@ -35,7 +35,6 @@ func NewConfig(path *string) (*Config, error) {
 		Logger: LoggerConfig{
 			Level:    level.Warning,
 			Utc:      true,
-			Prefix:   "[DM] ",
 			Path:     "/var/log/",
 			FileName: "mgw-deployment-manager",
 		},

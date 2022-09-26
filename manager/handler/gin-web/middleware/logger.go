@@ -28,7 +28,7 @@ func logFormatter(param gin.LogFormatterParams) string {
 	if param.Latency > time.Minute {
 		param.Latency = param.Latency.Truncate(time.Second)
 	}
-	return fmt.Sprintf("%v [GIN] %3d | %v | %s %#v\n%s",
+	return fmt.Sprintf("%v %3d | %v | %s %#v\n%s",
 		param.TimeStamp.Format("2006/01/02 15:04:05"),
 		param.StatusCode,
 		param.Latency,

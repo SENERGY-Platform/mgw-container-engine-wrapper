@@ -30,7 +30,6 @@ var Logger *log_level.Logger
 type LoggerConfig struct {
 	Level    level.Level `json:"level" env_var:"LOG_LEVEL"`
 	Utc      bool        `json:"utc" env_var:"LOG_UTC"`
-	Prefix   string      `json:"prefix" env_var:"LOG_PREFIX"`
 	Path     string      `json:"path" env_var:"LOG_PATH"`
 	FileName string      `json:"file_name" env_var:"LOG_FILE_NAME"`
 	Terminal bool        `json:"terminal" env_var:"LOG_TERMINAL"`
@@ -60,6 +59,6 @@ func InitLogger(config LoggerConfig) (out *os.File, err error) {
 			return
 		}
 	}
-	Logger, err = log_level.New(log.New(out, config.Prefix, flags), config.Level)
+	Logger, err = log_level.New(log.New(out, "", flags), config.Level)
 	return
 }
