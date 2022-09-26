@@ -77,7 +77,7 @@ func main() {
 	util.Logger.Debugf("docker: %s", util.ToJsonStr(dockerInfo))
 
 	dmApi := api.New(dockerHandler)
-	apiEngine := gin_web.New(config.ApiEngine, config.Logger.Level, logFile)
+	apiEngine := gin_web.New(config.Logger.Level, logFile)
 	api.SetRoutes(apiEngine, dmApi)
 
 	listener, err := util.NewUnixListener(config.SocketPath)

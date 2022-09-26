@@ -17,7 +17,6 @@
 package util
 
 import (
-	"deployment-manager/manager/handler/gin-web"
 	"encoding/json"
 	envldr "github.com/y-du/go-env-loader"
 	"github.com/y-du/go-log-level/level"
@@ -26,9 +25,8 @@ import (
 )
 
 type Config struct {
-	SocketPath string         `json:"socket_path" env_var:"SOCKET_PATH"`
-	Logger     LoggerConfig   `json:"logger" env_var:"LOG_CONFIG"`
-	ApiEngine  gin_web.Config `json:"api_engine" env_var:"API_ENGINE_CONFIG"`
+	SocketPath string       `json:"socket_path" env_var:"SOCKET_PATH"`
+	Logger     LoggerConfig `json:"logger" env_var:"LOG_CONFIG"`
 }
 
 func NewConfig(path *string) (*Config, error) {

@@ -22,11 +22,7 @@ import (
 	"os"
 )
 
-type Config struct {
-	StaticOrigins []string `json:"static_origins" env_var:"API_ENGINE_STATIC_ORIGINS"`
-}
-
-func New(config Config, logLevel level.Level, logFile *os.File) *gin.Engine {
+func New(logLevel level.Level, logFile *os.File) *gin.Engine {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
@@ -35,6 +31,6 @@ func New(config Config, logLevel level.Level, logFile *os.File) *gin.Engine {
 	if logFile != nil {
 		lc.Output = logFile
 	}
-	e.Use(ginLogger(lc, logLevel), gin.Recovery(), checkStaticOrigin(config.StaticOrigins))
+	e.Use(ginLogger(lc, logLevel), gin.Recovery())
 	return e
 }
