@@ -109,6 +109,26 @@ func GenFilterArgs(filter [][2]string) (f filters.Args) {
 	return
 }
 
+func GenContainerFilterArgs(filter itf.ContainerFilter) filters.Args {
+	fArgs := filters.NewArgs()
+	if filter.Name != "" {
+		fArgs.Add("name", filter.Name)
+	}
+	if filter.State != "" {
+		fArgs.Add("status", StateRMap[filter.State])
+	}
+	if filter.Labels != nil && len(filter.Labels) > 0 {
+		for k, v := range filter.Labels {
+			l := k
+			if v != "" {
+				l += "=" + v
+			}
+			fArgs.Add("label", l)
+		}
+	}
+	return fArgs
+}
+
 func GenNetIPAMConfig(n itf.Network) (c []network.IPAMConfig) {
 	c = append(c, network.IPAMConfig{
 		Subnet:  n.Subnet.KeyStr(),

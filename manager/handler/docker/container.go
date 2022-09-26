@@ -31,9 +31,9 @@ import (
 	"strconv"
 )
 
-func (d Docker) ListContainers(ctx context.Context, filter [][2]string) ([]itf.Container, error) {
+func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) ([]itf.Container, error) {
 	var csl []itf.Container
-	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenFilterArgs(filter)})
+	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
 	if err != nil {
 		return csl, itf.NewError(http.StatusInternalServerError, "listing containers failed", err)
 	}
