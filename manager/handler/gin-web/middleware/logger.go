@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package gin_web
+package middleware
 
 import (
 	"fmt"
@@ -39,7 +39,7 @@ func logFormatter(param gin.LogFormatterParams) string {
 	)
 }
 
-func ginLogger(conf gin.LoggerConfig, lvl level.Level) gin.HandlerFunc {
+func Logger(conf gin.LoggerConfig, lvl level.Level) gin.HandlerFunc {
 	formatter := conf.Formatter
 	if formatter == nil {
 		formatter = logFormatter
