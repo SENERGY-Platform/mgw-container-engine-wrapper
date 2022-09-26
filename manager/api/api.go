@@ -18,6 +18,7 @@ package api
 
 import (
 	"deployment-manager/manager/itf"
+	"github.com/gin-gonic/gin"
 )
 
 type Api struct {
@@ -28,4 +29,21 @@ func New(ceHandler itf.ContainerEngineHandler) *Api {
 	return &Api{
 		ceHandler: ceHandler,
 	}
+}
+
+func (a Api) SetRoutes(e *gin.Engine) {
+	e.GET("/containers", a.GetContainers)
+	e.POST("/containers", a.PostContainer)
+	e.PUT("/containers/:container", a.PutContainer)
+	e.DELETE("/containers/:container", a.DeleteContainer)
+	e.GET("/containers/:container", a.GetContainer)
+	e.GET("/containers/:container/log", a.GetContainerLog)
+	e.GET("/images", a.GetImages)
+	e.POST("/images", a.PostImage)
+	e.GET("/images/:image", a.GetImage)
+	e.DELETE("/images/:image", a.DeleteImage)
+	e.GET("/networks", a.GetNetworks)
+	e.POST("/networks", a.PostNetwork)
+	e.GET("/networks/:network", a.GetNetwork)
+	e.DELETE("/networks/:network", a.DeleteNetwork)
 }
