@@ -17,16 +17,12 @@
 package middleware
 
 import (
+	"deployment-manager/manager/api"
 	"deployment-manager/manager/itf"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
-
-type ErrResponse struct {
-	Status string   `json:"status"`
-	Errors []string `json:"errors"`
-}
 
 func ErrorHandler(gc *gin.Context) {
 	gc.Next()
@@ -42,7 +38,7 @@ func ErrorHandler(gc *gin.Context) {
 			}
 			errs = append(errs, e.Error())
 		}
-		gc.JSON(-1, &ErrResponse{
+		gc.JSON(-1, &api.ErrResponse{
 			Status: http.StatusText(gc.Writer.Status()),
 			Errors: errs,
 		})
