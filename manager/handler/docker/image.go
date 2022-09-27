@@ -44,6 +44,7 @@ func (d Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image
 			Size:    is.Size,
 			Tags:    is.RepoTags,
 			Digests: is.RepoDigests,
+			Labels:  is.Labels,
 		}
 		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
 			dmUtil.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
@@ -75,6 +76,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	img.Arch = i.Architecture
 	img.Tags = i.RepoTags
 	img.Digests = i.RepoDigests
+	img.Labels = i.Config.Labels
 	if ti, err := util.ParseTimestamp(i.Created); err != nil {
 		dmUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
 	} else {
