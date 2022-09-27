@@ -36,7 +36,13 @@ func (a Api) PostNetwork(gc *gin.Context) {
 }
 
 func (a Api) GetNetwork(gc *gin.Context) {
-
+	id := gc.Param(util.NetworkParam)
+	network, err := a.ceHandler.NetworkInfo(gc.Request.Context(), id)
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.JSON(http.StatusOK, &network)
 }
 
 func (a Api) DeleteNetwork(gc *gin.Context) {
