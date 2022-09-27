@@ -33,7 +33,7 @@ import (
 
 func (d Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
 	var images []itf.Image
-	il, err := d.client.ImageList(ctx, types.ImageListOptions{All: true, Filters: util.GenFilterArgs(filter)})
+	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenFilterArgs(filter)})
 	if err != nil {
 		return images, itf.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
