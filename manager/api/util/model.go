@@ -36,3 +36,7 @@ type ContainerLogQuery struct {
 type ImagesQuery struct {
 	Label []string `form:"label"`
 }
+
+type PostContainerResponse struct {
+	ID string `json:"id"`
+}
