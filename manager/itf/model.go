@@ -25,7 +25,7 @@ import (
 )
 
 type ContainerEngineHandler interface {
-	ListNetworks(ctx context.Context, filter [][2]string) ([]Network, error)
+	ListNetworks(ctx context.Context) ([]Network, error)
 	ListContainers(ctx context.Context, filter ContainerFilter) ([]Container, error)
 	ListImages(ctx context.Context, filter ImageFilter) ([]Image, error)
 	NetworkInfo(ctx context.Context, id string) (Network, error)
