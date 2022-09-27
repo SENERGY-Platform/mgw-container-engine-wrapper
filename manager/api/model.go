@@ -26,3 +26,9 @@ type ContainersQuery struct {
 	State string   `form:"state"`
 	Label []string `form:"label"`
 }
+
+type ContainerLogQuery struct {
+	MaxLines int    `form:"max_lines"`
+	Since    string `form:"since"`
+	Until    string `form:"until"`
+}
