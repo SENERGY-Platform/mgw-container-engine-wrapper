@@ -49,7 +49,7 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 		if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
 			mUtil.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
 		} else {
-			ctr.Name = ci.Name
+			ctr.Name = util.ParseContainerName(ci.Name)
 			if tc, err := util.ParseTimestamp(ci.Created); err != nil {
 				mUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 			} else {
@@ -102,7 +102,7 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 		mts = util.ParseMountPoints(c.Mounts)
 	}
 	ctr.ID = c.ID
-	ctr.Name = c.Name
+	ctr.Name = util.ParseContainerName(c.Name)
 	ctr.State = util.StateMap[c.State.Status]
 	ctr.Image = c.Config.Image
 	ctr.ImageID = c.Image
