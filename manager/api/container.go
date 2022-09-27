@@ -64,7 +64,7 @@ func (a Api) PostContainer(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	gc.JSON(http.StatusOK, &util.PostContainerResponse{ID: id})
+	gc.JSON(http.StatusOK, &util.ContainersPostResponse{ID: id})
 }
 
 func (a Api) PutContainer(gc *gin.Context) {
