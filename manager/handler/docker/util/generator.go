@@ -109,6 +109,18 @@ func GenFilterArgs(filter [][2]string) (f filters.Args) {
 	return
 }
 
+func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
+	if fLabels != nil && len(fLabels) > 0 {
+		for k, v := range fLabels {
+			l := k
+			if v != "" {
+				l += "=" + v
+			}
+			fArgs.Add("label", l)
+		}
+	}
+}
+
 func GenContainerFilterArgs(filter itf.ContainerFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	if filter.Name != "" {
