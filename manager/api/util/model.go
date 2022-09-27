@@ -32,3 +32,7 @@ type ContainerLogQuery struct {
 	Since    string `form:"since"`
 	Until    string `form:"until"`
 }
+
+type ImagesQuery struct {
+	Label []string `form:"label"`
+}
