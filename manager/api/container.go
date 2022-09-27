@@ -76,8 +76,7 @@ func (a Api) DeleteContainer(gc *gin.Context) {
 }
 
 func (a Api) GetContainer(gc *gin.Context) {
-	id := gc.Param(util.ContainerParam)
-	container, err := a.ceHandler.ContainerInfo(gc.Request.Context(), id)
+	container, err := a.ceHandler.ContainerInfo(gc.Request.Context(), gc.Param(util.ContainerParam))
 	if err != nil {
 		_ = gc.Error(err)
 		return
@@ -86,7 +85,6 @@ func (a Api) GetContainer(gc *gin.Context) {
 }
 
 func (a Api) GetContainerLog(gc *gin.Context) {
-	id := gc.Param(util.ContainerParam)
 	query := util.ContainerLogQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -112,7 +110,7 @@ func (a Api) GetContainerLog(gc *gin.Context) {
 		}
 		logOptions.Until = &until
 	}
-	rc, err := a.ceHandler.ContainerLog(gc.Request.Context(), id, logOptions)
+	rc, err := a.ceHandler.ContainerLog(gc.Request.Context(), gc.Param(util.ContainerParam), logOptions)
 	if err != nil {
 		_ = gc.Error(err)
 		return

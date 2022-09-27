@@ -44,8 +44,7 @@ func (a Api) PostImage(gc *gin.Context) {
 }
 
 func (a Api) GetImage(gc *gin.Context) {
-	id := gc.Param(util.ImageParam)
-	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), id)
+	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), gc.Param(util.ImageParam))
 	if err != nil {
 		_ = gc.Error(err)
 		return

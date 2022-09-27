@@ -36,8 +36,7 @@ func (a Api) PostNetwork(gc *gin.Context) {
 }
 
 func (a Api) GetNetwork(gc *gin.Context) {
-	id := gc.Param(util.NetworkParam)
-	network, err := a.ceHandler.NetworkInfo(gc.Request.Context(), id)
+	network, err := a.ceHandler.NetworkInfo(gc.Request.Context(), gc.Param(util.NetworkParam))
 	if err != nil {
 		_ = gc.Error(err)
 		return
