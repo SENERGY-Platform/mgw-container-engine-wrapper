@@ -18,6 +18,7 @@ package api
 
 import (
 	"deployment-manager/manager/api/util"
+	"deployment-manager/manager/itf"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -32,7 +33,17 @@ func (a Api) GetNetworks(gc *gin.Context) {
 }
 
 func (a Api) PostNetwork(gc *gin.Context) {
-
+	network := itf.Network{}
+	if err := gc.ShouldBindJSON(&network); err != nil {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(err)
+		return
+	}
+	if err := a.ceHandler.NetworkCreate(gc.Request.Context(), network); err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.Status(http.StatusOK)
 }
 
 func (a Api) GetNetwork(gc *gin.Context) {
