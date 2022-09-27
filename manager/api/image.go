@@ -19,6 +19,7 @@ package api
 import (
 	"deployment-manager/manager/api/util"
 	"deployment-manager/manager/itf"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -40,7 +41,22 @@ func (a Api) GetImages(gc *gin.Context) {
 }
 
 func (a Api) PostImage(gc *gin.Context) {
-
+	image := itf.Image{}
+	if err := gc.ShouldBindJSON(&image); err != nil {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(err)
+		return
+	}
+	if len(image.Tags) == 0 {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(fmt.Errorf("missing image reference"))
+		return
+	}
+	if err := a.ceHandler.ImagePull(gc.Request.Context(), image.Tags[0]); err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.Status(http.StatusOK)
 }
 
 func (a Api) GetImage(gc *gin.Context) {
