@@ -148,9 +148,9 @@ type ContainerFilter struct {
 }
 
 type LogOptions struct {
-	MaxLines int        `json:"max_lines"`
-	Since    *time.Time `json:"since"`
-	Until    *time.Time `json:"until"`
+	MaxLines int
+	Since    *time.Time
+	Until    *time.Time
 }
 
 type Error struct {
