@@ -16,10 +16,27 @@
 
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"deployment-manager/manager/api/util"
+	"deployment-manager/manager/itf"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 func (a Api) GetImages(gc *gin.Context) {
-
+	query := util.ImagesQuery{}
+	if err := gc.ShouldBindQuery(&query); err != nil {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(err)
+		return
+	}
+	filter := itf.ImageFilter{Labels: util.GenLabels(query.Label)}
+	images, err := a.ceHandler.ListImages(gc.Request.Context(), filter)
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.JSON(http.StatusOK, &images)
 }
 
 func (a Api) PostImage(gc *gin.Context) {
