@@ -16,10 +16,19 @@
 
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"deployment-manager/manager/api/util"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 func (a Api) GetNetworks(gc *gin.Context) {
-
+	networks, err := a.ceHandler.ListNetworks(gc.Request.Context())
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.JSON(http.StatusOK, &networks)
 }
 
 func (a Api) PostNetwork(gc *gin.Context) {
