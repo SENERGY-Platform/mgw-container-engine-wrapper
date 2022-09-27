@@ -27,7 +27,7 @@ import (
 type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context, filter [][2]string) ([]Network, error)
 	ListContainers(ctx context.Context, filter ContainerFilter) ([]Container, error)
-	ListImages(ctx context.Context, filter [][2]string) ([]Image, error)
+	ListImages(ctx context.Context, filter ImageFilter) ([]Image, error)
 	NetworkInfo(ctx context.Context, id string) (Network, error)
 	NetworkCreate(ctx context.Context, net Network) error
 	NetworkRemove(ctx context.Context, id string) error
@@ -44,12 +44,17 @@ type ContainerEngineHandler interface {
 }
 
 type Image struct {
-	ID      string    `json:"id"`
-	Created time.Time `json:"created"`
-	Size    int64     `json:"size"`
-	Arch    string    `json:"arch"`
-	Tags    []string  `json:"tags"`
-	Digests []string  `json:"digests"`
+	ID      string            `json:"id"`
+	Created time.Time         `json:"created"`
+	Size    int64             `json:"size"`
+	Arch    string            `json:"arch"`
+	Tags    []string          `json:"tags"`
+	Digests []string          `json:"digests"`
+	Labels  map[string]string `json:"labels"`
+}
+
+type ImageFilter struct {
+	Labels map[string]string
 }
 
 type NetworkType string
