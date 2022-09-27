@@ -67,8 +67,31 @@ func (a Api) PostContainer(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &util.ContainersPostResponse{ID: id})
 }
 
-func (a Api) PutContainer(gc *gin.Context) {
-
+func (a Api) PostContainerCtrl(gc *gin.Context) {
+	ctrl := util.ContainerCtrlPostRequest{}
+	if err := gc.ShouldBindJSON(&ctrl); err != nil {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(err)
+		return
+	}
+	switch ctrl.State {
+	case util.ContainerStart:
+		if err := a.ceHandler.ContainerStart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+			_ = gc.Error(err)
+			return
+		}
+	case util.ContainerRestart:
+		if err := a.ceHandler.ContainerRestart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+			_ = gc.Error(err)
+			return
+		}
+	case util.ContainerStop:
+		if err := a.ceHandler.ContainerStop(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+			_ = gc.Error(err)
+			return
+		}
+	}
+	gc.Status(http.StatusOK)
 }
 
 func (a Api) DeleteContainer(gc *gin.Context) {
