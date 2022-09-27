@@ -53,5 +53,9 @@ func (a Api) GetImage(gc *gin.Context) {
 }
 
 func (a Api) DeleteImage(gc *gin.Context) {
-
+	if err := a.ceHandler.ImageRemove(gc.Request.Context(), gc.Param(util.ImageParam)); err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.Status(http.StatusOK)
 }
