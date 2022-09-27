@@ -152,3 +152,7 @@ func ParseNetIPAMConfig(c []network.IPAMConfig) (s itf.Subnet, gw itf.IPAddr) {
 func ParseTimestamp(s string) (time.Time, error) {
 	return time.Parse(time.RFC3339Nano, s)
 }
+
+func ParseContainerName(s string) string {
+	return strings.TrimPrefix(s, "/")
+}
