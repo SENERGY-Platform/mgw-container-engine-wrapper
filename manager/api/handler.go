@@ -62,7 +62,13 @@ func (a Api) DeleteContainer(gc *gin.Context) {
 }
 
 func (a Api) GetContainer(gc *gin.Context) {
-
+	id := gc.Param(containerParam)
+	container, err := a.ceHandler.ContainerInfo(gc.Request.Context(), id)
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.JSON(http.StatusOK, &container)
 }
 
 func (a Api) GetContainerLog(gc *gin.Context) {
