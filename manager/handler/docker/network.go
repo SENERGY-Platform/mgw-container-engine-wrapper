@@ -28,9 +28,9 @@ import (
 	"net/http"
 )
 
-func (d Docker) ListNetworks(ctx context.Context, filter [][2]string) ([]itf.Network, error) {
+func (d Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
 	var n []itf.Network
-	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{Filters: util.GenFilterArgs(filter)})
+	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		return n, itf.NewError(http.StatusInternalServerError, "listing networks failed", err)
 	}
