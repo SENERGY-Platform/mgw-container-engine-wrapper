@@ -40,3 +40,9 @@ type ImagesQuery struct {
 type ContainersPostResponse struct {
 	ID string `json:"id"`
 }
+
+type ContainerState string
+
+type ContainerCtrlPostRequest struct {
+	State ContainerState `json:"state"`
+}

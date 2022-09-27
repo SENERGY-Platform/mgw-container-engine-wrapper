@@ -21,3 +21,15 @@ const (
 	ImageParam     = "image"
 	NetworkParam   = "network"
 )
+
+const (
+	ContainerStart   ContainerState = "start"
+	ContainerStop    ContainerState = "stop"
+	ContainerRestart ContainerState = "restart"
+)
+
+var ContainerStateMap = map[string]ContainerState{
+	string(ContainerStart):   ContainerStart,
+	string(ContainerStop):    ContainerStop,
+	string(ContainerRestart): ContainerRestart,
+}
