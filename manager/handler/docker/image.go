@@ -20,7 +20,7 @@ import (
 	"context"
 	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	dmUtil "deployment-manager/util"
+	mUtil "deployment-manager/manager/util"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -47,10 +47,10 @@ func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.I
 			Labels:  is.Labels,
 		}
 		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
-			dmUtil.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
+			mUtil.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
 		} else {
 			if ti, err := util.ParseTimestamp(i.Created); err != nil {
-				dmUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
+				mUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
 			} else {
 				img.Created = ti
 			}
@@ -78,7 +78,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	img.Digests = i.RepoDigests
 	img.Labels = i.Config.Labels
 	if ti, err := util.ParseTimestamp(i.Created); err != nil {
-		dmUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
+		mUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
 	} else {
 		img.Created = ti
 	}
@@ -107,7 +107,7 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 				return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
 			}
 		}
-		dmUtil.Logger.Debugf("pulling image '%s': %s", id, msg)
+		mUtil.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
 		return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))

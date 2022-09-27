@@ -20,7 +20,7 @@ import (
 	"context"
 	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	dmUtil "deployment-manager/util"
+	mUtil "deployment-manager/manager/util"
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -47,17 +47,17 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 			Networks: util.ParseEndpointSettings(c.NetworkSettings.Networks),
 		}
 		if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
-			dmUtil.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
+			mUtil.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
 		} else {
 			ctr.Name = ci.Name
 			if tc, err := util.ParseTimestamp(ci.Created); err != nil {
-				dmUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
+				mUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 			} else {
 				ctr.Created = tc
 			}
 			if c.State == "running" {
 				if ts, err := util.ParseTimestamp(ci.State.StartedAt); err != nil {
-					dmUtil.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
+					mUtil.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
 				} else {
 					ctr.Started = &ts
 				}
@@ -65,7 +65,7 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 			ctr.Image = ci.Config.Image
 			ctr.EnvVars = util.ParseEnv(ci.Config.Env)
 			if ports, err := util.ParsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports); err != nil {
-				dmUtil.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
+				mUtil.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
 			} else {
 				ctr.Ports = ports
 			}
@@ -110,7 +110,7 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 	ctr.Labels = c.Config.Labels
 	ctr.Mounts = mts
 	if ports, err := util.ParsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports); err != nil {
-		dmUtil.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
+		mUtil.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
 	} else {
 		ctr.Ports = ports
 	}
@@ -122,13 +122,13 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 		StopTimeout:     util.ParseStopTimeout(c.Config.StopTimeout),
 	}
 	if tc, err := util.ParseTimestamp(c.Created); err != nil {
-		dmUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
+		mUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 	} else {
 		ctr.Created = tc
 	}
 	if c.State.Status == "running" {
 		if ts, err := util.ParseTimestamp(c.State.StartedAt); err != nil {
-			dmUtil.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
+			mUtil.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
 		} else {
 			ctr.Started = &ts
 		}
@@ -186,14 +186,14 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 			if err != nil {
 				err2 := d.ContainerRemove(ctx, res.ID)
 				if err2 != nil {
-					dmUtil.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
+					mUtil.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
 				return "", itf.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 			}
 		}
 	}
 	if res.Warnings != nil && len(res.Warnings) > 0 {
-		dmUtil.Logger.Warningf("encountered warnings during creation of container '%s': %s", ctrConf.Name, res.Warnings)
+		mUtil.Logger.Warningf("encountered warnings during creation of container '%s': %s", ctrConf.Name, res.Warnings)
 	}
 	return res.ID, nil
 }

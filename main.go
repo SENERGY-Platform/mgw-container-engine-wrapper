@@ -21,7 +21,7 @@ import (
 	"deployment-manager/manager/api"
 	"deployment-manager/manager/handler/docker"
 	"deployment-manager/manager/handler/gin-web"
-	"deployment-manager/util"
+	"deployment-manager/manager/util"
 	"errors"
 	"fmt"
 	"github.com/docker/docker/client"
