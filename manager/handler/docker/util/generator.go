@@ -129,15 +129,13 @@ func GenContainerFilterArgs(filter itf.ContainerFilter) filters.Args {
 	if filter.State != "" {
 		fArgs.Add("status", StateRMap[filter.State])
 	}
-	if filter.Labels != nil && len(filter.Labels) > 0 {
-		for k, v := range filter.Labels {
-			l := k
-			if v != "" {
-				l += "=" + v
-			}
-			fArgs.Add("label", l)
-		}
-	}
+	genLabelFilterArgs(&fArgs, filter.Labels)
+	return fArgs
+}
+
+func GenImageFilterArgs(filter itf.ImageFilter) filters.Args {
+	fArgs := filters.NewArgs()
+	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs
 }
 

@@ -31,9 +31,9 @@ import (
 	"net/http"
 )
 
-func (d Docker) ListImages(ctx context.Context, filter [][2]string) ([]itf.Image, error) {
+func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.Image, error) {
 	var images []itf.Image
-	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenFilterArgs(filter)})
+	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
 		return images, itf.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
