@@ -26,7 +26,7 @@ import (
 
 func ErrorHandler(gc *gin.Context) {
 	gc.Next()
-	if len(gc.Errors) > 0 {
+	if !gc.IsAborted() && len(gc.Errors) > 0 {
 		if gc.Writer.Status() < 400 {
 			gc.Status(http.StatusInternalServerError)
 		}
