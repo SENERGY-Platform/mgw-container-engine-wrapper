@@ -53,7 +53,18 @@ func (a Api) GetContainers(gc *gin.Context) {
 }
 
 func (a Api) PostContainer(gc *gin.Context) {
-
+	container := itf.Container{}
+	if err := gc.ShouldBindJSON(&container); err != nil {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(err)
+		return
+	}
+	id, err := a.ceHandler.ContainerCreate(gc.Request.Context(), container)
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.JSON(http.StatusOK, &util.PostContainerResponse{ID: id})
 }
 
 func (a Api) PutContainer(gc *gin.Context) {
