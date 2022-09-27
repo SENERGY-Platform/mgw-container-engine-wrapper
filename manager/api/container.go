@@ -72,7 +72,11 @@ func (a Api) PutContainer(gc *gin.Context) {
 }
 
 func (a Api) DeleteContainer(gc *gin.Context) {
-
+	if err := a.ceHandler.ContainerRemove(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.Status(http.StatusOK)
 }
 
 func (a Api) GetContainer(gc *gin.Context) {
