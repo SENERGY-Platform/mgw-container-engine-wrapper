@@ -45,5 +45,9 @@ func (a Api) GetNetwork(gc *gin.Context) {
 }
 
 func (a Api) DeleteNetwork(gc *gin.Context) {
-
+	if err := a.ceHandler.NetworkRemove(gc.Request.Context(), gc.Param(util.NetworkParam)); err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.Status(http.StatusOK)
 }
