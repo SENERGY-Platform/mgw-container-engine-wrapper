@@ -16,19 +16,20 @@
 
 package api
 
-type ErrResponse struct {
-	Status string   `json:"status"`
-	Errors []string `json:"errors"`
+import "github.com/gin-gonic/gin"
+
+func (a Api) GetImages(gc *gin.Context) {
+
 }
 
-type ContainersQuery struct {
-	Name  string   `form:"name"`
-	State string   `form:"state"`
-	Label []string `form:"label"`
+func (a Api) PostImage(gc *gin.Context) {
+
 }
 
-type ContainerLogQuery struct {
-	MaxLines int    `form:"max_lines"`
-	Since    string `form:"since"`
-	Until    string `form:"until"`
+func (a Api) GetImage(gc *gin.Context) {
+
+}
+
+func (a Api) DeleteImage(gc *gin.Context) {
+
 }

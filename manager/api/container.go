@@ -17,6 +17,7 @@
 package api
 
 import (
+	"deployment-manager/manager/api/util"
 	"deployment-manager/manager/itf"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ import (
 )
 
 func (a Api) GetContainers(gc *gin.Context) {
-	query := ContainersQuery{}
+	query := util.ContainersQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
@@ -42,7 +43,7 @@ func (a Api) GetContainers(gc *gin.Context) {
 		}
 		filter.State = cs
 	}
-	filter.Labels = GenLabels(query.Label)
+	filter.Labels = util.GenLabels(query.Label)
 	containers, err := a.ceHandler.ListContainers(gc.Request.Context(), filter)
 	if err != nil {
 		_ = gc.Error(err)
@@ -64,7 +65,7 @@ func (a Api) DeleteContainer(gc *gin.Context) {
 }
 
 func (a Api) GetContainer(gc *gin.Context) {
-	id := gc.Param(containerParam)
+	id := gc.Param(util.ContainerParam)
 	container, err := a.ceHandler.ContainerInfo(gc.Request.Context(), id)
 	if err != nil {
 		_ = gc.Error(err)
@@ -74,8 +75,8 @@ func (a Api) GetContainer(gc *gin.Context) {
 }
 
 func (a Api) GetContainerLog(gc *gin.Context) {
-	id := gc.Param(containerParam)
-	query := ContainerLogQuery{}
+	id := gc.Param(util.ContainerParam)
+	query := util.ContainerLogQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
@@ -137,36 +138,4 @@ func (a Api) GetContainerLog(gc *gin.Context) {
 		}
 		gc.Writer.Flush()
 	}
-}
-
-func (a Api) GetImages(gc *gin.Context) {
-
-}
-
-func (a Api) PostImage(gc *gin.Context) {
-
-}
-
-func (a Api) GetImage(gc *gin.Context) {
-
-}
-
-func (a Api) DeleteImage(gc *gin.Context) {
-
-}
-
-func (a Api) GetNetworks(gc *gin.Context) {
-
-}
-
-func (a Api) PostNetwork(gc *gin.Context) {
-
-}
-
-func (a Api) GetNetwork(gc *gin.Context) {
-
-}
-
-func (a Api) DeleteNetwork(gc *gin.Context) {
-
 }

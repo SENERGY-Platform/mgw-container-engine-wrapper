@@ -17,6 +17,7 @@
 package api
 
 import (
+	"deployment-manager/manager/api/util"
 	"deployment-manager/manager/itf"
 	"github.com/gin-gonic/gin"
 )
@@ -34,16 +35,16 @@ func New(ceHandler itf.ContainerEngineHandler) *Api {
 func (a Api) SetRoutes(e *gin.Engine) {
 	e.GET("/containers", a.GetContainers)
 	e.POST("/containers", a.PostContainer)
-	e.PUT("/containers/:"+containerParam, a.PutContainer)
-	e.DELETE("/containers/:"+containerParam, a.DeleteContainer)
-	e.GET("/containers/:"+containerParam, a.GetContainer)
-	e.GET("/containers/:"+containerParam+"/log", a.GetContainerLog)
+	e.PUT("/containers/:"+util.ContainerParam, a.PutContainer)
+	e.DELETE("/containers/:"+util.ContainerParam, a.DeleteContainer)
+	e.GET("/containers/:"+util.ContainerParam, a.GetContainer)
+	e.GET("/containers/:"+util.ContainerParam+"/log", a.GetContainerLog)
 	e.GET("/images", a.GetImages)
 	e.POST("/images", a.PostImage)
-	e.GET("/images/:"+imageParam, a.GetImage)
-	e.DELETE("/images/:"+imageParam, a.DeleteImage)
+	e.GET("/images/:"+util.ImageParam, a.GetImage)
+	e.DELETE("/images/:"+util.ImageParam, a.DeleteImage)
 	e.GET("/networks", a.GetNetworks)
 	e.POST("/networks", a.PostNetwork)
-	e.GET("/networks/:"+networkParam, a.GetNetwork)
-	e.DELETE("/networks/:"+networkParam, a.DeleteNetwork)
+	e.GET("/networks/:"+util.NetworkParam, a.GetNetwork)
+	e.DELETE("/networks/:"+util.NetworkParam, a.DeleteNetwork)
 }
