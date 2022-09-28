@@ -44,7 +44,7 @@ func (e LogFileError) Error() string {
 }
 
 func InitLogger(config LoggerConfig) (out *os.File, err error) {
-	flags := log.Ldate | log.Ltime | log.Lmsgprefix
+	flags := log.Ldate | log.Ltime | log.Lmicroseconds | log.Lmsgprefix
 	if config.Utc {
 		flags = flags | log.LUTC
 	}
