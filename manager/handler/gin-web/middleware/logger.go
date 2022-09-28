@@ -38,7 +38,7 @@ func Logger(gc *gin.Context) {
 	errs := gc.Errors.ByType(gin.ErrorTypePrivate)
 	if len(errs) > 0 {
 		for _, e := range gc.Errors {
-			util.Logger.Error(e.Error())
+			util.Logger.Error(e)
 		}
 	}
 	util.Logger.Debugf("%3d | %v | %s %#v", gc.Writer.Status(), latency, gc.Request.Method, path)
