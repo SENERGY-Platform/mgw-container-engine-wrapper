@@ -19,19 +19,13 @@ package gin_web
 import (
 	"deployment-manager/manager/handler/gin-web/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/y-du/go-log-level/level"
-	"os"
 )
 
-func New(logLevel level.Level, logFile *os.File) *gin.Engine {
+func New() *gin.Engine {
 	gin.DisableConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
 	e.ForwardedByClientIP = false
-	lc := gin.LoggerConfig{}
-	if logFile != nil {
-		lc.Output = logFile
-	}
-	e.Use(middleware.Logger(lc, logLevel), middleware.ErrorHandler, gin.Recovery())
+	e.Use(middleware.Logger, middleware.ErrorHandler, gin.Recovery())
 	return e
 }

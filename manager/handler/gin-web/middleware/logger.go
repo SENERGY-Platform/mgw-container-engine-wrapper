@@ -17,71 +17,29 @@
 package middleware
 
 import (
-	"fmt"
+	"deployment-manager/manager/util"
 	"github.com/gin-gonic/gin"
-	"github.com/y-du/go-log-level/level"
-	"os"
 	"time"
 )
 
-func logFormatter(param gin.LogFormatterParams) string {
-	if param.Latency > time.Minute {
-		param.Latency = param.Latency.Truncate(time.Second)
+func Logger(gc *gin.Context) {
+	start := time.Now().UTC()
+	path := gc.Request.URL.Path
+	raw := gc.Request.URL.RawQuery
+	gc.Next()
+	end := time.Now().UTC()
+	latency := end.Sub(start)
+	if latency > time.Minute {
+		latency = latency.Truncate(time.Second)
 	}
-	return fmt.Sprintf("%v %3d | %v | %s %#v\n%s",
-		param.TimeStamp.Format("2006/01/02 15:04:05"),
-		param.StatusCode,
-		param.Latency,
-		//param.ClientIP,
-		param.Method,
-		param.Path,
-		param.ErrorMessage,
-	)
-}
-
-func Logger(conf gin.LoggerConfig, lvl level.Level) gin.HandlerFunc {
-	formatter := conf.Formatter
-	if formatter == nil {
-		formatter = logFormatter
+	if raw != "" {
+		path = path + "?" + raw
 	}
-	out := conf.Output
-	if out == nil {
-		out = os.Stderr
-	}
-	notlogged := conf.SkipPaths
-	var skip map[string]struct{}
-	if length := len(notlogged); length > 0 {
-		skip = make(map[string]struct{}, length)
-		for _, path := range notlogged {
-			skip[path] = struct{}{}
+	errs := gc.Errors.ByType(gin.ErrorTypePrivate)
+	if len(errs) > 0 {
+		for _, e := range gc.Errors {
+			util.Logger.Error(e.Error())
 		}
 	}
-	return func(c *gin.Context) {
-		start := time.Now().UTC()
-		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
-		c.Next()
-		if _, ok := skip[path]; !ok {
-			param := gin.LogFormatterParams{
-				Request: c.Request,
-				Keys:    c.Keys,
-			}
-			param.TimeStamp = time.Now().UTC()
-			param.Latency = param.TimeStamp.Sub(start)
-			//param.ClientIP = c.ClientIP()
-			param.Method = c.Request.Method
-			param.StatusCode = c.Writer.Status()
-			param.ErrorMessage = c.Errors.ByType(gin.ErrorTypePrivate).String()
-			param.BodySize = c.Writer.Size()
-			if raw != "" {
-				path = path + "?" + raw
-			}
-			param.Path = path
-			if lvl > level.Info {
-				fmt.Fprint(out, formatter(param))
-			} else if lvl <= level.Info && len(c.Errors) > 0 {
-				fmt.Fprint(out, formatter(param))
-			}
-		}
-	}
+	util.Logger.Debugf("%3d | %v | %s %#v", gc.Writer.Status(), latency, gc.Request.Method, path)
 }
