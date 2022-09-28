@@ -28,11 +28,12 @@ import (
 var Logger *log_level.Logger
 
 type LoggerConfig struct {
-	Level    level.Level `json:"level" env_var:"LOG_LEVEL"`
-	Utc      bool        `json:"utc" env_var:"LOG_UTC"`
-	Path     string      `json:"path" env_var:"LOG_PATH"`
-	FileName string      `json:"file_name" env_var:"LOG_FILE_NAME"`
-	Terminal bool        `json:"terminal" env_var:"LOG_TERMINAL"`
+	Level        level.Level `json:"level" env_var:"LOG_LEVEL"`
+	Utc          bool        `json:"utc" env_var:"LOG_UTC"`
+	Path         string      `json:"path" env_var:"LOG_PATH"`
+	FileName     string      `json:"file_name" env_var:"LOG_FILE_NAME"`
+	Terminal     bool        `json:"terminal" env_var:"LOG_TERMINAL"`
+	Microseconds bool        `json:"microseconds" env_var:"LOG_MICROSECONDS"`
 }
 
 type LogFileError struct {
@@ -44,9 +45,12 @@ func (e LogFileError) Error() string {
 }
 
 func InitLogger(config LoggerConfig) (out *os.File, err error) {
-	flags := log.Ldate | log.Ltime | log.Lmicroseconds | log.Lmsgprefix
+	flags := log.Ldate | log.Ltime | log.Lmsgprefix
 	if config.Utc {
 		flags = flags | log.LUTC
+	}
+	if config.Microseconds {
+		flags = flags | log.Lmicroseconds
 	}
 	if config.Terminal {
 		out = os.Stderr
