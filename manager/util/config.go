@@ -33,10 +33,11 @@ func NewConfig(path *string) (*Config, error) {
 	cfg := Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
 		Logger: LoggerConfig{
-			Level:    level.Warning,
-			Utc:      true,
-			Path:     "/var/log/",
-			FileName: "mgw-deployment-manager",
+			Level:        level.Warning,
+			Utc:          true,
+			Path:         "/var/log/",
+			FileName:     "mgw-deployment-manager",
+			Microseconds: true,
 		},
 	}
 	if path != nil {
