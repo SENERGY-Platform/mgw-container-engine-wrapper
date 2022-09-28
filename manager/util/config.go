@@ -26,7 +26,7 @@ import (
 
 type Config struct {
 	SocketPath string       `json:"socket_path" env_var:"SOCKET_PATH"`
-	Logger     LoggerConfig `json:"logger" env_var:"LOG_CONFIG"`
+	Logger     LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
 }
 
 func NewConfig(path *string) (*Config, error) {

@@ -28,12 +28,12 @@ import (
 var Logger *log_level.Logger
 
 type LoggerConfig struct {
-	Level        level.Level `json:"level" env_var:"LOG_LEVEL"`
-	Utc          bool        `json:"utc" env_var:"LOG_UTC"`
-	Path         string      `json:"path" env_var:"LOG_PATH"`
-	FileName     string      `json:"file_name" env_var:"LOG_FILE_NAME"`
-	Terminal     bool        `json:"terminal" env_var:"LOG_TERMINAL"`
-	Microseconds bool        `json:"microseconds" env_var:"LOG_MICROSECONDS"`
+	Level        level.Level `json:"level" env_var:"LOGGER_LEVEL"`
+	Utc          bool        `json:"utc" env_var:"LOGGER_UTC"`
+	Path         string      `json:"path" env_var:"LOGGER_PATH"`
+	FileName     string      `json:"file_name" env_var:"LOGGER_FILE_NAME"`
+	Terminal     bool        `json:"terminal" env_var:"LOGGER_TERMINAL"`
+	Microseconds bool        `json:"microseconds" env_var:"LOGGER_MICROSECONDS"`
 }
 
 type LogFileError struct {
