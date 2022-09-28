@@ -40,19 +40,23 @@ func NewConfig(path *string) (*Config, error) {
 			Microseconds: true,
 		},
 	}
+	err := loadConfig(path, &cfg)
+	return &cfg, err
+}
+
+func loadConfig(path *string, cfg any) error {
 	if path != nil {
 		file, err := os.Open(*path)
 		if err != nil {
-			return &cfg, err
+			return err
 		}
 		defer file.Close()
 		decoder := json.NewDecoder(file)
-		if err = decoder.Decode(&cfg); err != nil {
-			return &cfg, err
+		if err = decoder.Decode(cfg); err != nil {
+			return err
 		}
 	}
-	err := envldr.LoadEnvUserParser(&cfg, nil, typeParsers, nil)
-	return &cfg, err
+	return envldr.LoadEnvUserParser(cfg, nil, typeParsers, nil)
 }
 
 var typeParsers = map[reflect.Type]envldr.Parser{
