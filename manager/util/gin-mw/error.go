@@ -18,7 +18,6 @@ package gin_mw
 
 import (
 	"errors"
-	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -26,6 +25,12 @@ import (
 type ErrResponse struct {
 	Status string   `json:"status"`
 	Errors []string `json:"errors"`
+}
+
+type ErrorWithCode interface {
+	Error() string
+	Unwrap() error
+	Code() int
 }
 
 func ErrorHandler(gc *gin.Context) {
@@ -36,9 +41,9 @@ func ErrorHandler(gc *gin.Context) {
 		}
 		var errs []string
 		for _, e := range gc.Errors {
-			var err *srv_base.Error
-			if errors.As(e, &err) {
-				gc.Status(err.Code())
+			var errWC ErrorWithCode
+			if errors.As(e, &errWC) {
+				gc.Status(errWC.Code())
 			}
 			errs = append(errs, e.Error())
 		}
