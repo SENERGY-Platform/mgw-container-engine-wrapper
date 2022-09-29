@@ -22,12 +22,12 @@ import (
 	"time"
 )
 
-type LoggerItf interface {
+type Logger interface {
 	Error(v ...any)
 	Debug(v ...any)
 }
 
-func Logger(logger LoggerItf) gin.HandlerFunc {
+func LoggerHandler(logger Logger) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		start := time.Now().UTC()
 		path := gc.Request.URL.Path

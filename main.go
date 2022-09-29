@@ -80,7 +80,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
-	apiEngine.Use(gin_mw.Logger(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
+	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
 	dmApi := api.New(dockerHandler)
 	dmApi.SetRoutes(apiEngine)
 
