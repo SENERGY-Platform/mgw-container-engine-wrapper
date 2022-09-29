@@ -29,9 +29,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 var version string
@@ -40,6 +37,7 @@ func main() {
 	srv_base.PrintInfo("mgw-deployment-manager", version)
 
 	flags := util.NewFlags()
+
 	config, err := util.NewConfig(flags.ConfPath)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
@@ -65,12 +63,10 @@ func main() {
 		srv_base.Logger.Error(err)
 		return
 	}
+	defer dockerClient.Close()
+
 	dockerHandler := docker.New(dockerClient)
-	if err != nil {
-		srv_base.Logger.Error(err)
-		return
-	}
-	defer dockerHandler.Close()
+
 	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
 		srv_base.Logger.Error(err)
@@ -81,6 +77,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
 	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
+
 	dmApi := api.New(dockerHandler)
 	dmApi.SetRoutes(apiEngine)
 
@@ -89,29 +86,6 @@ func main() {
 		srv_base.Logger.Error(err)
 		return
 	}
-	server := http.Server{
-		Handler: apiEngine,
-	}
 
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
-
-	go func() {
-		sig := <-shutdown
-		srv_base.Logger.Warningf("received signal '%s'", sig)
-		srv_base.Logger.Info("initiating shutdown ...")
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err := server.Shutdown(ctx); err != nil {
-			srv_base.Logger.Error("server forced to shutdown: ", err)
-		}
-	}()
-
-	srv_base.Logger.Info("starting server ...")
-	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
-		srv_base.Logger.Error("starting server failed: ", err)
-		return
-	} else {
-		srv_base.Logger.Info("shutdown complete")
-	}
+	srv_base.Start(&http.Server{Handler: apiEngine}, listener, srv_base.DefaultSignals)
 }

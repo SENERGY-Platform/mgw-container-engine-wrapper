@@ -41,7 +41,3 @@ func (d Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	info["api"] = d.client.ClientVersion()
 	return info, nil
 }
-
-func (d Docker) Close() error {
-	return d.client.Close()
-}
