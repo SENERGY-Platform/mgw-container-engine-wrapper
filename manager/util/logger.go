@@ -58,9 +58,7 @@ func InitLogger(config LoggerConfig) (out *os.File, err error) {
 	} else {
 		out, err = os.OpenFile(path.Join(config.Path, fmt.Sprintf("%s.log", config.FileName)), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			err = &LogFileError{
-				msg: err.Error(),
-			}
+			err = &LogFileError{msg: fmt.Sprintf("log file error: %s", err)}
 			return
 		}
 	}
