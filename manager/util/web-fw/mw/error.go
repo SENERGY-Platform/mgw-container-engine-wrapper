@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package middleware
+package mw
 
 import (
-	"deployment-manager/manager/api/util"
-	"deployment-manager/manager/itf"
+	"deployment-manager/manager/util"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
+type ErrResponse struct {
+	Status string   `json:"status"`
+	Errors []string `json:"errors"`
+}
 
 func ErrorHandler(gc *gin.Context) {
 	gc.Next()
@@ -32,13 +36,13 @@ func ErrorHandler(gc *gin.Context) {
 		}
 		var errs []string
 		for _, e := range gc.Errors {
-			var ceErr *itf.Error
-			if errors.As(e, &ceErr) {
-				gc.Status(ceErr.Code())
+			var err *util.Error
+			if errors.As(e, &err) {
+				gc.Status(err.Code())
 			}
 			errs = append(errs, e.Error())
 		}
-		gc.JSON(-1, &util.ErrResponse{
+		gc.JSON(-1, &ErrResponse{
 			Status: http.StatusText(gc.Writer.Status()),
 			Errors: errs,
 		})

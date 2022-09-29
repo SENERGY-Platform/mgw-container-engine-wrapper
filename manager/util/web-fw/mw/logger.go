@@ -14,18 +14,32 @@
  * limitations under the License.
  */
 
-package gin_web
+package mw
 
 import (
-	"deployment-manager/manager/handler/gin-web/middleware"
+	"deployment-manager/manager/util"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
-func New() *gin.Engine {
-	gin.DisableConsoleColor()
-	gin.SetMode(gin.ReleaseMode)
-	e := gin.New()
-	e.ForwardedByClientIP = false
-	e.Use(middleware.Logger, middleware.ErrorHandler, gin.Recovery())
-	return e
+func Logger(gc *gin.Context) {
+	start := time.Now().UTC()
+	path := gc.Request.URL.Path
+	raw := gc.Request.URL.RawQuery
+	gc.Next()
+	end := time.Now().UTC()
+	latency := end.Sub(start)
+	if latency > time.Minute {
+		latency = latency.Truncate(time.Second)
+	}
+	if raw != "" {
+		path = path + "?" + raw
+	}
+	errs := gc.Errors.ByType(gin.ErrorTypePrivate)
+	if len(errs) > 0 {
+		for _, e := range gc.Errors {
+			util.Logger.Error(e)
+		}
+	}
+	util.Logger.Debugf("%3d | %v | %s %#v", gc.Writer.Status(), latency, gc.Request.Method, path)
 }

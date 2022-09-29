@@ -14,32 +14,18 @@
  * limitations under the License.
  */
 
-package middleware
+package web_fw
 
 import (
-	"deployment-manager/manager/util"
+	"deployment-manager/manager/util/web-fw/mw"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
-func Logger(gc *gin.Context) {
-	start := time.Now().UTC()
-	path := gc.Request.URL.Path
-	raw := gc.Request.URL.RawQuery
-	gc.Next()
-	end := time.Now().UTC()
-	latency := end.Sub(start)
-	if latency > time.Minute {
-		latency = latency.Truncate(time.Second)
-	}
-	if raw != "" {
-		path = path + "?" + raw
-	}
-	errs := gc.Errors.ByType(gin.ErrorTypePrivate)
-	if len(errs) > 0 {
-		for _, e := range gc.Errors {
-			util.Logger.Error(e)
-		}
-	}
-	util.Logger.Debugf("%3d | %v | %s %#v", gc.Writer.Status(), latency, gc.Request.Method, path)
+func New() *gin.Engine {
+	gin.DisableConsoleColor()
+	gin.SetMode(gin.ReleaseMode)
+	e := gin.New()
+	e.ForwardedByClientIP = false
+	e.Use(mw.Logger, mw.ErrorHandler, gin.Recovery())
+	return e
 }

@@ -35,7 +35,7 @@ func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.I
 	var images []itf.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
-		return images, itf.NewError(http.StatusInternalServerError, "listing images failed", err)
+		return images, mUtil.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
 	for _, is := range il {
 		img := itf.Image{
@@ -69,7 +69,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return img, itf.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
+		return img, mUtil.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
 	}
 	img.ID = i.ID
 	img.Size = i.Size
@@ -94,7 +94,7 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 		} else if client.IsErrUnauthorized(err) {
 			code = http.StatusUnauthorized
 		}
-		return itf.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
 	}
 	defer rc.Close()
 	jd := json.NewDecoder(rc)
@@ -104,13 +104,13 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 			if err == io.EOF {
 				break
 			} else {
-				return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
+				return mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
 			}
 		}
 		mUtil.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
-		return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
+		return mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func (d Docker) ImageRemove(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return itf.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
 	}
 	return nil
 }

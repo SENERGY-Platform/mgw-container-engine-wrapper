@@ -32,7 +32,7 @@ func (d Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
 	var n []itf.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
-		return n, itf.NewError(http.StatusInternalServerError, "listing networks failed", err)
+		return n, mUtil.NewError(http.StatusInternalServerError, "listing networks failed", err)
 	}
 	for _, r := range nr {
 		if nType, ok := util.NetTypeMap[r.Driver]; ok {
@@ -57,7 +57,7 @@ func (d Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error)
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return n, itf.NewError(code, fmt.Sprintf("retrieving info for network '%s' failed", id), err)
+		return n, mUtil.NewError(code, fmt.Sprintf("retrieving info for network '%s' failed", id), err)
 	}
 	s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
 	n.ID = nr.ID
@@ -78,7 +78,7 @@ func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 		},
 	})
 	if err != nil {
-		return itf.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
+		return mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
 	}
 	if res.Warning != "" {
 		mUtil.Logger.Warningf("encountered warnings during creation of network '%s': %s", net.Name, res.Warning)
@@ -92,7 +92,7 @@ func (d Docker) NetworkRemove(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return itf.NewError(code, fmt.Sprintf("removing network '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("removing network '%s' failed", id), err)
 	}
 	return nil
 }

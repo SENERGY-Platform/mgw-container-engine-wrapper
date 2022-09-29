@@ -16,28 +16,36 @@
 
 package util
 
-type ContainersQuery struct {
-	Name  string   `form:"name"`
-	State string   `form:"state"`
-	Label []string `form:"label"`
+import "fmt"
+
+type Error struct {
+	code int
+	msg  string
+	err  error
 }
 
-type ContainerLogQuery struct {
-	MaxLines int    `form:"max_lines"`
-	Since    string `form:"since"`
-	Until    string `form:"until"`
+func NewError(code int, msg string, err error) error {
+	return &Error{
+		code: code,
+		msg:  msg,
+		err:  err,
+	}
 }
 
-type ImagesQuery struct {
-	Label []string `form:"label"`
+func (e *Error) Error() string {
+	if e.msg != "" && e.err != nil {
+		return fmt.Sprintf("%s: %s", e.msg, e.err.Error())
+	} else if e.msg != "" {
+		return e.msg
+	} else {
+		return e.err.Error()
+	}
 }
 
-type ContainersPostResponse struct {
-	ID string `json:"id"`
+func (e *Error) Unwrap() error {
+	return e.err
 }
 
-type ContainerState string
-
-type ContainerCtrlPostRequest struct {
-	State ContainerState `json:"state"`
+func (e *Error) Code() int {
+	return e.code
 }

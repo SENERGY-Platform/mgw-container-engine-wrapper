@@ -35,7 +35,7 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 	var csl []itf.Container
 	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
 	if err != nil {
-		return csl, itf.NewError(http.StatusInternalServerError, "listing containers failed", err)
+		return csl, mUtil.NewError(http.StatusInternalServerError, "listing containers failed", err)
 	}
 	for _, c := range cl {
 		ctr := itf.Container{
@@ -93,7 +93,7 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return ctr, itf.NewError(code, fmt.Sprintf("retrieving info for container '%s' failed", id), err)
+		return ctr, mUtil.NewError(code, fmt.Sprintf("retrieving info for container '%s' failed", id), err)
 	}
 	var mts []itf.Mount
 	if len(c.HostConfig.Mounts) > 0 {
@@ -147,11 +147,11 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 	}
 	bindings, err := util.GenPortMap(ctrConf.Ports)
 	if err != nil {
-		return "", itf.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", mUtil.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	mts, err := util.GenMounts(ctrConf.Mounts)
 	if err != nil {
-		return "", itf.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", mUtil.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	hConfig := &container.HostConfig{
 		PortBindings: bindings,
@@ -164,7 +164,7 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 	}
 	err = util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
-		return "", itf.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", mUtil.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	var nConfig *network.NetworkingConfig
 	if len(ctrConf.Networks) > 0 {
@@ -176,7 +176,7 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 	}
 	res, err := d.client.ContainerCreate(ctx, cConfig, hConfig, nConfig, nil, ctrConf.Name)
 	if err != nil {
-		return "", itf.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	if len(ctrConf.Networks) > 1 {
 		for i := 1; i < len(ctrConf.Networks); i++ {
@@ -188,7 +188,7 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 				if err2 != nil {
 					mUtil.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
-				return "", itf.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+				return "", mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 			}
 		}
 	}
@@ -204,7 +204,7 @@ func (d Docker) ContainerRemove(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return itf.NewError(code, fmt.Sprintf("removing container '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("removing container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -215,7 +215,7 @@ func (d Docker) ContainerStart(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return itf.NewError(code, fmt.Sprintf("starting container '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("starting container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -226,7 +226,7 @@ func (d Docker) ContainerStop(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return itf.NewError(code, fmt.Sprintf("stopping container '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("stopping container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -237,7 +237,7 @@ func (d Docker) ContainerRestart(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return itf.NewError(code, fmt.Sprintf("restarting container '%s' failed", id), err)
+		return mUtil.NewError(code, fmt.Sprintf("restarting container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -262,7 +262,7 @@ func (d Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptio
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return nil, itf.NewError(code, fmt.Sprintf("retrieving log for container '%s' failed", id), err)
+		return nil, mUtil.NewError(code, fmt.Sprintf("retrieving log for container '%s' failed", id), err)
 	}
 	return util.NewLogReader(rc), nil
 }

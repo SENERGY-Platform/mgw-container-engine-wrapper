@@ -152,9 +152,3 @@ type LogOptions struct {
 	Since    *time.Time
 	Until    *time.Time
 }
-
-type Error struct {
-	code int
-	msg  string
-	err  error
-}

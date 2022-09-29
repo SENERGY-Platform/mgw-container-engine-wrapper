@@ -116,29 +116,3 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 func (d Duration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.String())
 }
-
-func NewError(code int, msg string, err error) error {
-	return &Error{
-		code: code,
-		msg:  msg,
-		err:  err,
-	}
-}
-
-func (e *Error) Error() string {
-	if e.msg != "" && e.err != nil {
-		return fmt.Sprintf("%s: %s", e.msg, e.err.Error())
-	} else if e.msg != "" {
-		return e.msg
-	} else {
-		return e.err.Error()
-	}
-}
-
-func (e *Error) Unwrap() error {
-	return e.err
-}
-
-func (e *Error) Code() int {
-	return e.code
-}
