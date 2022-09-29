@@ -34,6 +34,7 @@ type LoggerConfig struct {
 	FileName     string      `json:"file_name" env_var:"LOGGER_FILE_NAME"`
 	Terminal     bool        `json:"terminal" env_var:"LOGGER_TERMINAL"`
 	Microseconds bool        `json:"microseconds" env_var:"LOGGER_MICROSECONDS"`
+	Prefix       string      `json:"prefix" env_var:"LOGGER_PREFIX"`
 }
 
 type LogFileError struct {
@@ -63,6 +64,6 @@ func InitLogger(config LoggerConfig) (out *os.File, err error) {
 			return
 		}
 	}
-	Logger, err = log_level.New(log.New(out, "", flags), config.Level)
+	Logger, err = log_level.New(log.New(out, config.Prefix, flags), config.Level)
 	return
 }
