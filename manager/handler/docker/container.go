@@ -20,8 +20,8 @@ import (
 	"context"
 	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	mUtil "deployment-manager/manager/util"
 	"fmt"
+	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -35,7 +35,7 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 	var csl []itf.Container
 	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
 	if err != nil {
-		return csl, mUtil.NewError(http.StatusInternalServerError, "listing containers failed", err)
+		return csl, srv_base.NewError(http.StatusInternalServerError, "listing containers failed", err)
 	}
 	for _, c := range cl {
 		ctr := itf.Container{
@@ -47,17 +47,17 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 			Networks: util.ParseEndpointSettings(c.NetworkSettings.Networks),
 		}
 		if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
-			mUtil.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
+			srv_base.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
 		} else {
 			ctr.Name = util.ParseContainerName(ci.Name)
 			if tc, err := util.ParseTimestamp(ci.Created); err != nil {
-				mUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
+				srv_base.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 			} else {
 				ctr.Created = tc
 			}
 			if c.State == "running" {
 				if ts, err := util.ParseTimestamp(ci.State.StartedAt); err != nil {
-					mUtil.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
+					srv_base.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
 				} else {
 					ctr.Started = &ts
 				}
@@ -65,7 +65,7 @@ func (d Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) 
 			ctr.Image = ci.Config.Image
 			ctr.EnvVars = util.ParseEnv(ci.Config.Env)
 			if ports, err := util.ParsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports); err != nil {
-				mUtil.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
+				srv_base.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
 			} else {
 				ctr.Ports = ports
 			}
@@ -93,7 +93,7 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return ctr, mUtil.NewError(code, fmt.Sprintf("retrieving info for container '%s' failed", id), err)
+		return ctr, srv_base.NewError(code, fmt.Sprintf("retrieving info for container '%s' failed", id), err)
 	}
 	var mts []itf.Mount
 	if len(c.HostConfig.Mounts) > 0 {
@@ -110,7 +110,7 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 	ctr.Labels = c.Config.Labels
 	ctr.Mounts = mts
 	if ports, err := util.ParsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports); err != nil {
-		mUtil.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
+		srv_base.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
 	} else {
 		ctr.Ports = ports
 	}
@@ -122,13 +122,13 @@ func (d Docker) ContainerInfo(ctx context.Context, id string) (itf.Container, er
 		StopTimeout:     util.ParseStopTimeout(c.Config.StopTimeout),
 	}
 	if tc, err := util.ParseTimestamp(c.Created); err != nil {
-		mUtil.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
+		srv_base.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 	} else {
 		ctr.Created = tc
 	}
 	if c.State.Status == "running" {
 		if ts, err := util.ParseTimestamp(c.State.StartedAt); err != nil {
-			mUtil.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
+			srv_base.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
 		} else {
 			ctr.Started = &ts
 		}
@@ -147,11 +147,11 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 	}
 	bindings, err := util.GenPortMap(ctrConf.Ports)
 	if err != nil {
-		return "", mUtil.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", srv_base.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	mts, err := util.GenMounts(ctrConf.Mounts)
 	if err != nil {
-		return "", mUtil.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", srv_base.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	hConfig := &container.HostConfig{
 		PortBindings: bindings,
@@ -164,7 +164,7 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 	}
 	err = util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
-		return "", mUtil.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", srv_base.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	var nConfig *network.NetworkingConfig
 	if len(ctrConf.Networks) > 0 {
@@ -176,7 +176,7 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 	}
 	res, err := d.client.ContainerCreate(ctx, cConfig, hConfig, nConfig, nil, ctrConf.Name)
 	if err != nil {
-		return "", mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", srv_base.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
 	if len(ctrConf.Networks) > 1 {
 		for i := 1; i < len(ctrConf.Networks); i++ {
@@ -186,14 +186,14 @@ func (d Docker) ContainerCreate(ctx context.Context, ctrConf itf.Container) (str
 			if err != nil {
 				err2 := d.ContainerRemove(ctx, res.ID)
 				if err2 != nil {
-					mUtil.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
+					srv_base.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
-				return "", mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+				return "", srv_base.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 			}
 		}
 	}
 	if res.Warnings != nil && len(res.Warnings) > 0 {
-		mUtil.Logger.Warningf("encountered warnings during creation of container '%s': %s", ctrConf.Name, res.Warnings)
+		srv_base.Logger.Warningf("encountered warnings during creation of container '%s': %s", ctrConf.Name, res.Warnings)
 	}
 	return res.ID, nil
 }
@@ -204,7 +204,7 @@ func (d Docker) ContainerRemove(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return mUtil.NewError(code, fmt.Sprintf("removing container '%s' failed", id), err)
+		return srv_base.NewError(code, fmt.Sprintf("removing container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -215,7 +215,7 @@ func (d Docker) ContainerStart(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return mUtil.NewError(code, fmt.Sprintf("starting container '%s' failed", id), err)
+		return srv_base.NewError(code, fmt.Sprintf("starting container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -226,7 +226,7 @@ func (d Docker) ContainerStop(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return mUtil.NewError(code, fmt.Sprintf("stopping container '%s' failed", id), err)
+		return srv_base.NewError(code, fmt.Sprintf("stopping container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -237,7 +237,7 @@ func (d Docker) ContainerRestart(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return mUtil.NewError(code, fmt.Sprintf("restarting container '%s' failed", id), err)
+		return srv_base.NewError(code, fmt.Sprintf("restarting container '%s' failed", id), err)
 	}
 	return nil
 }
@@ -262,7 +262,7 @@ func (d Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptio
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return nil, mUtil.NewError(code, fmt.Sprintf("retrieving log for container '%s' failed", id), err)
+		return nil, srv_base.NewError(code, fmt.Sprintf("retrieving log for container '%s' failed", id), err)
 	}
 	return util.NewLogReader(rc), nil
 }

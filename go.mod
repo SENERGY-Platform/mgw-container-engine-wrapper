@@ -3,10 +3,10 @@ module deployment-manager
 go 1.19
 
 require (
+	github.com/SENERGY-Platform/go-service-base v0.0.1
 	github.com/docker/docker v20.10.17+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/gin-gonic/gin v1.8.1
-	github.com/y-du/go-env-loader v0.5.0
 	github.com/y-du/go-log-level v0.2.2
 )
 
@@ -33,6 +33,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
+	github.com/y-du/go-env-loader v0.5.0 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c // indirect
 	golang.org/x/sys v0.0.0-20220907062415-87db552b00fd // indirect

@@ -17,22 +17,19 @@
 package util
 
 import (
-	"encoding/json"
-	envldr "github.com/y-du/go-env-loader"
+	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/y-du/go-log-level/level"
-	"os"
-	"reflect"
 )
 
 type Config struct {
-	SocketPath string       `json:"socket_path" env_var:"SOCKET_PATH"`
-	Logger     LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	SocketPath string                `json:"socket_path" env_var:"SOCKET_PATH"`
+	Logger     srv_base.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
 }
 
 func NewConfig(path *string) (*Config, error) {
 	cfg := Config{
 		SocketPath: "/opt/deployment-manager/manager.sock",
-		Logger: LoggerConfig{
+		Logger: srv_base.LoggerConfig{
 			Level:        level.Warning,
 			Utc:          true,
 			Path:         "/var/log/",
@@ -40,29 +37,6 @@ func NewConfig(path *string) (*Config, error) {
 			Microseconds: true,
 		},
 	}
-	err := loadConfig(path, &cfg)
+	err := srv_base.LoadConfig(path, &cfg)
 	return &cfg, err
-}
-
-func loadConfig(path *string, cfg any) error {
-	if path != nil {
-		file, err := os.Open(*path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		decoder := json.NewDecoder(file)
-		if err = decoder.Decode(cfg); err != nil {
-			return err
-		}
-	}
-	return envldr.LoadEnvUserParser(cfg, nil, typeParsers, nil)
-}
-
-var typeParsers = map[reflect.Type]envldr.Parser{
-	reflect.TypeOf(level.Off): LogLevelParser,
-}
-
-var LogLevelParser envldr.Parser = func(t reflect.Type, val string, params []string, kwParams map[string]string) (interface{}, error) {
-	return level.Parse(val)
 }

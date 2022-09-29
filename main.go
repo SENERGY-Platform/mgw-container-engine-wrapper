@@ -24,6 +24,7 @@ import (
 	"deployment-manager/manager/util/gin-mw"
 	"errors"
 	"fmt"
+	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -36,7 +37,7 @@ import (
 var version string
 
 func main() {
-	util.PrintInfo("mgw-deployment-manager", version)
+	srv_base.PrintInfo("mgw-deployment-manager", version)
 
 	flags := util.NewFlags()
 	config, err := util.NewConfig(flags.ConfPath)
@@ -45,10 +46,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	logFile, err := util.InitLogger(config.Logger)
+	logFile, err := srv_base.InitLogger(config.Logger)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
-		var logFileError *util.LogFileError
+		var logFileError *srv_base.LogFileError
 		if errors.As(err, &logFileError) {
 			os.Exit(1)
 		}
@@ -57,35 +58,35 @@ func main() {
 		defer logFile.Close()
 	}
 
-	util.Logger.Debugf("config: %s", util.ToJsonStr(config))
+	srv_base.Logger.Debugf("config: %s", srv_base.ToJsonStr(config))
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		util.Logger.Error(err)
+		srv_base.Logger.Error(err)
 		return
 	}
 	dockerHandler := docker.New(dockerClient)
 	if err != nil {
-		util.Logger.Error(err)
+		srv_base.Logger.Error(err)
 		return
 	}
 	defer dockerHandler.Close()
 	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
-		util.Logger.Error(err)
+		srv_base.Logger.Error(err)
 		return
 	}
-	util.Logger.Debugf("docker: %s", util.ToJsonStr(dockerInfo))
+	srv_base.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
 
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
-	apiEngine.Use(gin_mw.Logger(util.Logger), gin_mw.ErrorHandler, gin.Recovery())
+	apiEngine.Use(gin_mw.Logger(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
 	dmApi := api.New(dockerHandler)
 	dmApi.SetRoutes(apiEngine)
 
 	listener, err := util.NewUnixListener(config.SocketPath)
 	if err != nil {
-		util.Logger.Error(err)
+		srv_base.Logger.Error(err)
 		return
 	}
 	server := http.Server{
@@ -97,20 +98,20 @@ func main() {
 
 	go func() {
 		sig := <-shutdown
-		util.Logger.Warningf("received signal '%s'", sig)
-		util.Logger.Info("initiating shutdown ...")
+		srv_base.Logger.Warningf("received signal '%s'", sig)
+		srv_base.Logger.Info("initiating shutdown ...")
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := server.Shutdown(ctx); err != nil {
-			util.Logger.Error("server forced to shutdown: ", err)
+			srv_base.Logger.Error("server forced to shutdown: ", err)
 		}
 	}()
 
-	util.Logger.Info("starting server ...")
+	srv_base.Logger.Info("starting server ...")
 	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
-		util.Logger.Error("starting server failed: ", err)
+		srv_base.Logger.Error("starting server failed: ", err)
 		return
 	} else {
-		util.Logger.Info("shutdown complete")
+		srv_base.Logger.Info("shutdown complete")
 	}
 }

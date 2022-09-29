@@ -20,10 +20,10 @@ import (
 	"context"
 	"deployment-manager/manager/handler/docker/util"
 	"deployment-manager/manager/itf"
-	mUtil "deployment-manager/manager/util"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -35,7 +35,7 @@ func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.I
 	var images []itf.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
-		return images, mUtil.NewError(http.StatusInternalServerError, "listing images failed", err)
+		return images, srv_base.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
 	for _, is := range il {
 		img := itf.Image{
@@ -47,10 +47,10 @@ func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.I
 			Labels:  is.Labels,
 		}
 		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
-			mUtil.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
+			srv_base.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
 		} else {
 			if ti, err := util.ParseTimestamp(i.Created); err != nil {
-				mUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
+				srv_base.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
 			} else {
 				img.Created = ti
 			}
@@ -69,7 +69,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return img, mUtil.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
+		return img, srv_base.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
 	}
 	img.ID = i.ID
 	img.Size = i.Size
@@ -78,7 +78,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	img.Digests = i.RepoDigests
 	img.Labels = i.Config.Labels
 	if ti, err := util.ParseTimestamp(i.Created); err != nil {
-		mUtil.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
+		srv_base.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
 	} else {
 		img.Created = ti
 	}
@@ -94,7 +94,7 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 		} else if client.IsErrUnauthorized(err) {
 			code = http.StatusUnauthorized
 		}
-		return mUtil.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
+		return srv_base.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
 	}
 	defer rc.Close()
 	jd := json.NewDecoder(rc)
@@ -104,13 +104,13 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 			if err == io.EOF {
 				break
 			} else {
-				return mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
+				return srv_base.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
 			}
 		}
-		mUtil.Logger.Debugf("pulling image '%s': %s", id, msg)
+		srv_base.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
-		return mUtil.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
+		return srv_base.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func (d Docker) ImageRemove(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return mUtil.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
+		return srv_base.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
 	}
 	return nil
 }

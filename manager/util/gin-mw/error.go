@@ -17,8 +17,8 @@
 package gin_mw
 
 import (
-	"deployment-manager/manager/util"
 	"errors"
+	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -36,7 +36,7 @@ func ErrorHandler(gc *gin.Context) {
 		}
 		var errs []string
 		for _, e := range gc.Errors {
-			var err *util.Error
+			var err *srv_base.Error
 			if errors.As(e, &err) {
 				gc.Status(err.Code())
 			}
