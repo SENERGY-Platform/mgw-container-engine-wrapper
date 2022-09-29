@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mw
+package gin_mw
 
 import (
 	"deployment-manager/manager/util"

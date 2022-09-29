@@ -21,10 +21,11 @@ import (
 	"deployment-manager/manager/api"
 	"deployment-manager/manager/handler/docker"
 	"deployment-manager/manager/util"
-	"deployment-manager/manager/util/web-fw"
+	"deployment-manager/manager/util/gin-mw"
 	"errors"
 	"fmt"
 	"github.com/docker/docker/client"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 	"os/signal"
@@ -76,8 +77,10 @@ func main() {
 	}
 	util.Logger.Debugf("docker: %s", util.ToJsonStr(dockerInfo))
 
+	gin.SetMode(gin.ReleaseMode)
+	apiEngine := gin.New()
+	apiEngine.Use(gin_mw.Logger(util.Logger), gin_mw.ErrorHandler, gin.Recovery())
 	dmApi := api.New(dockerHandler)
-	apiEngine := web_fw.New()
 	dmApi.SetRoutes(apiEngine)
 
 	listener, err := util.NewUnixListener(config.SocketPath)
