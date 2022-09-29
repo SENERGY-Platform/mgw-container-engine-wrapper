@@ -17,8 +17,6 @@
 package util
 
 import (
-	"encoding/json"
-	"fmt"
 	"strings"
 )
 
@@ -33,19 +31,6 @@ func GenLabels(sl []string) (l map[string]string) {
 				l[p[0]] = ""
 			}
 		}
-	}
-	return
-}
-
-func (c *ContainerState) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	if st, ok := ContainerStateMap[s]; ok {
-		*c = st
-	} else {
-		err = fmt.Errorf("unknown container state '%s'", s)
 	}
 	return
 }

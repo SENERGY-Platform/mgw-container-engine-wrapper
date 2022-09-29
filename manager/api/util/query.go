@@ -31,13 +31,3 @@ type ContainerLogQuery struct {
 type ImagesQuery struct {
 	Label []string `form:"label"`
 }
-
-type ContainersPostResponse struct {
-	ID string `json:"id"`
-}
-
-type ContainerState string
-
-type ContainerCtrlPostRequest struct {
-	State ContainerState `json:"state"`
-}

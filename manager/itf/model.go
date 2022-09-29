@@ -17,31 +17,10 @@
 package itf
 
 import (
-	"context"
-	"io"
 	"io/fs"
 	"net"
 	"time"
 )
-
-type ContainerEngineHandler interface {
-	ListNetworks(ctx context.Context) ([]Network, error)
-	ListContainers(ctx context.Context, filter ContainerFilter) ([]Container, error)
-	ListImages(ctx context.Context, filter ImageFilter) ([]Image, error)
-	NetworkInfo(ctx context.Context, id string) (Network, error)
-	NetworkCreate(ctx context.Context, net Network) error
-	NetworkRemove(ctx context.Context, id string) error
-	ContainerInfo(ctx context.Context, id string) (Container, error)
-	ContainerCreate(ctx context.Context, container Container) (id string, err error)
-	ContainerRemove(ctx context.Context, id string) error
-	ContainerStart(ctx context.Context, id string) error
-	ContainerStop(ctx context.Context, id string) error
-	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
-	ImageInfo(ctx context.Context, id string) (Image, error)
-	ImagePull(ctx context.Context, id string) error
-	ImageRemove(ctx context.Context, id string) error
-}
 
 type Image struct {
 	ID      string            `json:"id"`
@@ -151,4 +130,14 @@ type LogOptions struct {
 	MaxLines int
 	Since    *time.Time
 	Until    *time.Time
+}
+
+type ContainersPostResponse struct {
+	ID string `json:"id"`
+}
+
+type ContainerSetState string
+
+type ContainerCtrlPostRequest struct {
+	State ContainerSetState `json:"state"`
 }

@@ -79,3 +79,15 @@ var ContainerStateMap = map[string]ContainerState{
 	string(UnhealthyState): UnhealthyState,
 	string(UnknownState):   UnknownState,
 }
+
+const (
+	ContainerStart   ContainerSetState = "start"
+	ContainerStop    ContainerSetState = "stop"
+	ContainerRestart ContainerSetState = "restart"
+)
+
+var ContainerSetStateMap = map[string]ContainerSetState{
+	string(ContainerStart):   ContainerStart,
+	string(ContainerStop):    ContainerStop,
+	string(ContainerRestart): ContainerRestart,
+}

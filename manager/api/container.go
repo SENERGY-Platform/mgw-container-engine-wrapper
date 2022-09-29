@@ -64,28 +64,28 @@ func (a Api) PostContainer(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	gc.JSON(http.StatusOK, &util.ContainersPostResponse{ID: id})
+	gc.JSON(http.StatusOK, &itf.ContainersPostResponse{ID: id})
 }
 
 func (a Api) PostContainerCtrl(gc *gin.Context) {
-	ctrl := util.ContainerCtrlPostRequest{}
+	ctrl := itf.ContainerCtrlPostRequest{}
 	if err := gc.ShouldBindJSON(&ctrl); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
 		return
 	}
 	switch ctrl.State {
-	case util.ContainerStart:
+	case itf.ContainerStart:
 		if err := a.ceHandler.ContainerStart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 			_ = gc.Error(err)
 			return
 		}
-	case util.ContainerRestart:
+	case itf.ContainerRestart:
 		if err := a.ceHandler.ContainerRestart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 			_ = gc.Error(err)
 			return
 		}
-	case util.ContainerStop:
+	case itf.ContainerStop:
 		if err := a.ceHandler.ContainerStop(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 			_ = gc.Error(err)
 			return

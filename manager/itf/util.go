@@ -116,3 +116,16 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 func (d Duration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.String())
 }
+
+func (c *ContainerSetState) UnmarshalJSON(b []byte) (err error) {
+	var s string
+	if err = json.Unmarshal(b, &s); err != nil {
+		return
+	}
+	if st, ok := ContainerSetStateMap[s]; ok {
+		*c = st
+	} else {
+		err = fmt.Errorf("unknown container state '%s'", s)
+	}
+	return
+}
