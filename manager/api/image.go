@@ -18,8 +18,8 @@ package api
 
 import (
 	"deployment-manager/manager/api/util"
-	"deployment-manager/manager/itf"
 	"fmt"
+	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -31,7 +31,7 @@ func (a *Api) GetImages(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	filter := itf.ImageFilter{Labels: util.GenLabels(query.Label)}
+	filter := dm_lib.ImageFilter{Labels: util.GenLabels(query.Label)}
 	images, err := a.ceHandler.ListImages(gc.Request.Context(), filter)
 	if err != nil {
 		_ = gc.Error(err)
@@ -41,7 +41,7 @@ func (a *Api) GetImages(gc *gin.Context) {
 }
 
 func (a *Api) PostImage(gc *gin.Context) {
-	image := itf.Image{}
+	image := dm_lib.Image{}
 	if err := gc.ShouldBindJSON(&image); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)

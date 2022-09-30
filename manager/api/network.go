@@ -18,7 +18,7 @@ package api
 
 import (
 	"deployment-manager/manager/api/util"
-	"deployment-manager/manager/itf"
+	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -33,7 +33,7 @@ func (a *Api) GetNetworks(gc *gin.Context) {
 }
 
 func (a *Api) PostNetwork(gc *gin.Context) {
-	network := itf.Network{}
+	network := dm_lib.Network{}
 	if err := gc.ShouldBindJSON(&network); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)

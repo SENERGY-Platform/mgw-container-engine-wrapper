@@ -19,18 +19,18 @@ package docker
 import (
 	"context"
 	"deployment-manager/manager/handler/docker/util"
-	"deployment-manager/manager/itf"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
+	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"net/http"
 )
 
-func (d *Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
-	var n []itf.Network
+func (d *Docker) ListNetworks(ctx context.Context) ([]dm_lib.Network, error) {
+	var n []dm_lib.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		return n, srv_base_types.NewError(http.StatusInternalServerError, "listing networks failed", err)
@@ -38,7 +38,7 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
 	for _, r := range nr {
 		if nType, ok := util.NetTypeMap[r.Driver]; ok {
 			s, gw := util.ParseNetIPAMConfig(r.IPAM.Config)
-			n = append(n, itf.Network{
+			n = append(n, dm_lib.Network{
 				ID:      r.ID,
 				Name:    r.Name,
 				Type:    nType,
@@ -50,8 +50,8 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
 	return n, nil
 }
 
-func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
-	n := itf.Network{}
+func (d *Docker) NetworkInfo(ctx context.Context, id string) (dm_lib.Network, error) {
+	n := dm_lib.Network{}
 	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
 	if err != nil {
 		code := http.StatusInternalServerError
@@ -69,7 +69,7 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error
 	return n, nil
 }
 
-func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
+func (d *Docker) NetworkCreate(ctx context.Context, net dm_lib.Network) error {
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         util.NetTypeRMap[net.Type],

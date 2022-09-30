@@ -17,78 +17,78 @@
 package util
 
 import (
-	"deployment-manager/manager/itf"
+	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/docker/docker/api/types/mount"
 )
 
-var StateMap = map[string]itf.ContainerState{
-	"created":    itf.UnknownState,
-	"running":    itf.RunningState,
-	"paused":     itf.UnknownState,
-	"restarting": itf.UnknownState,
-	"removing":   itf.UnknownState,
-	"exited":     itf.StoppedState,
-	"dead":       itf.UnhealthyState,
+var StateMap = map[string]dm_lib.ContainerState{
+	"created":    dm_lib.UnknownState,
+	"running":    dm_lib.RunningState,
+	"paused":     dm_lib.UnknownState,
+	"restarting": dm_lib.UnknownState,
+	"removing":   dm_lib.UnknownState,
+	"exited":     dm_lib.StoppedState,
+	"dead":       dm_lib.UnhealthyState,
 }
 
-var StateRMap = map[itf.ContainerState]string{
-	itf.RunningState:   "running",
-	itf.StoppedState:   "exited",
-	itf.UnhealthyState: "dead",
-	itf.UnknownState:   "created",
+var StateRMap = map[dm_lib.ContainerState]string{
+	dm_lib.RunningState:   "running",
+	dm_lib.StoppedState:   "exited",
+	dm_lib.UnhealthyState: "dead",
+	dm_lib.UnknownState:   "created",
 }
 
-var RestartPolicyMap = map[string]itf.RestartStrategy{
-	"no":             itf.RestartNever,
-	"on-failure":     itf.RestartOnFail,
-	"always":         itf.RestartAlways,
-	"unless-stopped": itf.RestartNotStopped,
+var RestartPolicyMap = map[string]dm_lib.RestartStrategy{
+	"no":             dm_lib.RestartNever,
+	"on-failure":     dm_lib.RestartOnFail,
+	"always":         dm_lib.RestartAlways,
+	"unless-stopped": dm_lib.RestartNotStopped,
 }
 
-var RestartPolicyRMap = func() map[itf.RestartStrategy]string {
-	m := make(map[itf.RestartStrategy]string)
+var RestartPolicyRMap = func() map[dm_lib.RestartStrategy]string {
+	m := make(map[dm_lib.RestartStrategy]string)
 	for k, v := range RestartPolicyMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var MountTypeMap = map[mount.Type]itf.MountType{
-	mount.TypeBind:   itf.BindMount,
-	mount.TypeVolume: itf.VolumeMount,
-	mount.TypeTmpfs:  itf.TmpfsMount,
+var MountTypeMap = map[mount.Type]dm_lib.MountType{
+	mount.TypeBind:   dm_lib.BindMount,
+	mount.TypeVolume: dm_lib.VolumeMount,
+	mount.TypeTmpfs:  dm_lib.TmpfsMount,
 }
 
-var MountTypeRMap = func() map[itf.MountType]mount.Type {
-	m := make(map[itf.MountType]mount.Type)
+var MountTypeRMap = func() map[dm_lib.MountType]mount.Type {
+	m := make(map[dm_lib.MountType]mount.Type)
 	for k, v := range MountTypeMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var PortTypeMap = map[string]itf.PortType{
-	"tcp":  itf.TcpPort,
-	"udp":  itf.UdpPort,
-	"sctp": itf.SctpPort,
+var PortTypeMap = map[string]dm_lib.PortType{
+	"tcp":  dm_lib.TcpPort,
+	"udp":  dm_lib.UdpPort,
+	"sctp": dm_lib.SctpPort,
 }
 
-var PortTypeRMap = func() map[itf.PortType]string {
-	m := make(map[itf.PortType]string)
+var PortTypeRMap = func() map[dm_lib.PortType]string {
+	m := make(map[dm_lib.PortType]string)
 	for k, v := range PortTypeMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var NetTypeMap = map[string]itf.NetworkType{
-	"bridge":  itf.BridgeNet,
-	"macvlan": itf.MACVlanNet,
-	"host":    itf.HostNet,
+var NetTypeMap = map[string]dm_lib.NetworkType{
+	"bridge":  dm_lib.BridgeNet,
+	"macvlan": dm_lib.MACVlanNet,
+	"host":    dm_lib.HostNet,
 }
 
-var NetTypeRMap = func() map[itf.NetworkType]string {
-	m := make(map[itf.NetworkType]string)
+var NetTypeRMap = func() map[dm_lib.NetworkType]string {
+	m := make(map[dm_lib.NetworkType]string)
 	for k, v := range NetTypeMap {
 		m[v] = k
 	}
