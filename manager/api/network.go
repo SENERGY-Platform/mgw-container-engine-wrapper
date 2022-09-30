@@ -23,7 +23,7 @@ import (
 	"net/http"
 )
 
-func (a Api) GetNetworks(gc *gin.Context) {
+func (a *Api) GetNetworks(gc *gin.Context) {
 	networks, err := a.ceHandler.ListNetworks(gc.Request.Context())
 	if err != nil {
 		_ = gc.Error(err)
@@ -32,7 +32,7 @@ func (a Api) GetNetworks(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &networks)
 }
 
-func (a Api) PostNetwork(gc *gin.Context) {
+func (a *Api) PostNetwork(gc *gin.Context) {
 	network := itf.Network{}
 	if err := gc.ShouldBindJSON(&network); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -46,7 +46,7 @@ func (a Api) PostNetwork(gc *gin.Context) {
 	gc.Status(http.StatusOK)
 }
 
-func (a Api) GetNetwork(gc *gin.Context) {
+func (a *Api) GetNetwork(gc *gin.Context) {
 	network, err := a.ceHandler.NetworkInfo(gc.Request.Context(), gc.Param(util.NetworkParam))
 	if err != nil {
 		_ = gc.Error(err)
@@ -55,7 +55,7 @@ func (a Api) GetNetwork(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &network)
 }
 
-func (a Api) DeleteNetwork(gc *gin.Context) {
+func (a *Api) DeleteNetwork(gc *gin.Context) {
 	if err := a.ceHandler.NetworkRemove(gc.Request.Context(), gc.Param(util.NetworkParam)); err != nil {
 		_ = gc.Error(err)
 		return

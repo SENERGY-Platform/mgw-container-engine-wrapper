@@ -24,7 +24,7 @@ import (
 	"net/http"
 )
 
-func (a Api) GetImages(gc *gin.Context) {
+func (a *Api) GetImages(gc *gin.Context) {
 	query := util.ImagesQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -40,7 +40,7 @@ func (a Api) GetImages(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &images)
 }
 
-func (a Api) PostImage(gc *gin.Context) {
+func (a *Api) PostImage(gc *gin.Context) {
 	image := itf.Image{}
 	if err := gc.ShouldBindJSON(&image); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -59,7 +59,7 @@ func (a Api) PostImage(gc *gin.Context) {
 	gc.Status(http.StatusOK)
 }
 
-func (a Api) GetImage(gc *gin.Context) {
+func (a *Api) GetImage(gc *gin.Context) {
 	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), gc.Param(util.ImageParam))
 	if err != nil {
 		_ = gc.Error(err)
@@ -68,7 +68,7 @@ func (a Api) GetImage(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &image)
 }
 
-func (a Api) DeleteImage(gc *gin.Context) {
+func (a *Api) DeleteImage(gc *gin.Context) {
 	if err := a.ceHandler.ImageRemove(gc.Request.Context(), gc.Param(util.ImageParam)); err != nil {
 		_ = gc.Error(err)
 		return

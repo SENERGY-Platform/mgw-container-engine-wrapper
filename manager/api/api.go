@@ -32,7 +32,7 @@ func New(ceHandler itf.ContainerEngineHandler) *Api {
 	}
 }
 
-func (a Api) SetRoutes(e *gin.Engine) {
+func (a *Api) SetRoutes(e *gin.Engine) {
 	e.GET("/containers", a.GetContainers)
 	e.POST("/containers", a.PostContainer)
 	e.DELETE("/containers/:"+util.ContainerParam, a.DeleteContainer)

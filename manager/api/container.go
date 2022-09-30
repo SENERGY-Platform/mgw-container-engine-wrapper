@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-func (a Api) GetContainers(gc *gin.Context) {
+func (a *Api) GetContainers(gc *gin.Context) {
 	query := util.ContainersQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -52,7 +52,7 @@ func (a Api) GetContainers(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &containers)
 }
 
-func (a Api) PostContainer(gc *gin.Context) {
+func (a *Api) PostContainer(gc *gin.Context) {
 	container := itf.Container{}
 	if err := gc.ShouldBindJSON(&container); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -67,7 +67,7 @@ func (a Api) PostContainer(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &itf.ContainersPostResponse{ID: id})
 }
 
-func (a Api) PostContainerCtrl(gc *gin.Context) {
+func (a *Api) PostContainerCtrl(gc *gin.Context) {
 	ctrl := itf.ContainerCtrlPostRequest{}
 	if err := gc.ShouldBindJSON(&ctrl); err != nil {
 		gc.Status(http.StatusBadRequest)
@@ -94,7 +94,7 @@ func (a Api) PostContainerCtrl(gc *gin.Context) {
 	gc.Status(http.StatusOK)
 }
 
-func (a Api) DeleteContainer(gc *gin.Context) {
+func (a *Api) DeleteContainer(gc *gin.Context) {
 	if err := a.ceHandler.ContainerRemove(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 		_ = gc.Error(err)
 		return
@@ -102,7 +102,7 @@ func (a Api) DeleteContainer(gc *gin.Context) {
 	gc.Status(http.StatusOK)
 }
 
-func (a Api) GetContainer(gc *gin.Context) {
+func (a *Api) GetContainer(gc *gin.Context) {
 	container, err := a.ceHandler.ContainerInfo(gc.Request.Context(), gc.Param(util.ContainerParam))
 	if err != nil {
 		_ = gc.Error(err)
@@ -111,7 +111,7 @@ func (a Api) GetContainer(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &container)
 }
 
-func (a Api) GetContainerLog(gc *gin.Context) {
+func (a *Api) GetContainerLog(gc *gin.Context) {
 	query := util.ContainerLogQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
