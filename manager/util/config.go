@@ -49,6 +49,6 @@ func NewConfig(path *string) (*Config, error) {
 			FileMode: 0660,
 		},
 	}
-	err := srv_base.LoadConfig(path, &cfg)
+	err := srv_base.LoadConfig(path, &cfg, nil, nil, nil)
 	return &cfg, err
 }

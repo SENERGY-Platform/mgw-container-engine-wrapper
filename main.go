@@ -81,7 +81,7 @@ func main() {
 	dmApi := api.New(dockerHandler)
 	dmApi.SetRoutes(apiEngine)
 
-	listener, err := util.NewUnixListener(config.SocketPath)
+	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {
 		srv_base.Logger.Error(err)
 		return

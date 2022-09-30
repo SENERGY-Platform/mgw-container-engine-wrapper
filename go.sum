@@ -4,8 +4,8 @@ github.com/Microsoft/go-winio v0.5.2 h1:a9IhgEQBCUEk6QCdml9CiJGhAws+YwffDHEMp1VM
 github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=
 github.com/SENERGY-Platform/gin-middleware v0.0.1 h1:9GZIn3YKcRZ0170K6suilt0mn+eGyafIzUwF2BBn/+A=
 github.com/SENERGY-Platform/gin-middleware v0.0.1/go.mod h1:dQhrVQLWQ+o1mcjp8492amf5ISsdxDRI5UnHBmDBMcA=
-github.com/SENERGY-Platform/go-service-base v0.1.0 h1:oBMbZRxIbNqEzlIM7DyJVXBf5gkxaSegph6DlN85uYY=
-github.com/SENERGY-Platform/go-service-base v0.1.0/go.mod h1:MzMs3X4xFg9GxYoC1JrRXyKpN6lh3NgWTuwpk6P2Qzs=
+github.com/SENERGY-Platform/go-service-base v0.2.0 h1:0rQhIt11HXckJdiUC8VVHhT9GvAU/52AeuNIq5JBfCE=
+github.com/SENERGY-Platform/go-service-base v0.2.0/go.mod h1:MzMs3X4xFg9GxYoC1JrRXyKpN6lh3NgWTuwpk6P2Qzs=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creack/pty v1.1.11/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
