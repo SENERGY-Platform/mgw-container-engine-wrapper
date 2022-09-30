@@ -32,7 +32,7 @@ import (
 	"net/http"
 )
 
-func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.Image, error) {
+func (d *Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.Image, error) {
 	var images []itf.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
@@ -62,7 +62,7 @@ func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.I
 	return images, nil
 }
 
-func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
+func (d *Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	img := itf.Image{}
 	i, _, err := d.client.ImageInspectWithRaw(ctx, id)
 	if err != nil {
@@ -86,7 +86,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 	return img, nil
 }
 
-func (d Docker) ImagePull(ctx context.Context, id string) error {
+func (d *Docker) ImagePull(ctx context.Context, id string) error {
 	rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{})
 	if err != nil {
 		code := http.StatusInternalServerError
@@ -116,7 +116,7 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d Docker) ImageRemove(ctx context.Context, id string) error {
+func (d *Docker) ImageRemove(ctx context.Context, id string) error {
 	if _, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
@@ -127,7 +127,7 @@ func (d Docker) ImageRemove(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d Docker) PruneImages(ctx context.Context) error {
+func (d *Docker) PruneImages(ctx context.Context) error {
 	_, err := d.client.ImagesPrune(ctx, filters.Args{})
 	return err
 }

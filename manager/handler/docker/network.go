@@ -29,7 +29,7 @@ import (
 	"net/http"
 )
 
-func (d Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
+func (d *Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
 	var n []itf.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
@@ -50,7 +50,7 @@ func (d Docker) ListNetworks(ctx context.Context) ([]itf.Network, error) {
 	return n, nil
 }
 
-func (d Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
+func (d *Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error) {
 	n := itf.Network{}
 	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
 	if err != nil {
@@ -69,7 +69,7 @@ func (d Docker) NetworkInfo(ctx context.Context, id string) (itf.Network, error)
 	return n, nil
 }
 
-func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
+func (d *Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         util.NetTypeRMap[net.Type],
@@ -87,7 +87,7 @@ func (d Docker) NetworkCreate(ctx context.Context, net itf.Network) error {
 	return nil
 }
 
-func (d Docker) NetworkRemove(ctx context.Context, id string) error {
+func (d *Docker) NetworkRemove(ctx context.Context, id string) error {
 	if err := d.client.NetworkRemove(ctx, id); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
