@@ -19,22 +19,34 @@ package util
 import (
 	"github.com/SENERGY-Platform/go-service-base"
 	"github.com/y-du/go-log-level/level"
+	"io/fs"
+	"os"
 )
 
+type SocketConfig struct {
+	Path     string      `json:"path" env_var:"SOCKET_PATH"`
+	GroupID  int         `json:"group_id" env_var:"SOCKET_GROUP_ID"`
+	FileMode fs.FileMode `json:"file_mode" env_var:"SOCKET_FILE_MODE"`
+}
+
 type Config struct {
-	SocketPath string                `json:"socket_path" env_var:"SOCKET_PATH"`
-	Logger     srv_base.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	Logger srv_base.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	Socket SocketConfig          `json:"socket" env_var:"SOCKET_CONFIG"`
 }
 
 func NewConfig(path *string) (*Config, error) {
 	cfg := Config{
-		SocketPath: "/opt/deployment-manager/manager.sock",
 		Logger: srv_base.LoggerConfig{
 			Level:        level.Warning,
 			Utc:          true,
 			Path:         "/var/log/",
 			FileName:     "mgw-deployment-manager",
 			Microseconds: true,
+		},
+		Socket: SocketConfig{
+			Path:     "/opt/deployment-manager/manager.sock",
+			GroupID:  os.Getgid(),
+			FileMode: 0660,
 		},
 	}
 	err := srv_base.LoadConfig(path, &cfg)
