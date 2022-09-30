@@ -99,16 +99,6 @@ func GenMounts(mounts []itf.Mount) ([]mount.Mount, error) {
 	return msl, nil
 }
 
-func GenFilterArgs(filter [][2]string) (f filters.Args) {
-	if filter != nil && len(filter) > 0 {
-		f = filters.NewArgs()
-		for _, i := range filter {
-			f.Add(i[0], i[1])
-		}
-	}
-	return
-}
-
 func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
 	if fLabels != nil && len(fLabels) > 0 {
 		for k, v := range fLabels {
