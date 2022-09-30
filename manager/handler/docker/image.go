@@ -23,7 +23,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/SENERGY-Platform/go-service-base"
+	"github.com/SENERGY-Platform/go-service-base/srv-base"
+	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -35,7 +36,7 @@ func (d Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]itf.I
 	var images []itf.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
-		return images, srv_base.NewError(http.StatusInternalServerError, "listing images failed", err)
+		return images, srv_base_types.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
 	for _, is := range il {
 		img := itf.Image{
@@ -69,7 +70,7 @@ func (d Docker) ImageInfo(ctx context.Context, id string) (itf.Image, error) {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return img, srv_base.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
+		return img, srv_base_types.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
 	}
 	img.ID = i.ID
 	img.Size = i.Size
@@ -94,7 +95,7 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 		} else if client.IsErrUnauthorized(err) {
 			code = http.StatusUnauthorized
 		}
-		return srv_base.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
+		return srv_base_types.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
 	}
 	defer rc.Close()
 	jd := json.NewDecoder(rc)
@@ -104,13 +105,13 @@ func (d Docker) ImagePull(ctx context.Context, id string) error {
 			if err == io.EOF {
 				break
 			} else {
-				return srv_base.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
+				return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
 			}
 		}
 		srv_base.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
-		return srv_base.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
+		return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
 	}
 	return nil
 }
@@ -121,7 +122,7 @@ func (d Docker) ImageRemove(ctx context.Context, id string) error {
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
 		}
-		return srv_base.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
+		return srv_base_types.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
 	}
 	return nil
 }

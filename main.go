@@ -24,7 +24,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/gin-middleware"
-	"github.com/SENERGY-Platform/go-service-base"
+	"github.com/SENERGY-Platform/go-service-base/srv-base"
+	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -87,5 +88,5 @@ func main() {
 		return
 	}
 
-	srv_base.Start(&http.Server{Handler: apiEngine}, listener, srv_base.DefaultSignals)
+	srv_base.StartServer(&http.Server{Handler: apiEngine}, listener, srv_base_types.DefaultShutdownSignals)
 }

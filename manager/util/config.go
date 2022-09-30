@@ -17,7 +17,7 @@
 package util
 
 import (
-	"github.com/SENERGY-Platform/go-service-base"
+	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/y-du/go-log-level/level"
 	"io/fs"
 	"os"
