@@ -18,7 +18,6 @@ package api
 
 import (
 	"deployment-manager/manager/api/util"
-	"fmt"
 	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -41,18 +40,13 @@ func (a *Api) GetImages(gc *gin.Context) {
 }
 
 func (a *Api) PostImage(gc *gin.Context) {
-	image := dm_lib.Image{}
-	if err := gc.ShouldBindJSON(&image); err != nil {
+	req := dm_lib.ImagesPostRequest{}
+	if err := gc.ShouldBindJSON(&req); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
 		return
 	}
-	if len(image.Tags) == 0 {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(fmt.Errorf("missing image reference"))
-		return
-	}
-	if err := a.ceHandler.ImagePull(gc.Request.Context(), image.Tags[0]); err != nil {
+	if err := a.ceHandler.ImagePull(gc.Request.Context(), req.Image); err != nil {
 		_ = gc.Error(err)
 		return
 	}
