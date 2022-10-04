@@ -3,7 +3,7 @@ module deployment-manager
 go 1.19
 
 require (
-	github.com/SENERGY-Platform/gin-middleware v0.0.2
+	github.com/SENERGY-Platform/gin-middleware v0.0.3
 	github.com/SENERGY-Platform/go-service-base v0.5.1
 	github.com/SENERGY-Platform/mgw-deployment-manager-lib v0.0.1
 	github.com/docker/docker v20.10.17+incompatible
