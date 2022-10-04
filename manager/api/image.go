@@ -22,7 +22,6 @@ import (
 	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"net/url"
 )
 
 func (a *Api) GetImages(gc *gin.Context) {
@@ -61,12 +60,7 @@ func (a *Api) PostImage(gc *gin.Context) {
 }
 
 func (a *Api) GetImage(gc *gin.Context) {
-	param, err := url.QueryUnescape(gc.Param(util.ImageParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), param)
+	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), gc.Param(util.ImageParam))
 	if err != nil {
 		_ = gc.Error(err)
 		return
@@ -75,12 +69,7 @@ func (a *Api) GetImage(gc *gin.Context) {
 }
 
 func (a *Api) DeleteImage(gc *gin.Context) {
-	param, err := url.QueryUnescape(gc.Param(util.ImageParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	if err := a.ceHandler.ImageRemove(gc.Request.Context(), param); err != nil {
+	if err := a.ceHandler.ImageRemove(gc.Request.Context(), gc.Param(util.ImageParam)); err != nil {
 		_ = gc.Error(err)
 		return
 	}
