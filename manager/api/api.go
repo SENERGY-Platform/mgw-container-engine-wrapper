@@ -38,7 +38,7 @@ func (a *Api) SetRoutes(e *gin.Engine) {
 	e.DELETE("/containers/:"+util.ContainerParam, a.DeleteContainer)
 	e.GET("/containers/:"+util.ContainerParam, a.GetContainer)
 	e.POST("/containers/:"+util.ContainerParam+"/ctrl", a.PostContainerCtrl)
-	e.GET("/containers/:"+util.ContainerParam+"/log", a.GetContainerLog)
+	e.GET("/logs/:"+util.ContainerParam, a.GetContainerLog)
 	e.GET("/images", a.GetImages)
 	e.POST("/images", a.PostImage)
 	e.GET("/images/:"+util.ImageParam, a.GetImage)
