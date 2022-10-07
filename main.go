@@ -35,7 +35,7 @@ import (
 var version string
 
 func main() {
-	srv_base.PrintInfo("mgw-deployment-manager", version)
+	srv_base.PrintInfo("mgw-container-engine-manager", version)
 
 	flags := util.NewFlags()
 
