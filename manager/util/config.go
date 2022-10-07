@@ -40,11 +40,11 @@ func NewConfig(path *string) (*Config, error) {
 			Level:        level.Warning,
 			Utc:          true,
 			Path:         "/var/log/",
-			FileName:     "mgw-deployment-manager",
+			FileName:     "mgw-container-engine-manager",
 			Microseconds: true,
 		},
 		Socket: SocketConfig{
-			Path:     "/opt/deployment-manager/manager.sock",
+			Path:     "/opt/container-engine-manager/manager.sock",
 			GroupID:  os.Getgid(),
 			FileMode: 0660,
 		},
