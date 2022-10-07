@@ -18,7 +18,7 @@ package api
 
 import (
 	"container-engine-manager/manager/api/util"
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -30,7 +30,7 @@ func (a *Api) GetImages(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	filter := dm_lib.ImageFilter{Labels: util.GenLabels(query.Label)}
+	filter := cem_lib.ImageFilter{Labels: util.GenLabels(query.Label)}
 	images, err := a.ceHandler.ListImages(gc.Request.Context(), filter)
 	if err != nil {
 		_ = gc.Error(err)
@@ -40,7 +40,7 @@ func (a *Api) GetImages(gc *gin.Context) {
 }
 
 func (a *Api) PostImage(gc *gin.Context) {
-	req := dm_lib.ImagesPostRequest{}
+	req := cem_lib.ImagesPostRequest{}
 	if err := gc.ShouldBindJSON(&req); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)

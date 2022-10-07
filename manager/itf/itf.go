@@ -18,25 +18,25 @@ package itf
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"io"
 )
 
 type ContainerEngineHandler interface {
-	ListNetworks(ctx context.Context) ([]dm_lib.Network, error)
-	ListContainers(ctx context.Context, filter dm_lib.ContainerFilter) ([]dm_lib.Container, error)
-	ListImages(ctx context.Context, filter dm_lib.ImageFilter) ([]dm_lib.Image, error)
-	NetworkInfo(ctx context.Context, id string) (dm_lib.Network, error)
-	NetworkCreate(ctx context.Context, net dm_lib.Network) error
+	ListNetworks(ctx context.Context) ([]cem_lib.Network, error)
+	ListContainers(ctx context.Context, filter cem_lib.ContainerFilter) ([]cem_lib.Container, error)
+	ListImages(ctx context.Context, filter cem_lib.ImageFilter) ([]cem_lib.Image, error)
+	NetworkInfo(ctx context.Context, id string) (cem_lib.Network, error)
+	NetworkCreate(ctx context.Context, net cem_lib.Network) error
 	NetworkRemove(ctx context.Context, id string) error
-	ContainerInfo(ctx context.Context, id string) (dm_lib.Container, error)
-	ContainerCreate(ctx context.Context, container dm_lib.Container) (id string, err error)
+	ContainerInfo(ctx context.Context, id string) (cem_lib.Container, error)
+	ContainerCreate(ctx context.Context, container cem_lib.Container) (id string, err error)
 	ContainerRemove(ctx context.Context, id string) error
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string, logOptions dm_lib.LogOptions) (io.ReadCloser, error)
-	ImageInfo(ctx context.Context, id string) (dm_lib.Image, error)
+	ContainerLog(ctx context.Context, id string, logOptions cem_lib.LogOptions) (io.ReadCloser, error)
+	ImageInfo(ctx context.Context, id string) (cem_lib.Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
 }

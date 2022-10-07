@@ -17,7 +17,7 @@
 package util
 
 import (
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
@@ -28,14 +28,14 @@ import (
 	"time"
 )
 
-func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []dm_lib.ContainerNet) {
+func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []cem_lib.ContainerNet) {
 	if len(endptSettings) > 0 {
 		for key, val := range endptSettings {
-			netInfo = append(netInfo, dm_lib.ContainerNet{
+			netInfo = append(netInfo, cem_lib.ContainerNet{
 				ID:          val.NetworkID,
 				Name:        key,
-				IPAddress:   dm_lib.IPAddr{IP: net.ParseIP(val.IPAddress)},
-				Gateway:     dm_lib.IPAddr{IP: net.ParseIP(val.Gateway)},
+				IPAddress:   cem_lib.IPAddr{IP: net.ParseIP(val.IPAddress)},
+				Gateway:     cem_lib.IPAddr{IP: net.ParseIP(val.Gateway)},
 				DomainNames: val.Aliases,
 				MacAddress:  val.MacAddress,
 			})
@@ -44,12 +44,12 @@ func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (
 	return
 }
 
-func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]dm_lib.Port, error) {
-	var ports []dm_lib.Port
+func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]cem_lib.Port, error) {
+	var ports []cem_lib.Port
 	if len(portSet) > 0 || len(portMap) > 0 {
 		set := make(map[string]struct{})
 		for port, bindings := range portMap {
-			p := dm_lib.Port{
+			p := cem_lib.Port{
 				Number:   port.Int(),
 				Protocol: PortTypeMap[port.Proto()],
 			}
@@ -58,9 +58,9 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]dm_lib.Port
 				if err != nil {
 					return ports, err
 				}
-				p.Bindings = append(p.Bindings, dm_lib.PortBinding{
+				p.Bindings = append(p.Bindings, cem_lib.PortBinding{
 					Number:    int(num),
-					Interface: dm_lib.IPAddr{IP: net.ParseIP(binding.HostIP)},
+					Interface: cem_lib.IPAddr{IP: net.ParseIP(binding.HostIP)},
 				})
 			}
 			ports = append(ports, p)
@@ -68,7 +68,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]dm_lib.Port
 		}
 		for port := range portSet {
 			if _, ok := set[string(port)]; !ok {
-				ports = append(ports, dm_lib.Port{
+				ports = append(ports, cem_lib.Port{
 					Number:   port.Int(),
 					Protocol: PortTypeMap[port.Proto()],
 				})
@@ -78,11 +78,11 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]dm_lib.Port
 	return ports, nil
 }
 
-func ParseMountPoints(mountPoints []types.MountPoint) (mounts []dm_lib.Mount) {
+func ParseMountPoints(mountPoints []types.MountPoint) (mounts []cem_lib.Mount) {
 	if len(mountPoints) > 0 {
 		for _, mp := range mountPoints {
 			if mType, ok := MountTypeMap[mp.Type]; ok {
-				mounts = append(mounts, dm_lib.Mount{
+				mounts = append(mounts, cem_lib.Mount{
 					Type:     mType,
 					Source:   mp.Source,
 					Target:   mp.Destination,
@@ -94,11 +94,11 @@ func ParseMountPoints(mountPoints []types.MountPoint) (mounts []dm_lib.Mount) {
 	return
 }
 
-func ParseMounts(mts []mount.Mount) (mounts []dm_lib.Mount) {
+func ParseMounts(mts []mount.Mount) (mounts []cem_lib.Mount) {
 	if len(mts) > 0 {
 		for _, mt := range mts {
 			if mType, ok := MountTypeMap[mt.Type]; ok {
-				m := dm_lib.Mount{
+				m := cem_lib.Mount{
 					Type:     mType,
 					Source:   mt.Source,
 					Target:   mt.Target,
@@ -129,14 +129,14 @@ func ParseEnv(ev []string) (env map[string]string) {
 	return
 }
 
-func ParseStopTimeout(t *int) *dm_lib.Duration {
+func ParseStopTimeout(t *int) *cem_lib.Duration {
 	if t != nil {
-		return &dm_lib.Duration{Duration: time.Duration(*t * int(time.Second))}
+		return &cem_lib.Duration{Duration: time.Duration(*t * int(time.Second))}
 	}
 	return nil
 }
 
-func ParseNetIPAMConfig(c []network.IPAMConfig) (s dm_lib.Subnet, gw dm_lib.IPAddr) {
+func ParseNetIPAMConfig(c []network.IPAMConfig) (s cem_lib.Subnet, gw cem_lib.IPAddr) {
 	if c != nil && len(c) > 0 {
 		sp := strings.Split(c[0].Subnet, "/")
 		if len(sp) == 2 {

@@ -17,78 +17,78 @@
 package util
 
 import (
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/docker/docker/api/types/mount"
 )
 
-var StateMap = map[string]dm_lib.ContainerState{
-	"created":    dm_lib.UnknownState,
-	"running":    dm_lib.RunningState,
-	"paused":     dm_lib.UnknownState,
-	"restarting": dm_lib.UnknownState,
-	"removing":   dm_lib.UnknownState,
-	"exited":     dm_lib.StoppedState,
-	"dead":       dm_lib.UnhealthyState,
+var StateMap = map[string]cem_lib.ContainerState{
+	"created":    cem_lib.UnknownState,
+	"running":    cem_lib.RunningState,
+	"paused":     cem_lib.UnknownState,
+	"restarting": cem_lib.UnknownState,
+	"removing":   cem_lib.UnknownState,
+	"exited":     cem_lib.StoppedState,
+	"dead":       cem_lib.UnhealthyState,
 }
 
-var StateRMap = map[dm_lib.ContainerState]string{
-	dm_lib.RunningState:   "running",
-	dm_lib.StoppedState:   "exited",
-	dm_lib.UnhealthyState: "dead",
-	dm_lib.UnknownState:   "created",
+var StateRMap = map[cem_lib.ContainerState]string{
+	cem_lib.RunningState:   "running",
+	cem_lib.StoppedState:   "exited",
+	cem_lib.UnhealthyState: "dead",
+	cem_lib.UnknownState:   "created",
 }
 
-var RestartPolicyMap = map[string]dm_lib.RestartStrategy{
-	"no":             dm_lib.RestartNever,
-	"on-failure":     dm_lib.RestartOnFail,
-	"always":         dm_lib.RestartAlways,
-	"unless-stopped": dm_lib.RestartNotStopped,
+var RestartPolicyMap = map[string]cem_lib.RestartStrategy{
+	"no":             cem_lib.RestartNever,
+	"on-failure":     cem_lib.RestartOnFail,
+	"always":         cem_lib.RestartAlways,
+	"unless-stopped": cem_lib.RestartNotStopped,
 }
 
-var RestartPolicyRMap = func() map[dm_lib.RestartStrategy]string {
-	m := make(map[dm_lib.RestartStrategy]string)
+var RestartPolicyRMap = func() map[cem_lib.RestartStrategy]string {
+	m := make(map[cem_lib.RestartStrategy]string)
 	for k, v := range RestartPolicyMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var MountTypeMap = map[mount.Type]dm_lib.MountType{
-	mount.TypeBind:   dm_lib.BindMount,
-	mount.TypeVolume: dm_lib.VolumeMount,
-	mount.TypeTmpfs:  dm_lib.TmpfsMount,
+var MountTypeMap = map[mount.Type]cem_lib.MountType{
+	mount.TypeBind:   cem_lib.BindMount,
+	mount.TypeVolume: cem_lib.VolumeMount,
+	mount.TypeTmpfs:  cem_lib.TmpfsMount,
 }
 
-var MountTypeRMap = func() map[dm_lib.MountType]mount.Type {
-	m := make(map[dm_lib.MountType]mount.Type)
+var MountTypeRMap = func() map[cem_lib.MountType]mount.Type {
+	m := make(map[cem_lib.MountType]mount.Type)
 	for k, v := range MountTypeMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var PortTypeMap = map[string]dm_lib.PortType{
-	"tcp":  dm_lib.TcpPort,
-	"udp":  dm_lib.UdpPort,
-	"sctp": dm_lib.SctpPort,
+var PortTypeMap = map[string]cem_lib.PortType{
+	"tcp":  cem_lib.TcpPort,
+	"udp":  cem_lib.UdpPort,
+	"sctp": cem_lib.SctpPort,
 }
 
-var PortTypeRMap = func() map[dm_lib.PortType]string {
-	m := make(map[dm_lib.PortType]string)
+var PortTypeRMap = func() map[cem_lib.PortType]string {
+	m := make(map[cem_lib.PortType]string)
 	for k, v := range PortTypeMap {
 		m[v] = k
 	}
 	return m
 }()
 
-var NetTypeMap = map[string]dm_lib.NetworkType{
-	"bridge":  dm_lib.BridgeNet,
-	"macvlan": dm_lib.MACVlanNet,
-	"host":    dm_lib.HostNet,
+var NetTypeMap = map[string]cem_lib.NetworkType{
+	"bridge":  cem_lib.BridgeNet,
+	"macvlan": cem_lib.MACVlanNet,
+	"host":    cem_lib.HostNet,
 }
 
-var NetTypeRMap = func() map[dm_lib.NetworkType]string {
-	m := make(map[dm_lib.NetworkType]string)
+var NetTypeRMap = func() map[cem_lib.NetworkType]string {
+	m := make(map[cem_lib.NetworkType]string)
 	for k, v := range NetTypeMap {
 		m[v] = k
 	}

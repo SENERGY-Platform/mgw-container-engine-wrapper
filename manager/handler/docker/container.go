@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -32,14 +32,14 @@ import (
 	"strconv"
 )
 
-func (d *Docker) ListContainers(ctx context.Context, filter dm_lib.ContainerFilter) ([]dm_lib.Container, error) {
-	var csl []dm_lib.Container
+func (d *Docker) ListContainers(ctx context.Context, filter cem_lib.ContainerFilter) ([]cem_lib.Container, error) {
+	var csl []cem_lib.Container
 	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
 	if err != nil {
 		return csl, srv_base_types.NewError(http.StatusInternalServerError, "listing containers failed", err)
 	}
 	for _, c := range cl {
-		ctr := dm_lib.Container{
+		ctr := cem_lib.Container{
 			ID:       c.ID,
 			State:    util.StateMap[c.State],
 			ImageID:  c.ImageID,
@@ -74,7 +74,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter dm_lib.ContainerFilt
 				ctr.Mounts = util.ParseMounts(ci.HostConfig.Mounts)
 			}
 			ctr.Networks = util.ParseEndpointSettings(ci.NetworkSettings.Networks)
-			ctr.RunConfig = dm_lib.RunConfig{
+			ctr.RunConfig = cem_lib.RunConfig{
 				RestartStrategy: util.RestartPolicyMap[ci.HostConfig.RestartPolicy.Name],
 				Retries:         ci.HostConfig.RestartPolicy.MaximumRetryCount,
 				RemoveAfterRun:  ci.HostConfig.AutoRemove,
@@ -86,8 +86,8 @@ func (d *Docker) ListContainers(ctx context.Context, filter dm_lib.ContainerFilt
 	return csl, nil
 }
 
-func (d *Docker) ContainerInfo(ctx context.Context, id string) (dm_lib.Container, error) {
-	ctr := dm_lib.Container{}
+func (d *Docker) ContainerInfo(ctx context.Context, id string) (cem_lib.Container, error) {
+	ctr := cem_lib.Container{}
 	c, err := d.client.ContainerInspect(ctx, id)
 	if err != nil {
 		code := http.StatusInternalServerError
@@ -96,7 +96,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (dm_lib.Container
 		}
 		return ctr, srv_base_types.NewError(code, fmt.Sprintf("retrieving info for container '%s' failed", id), err)
 	}
-	var mts []dm_lib.Mount
+	var mts []cem_lib.Mount
 	if len(c.HostConfig.Mounts) > 0 {
 		mts = util.ParseMounts(c.HostConfig.Mounts)
 	} else {
@@ -116,7 +116,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (dm_lib.Container
 		ctr.Ports = ports
 	}
 	ctr.Networks = util.ParseEndpointSettings(c.NetworkSettings.Networks)
-	ctr.RunConfig = dm_lib.RunConfig{
+	ctr.RunConfig = cem_lib.RunConfig{
 		RestartStrategy: util.RestartPolicyMap[c.HostConfig.RestartPolicy.Name],
 		Retries:         c.HostConfig.RestartPolicy.MaximumRetryCount,
 		RemoveAfterRun:  c.HostConfig.AutoRemove,
@@ -137,7 +137,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (dm_lib.Container
 	return ctr, nil
 }
 
-func (d *Docker) ContainerCreate(ctx context.Context, ctrConf dm_lib.Container) (string, error) {
+func (d *Docker) ContainerCreate(ctx context.Context, ctrConf cem_lib.Container) (string, error) {
 	cConfig := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -243,7 +243,7 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt dm_lib.LogOptions) (io.ReadCloser, error) {
+func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt cem_lib.LogOptions) (io.ReadCloser, error) {
 	clo := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,

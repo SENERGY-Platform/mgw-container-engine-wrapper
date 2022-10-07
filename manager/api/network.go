@@ -18,7 +18,7 @@ package api
 
 import (
 	"container-engine-manager/manager/api/util"
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -33,7 +33,7 @@ func (a *Api) GetNetworks(gc *gin.Context) {
 }
 
 func (a *Api) PostNetwork(gc *gin.Context) {
-	network := dm_lib.Network{}
+	network := cem_lib.Network{}
 	if err := gc.ShouldBindJSON(&network); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)

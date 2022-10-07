@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -32,14 +32,14 @@ import (
 	"net/http"
 )
 
-func (d *Docker) ListImages(ctx context.Context, filter dm_lib.ImageFilter) ([]dm_lib.Image, error) {
-	var images []dm_lib.Image
+func (d *Docker) ListImages(ctx context.Context, filter cem_lib.ImageFilter) ([]cem_lib.Image, error) {
+	var images []cem_lib.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
 		return images, srv_base_types.NewError(http.StatusInternalServerError, "listing images failed", err)
 	}
 	for _, is := range il {
-		img := dm_lib.Image{
+		img := cem_lib.Image{
 			ID: is.ID,
 			//Created: is.Created,
 			Size:    is.Size,
@@ -62,8 +62,8 @@ func (d *Docker) ListImages(ctx context.Context, filter dm_lib.ImageFilter) ([]d
 	return images, nil
 }
 
-func (d *Docker) ImageInfo(ctx context.Context, id string) (dm_lib.Image, error) {
-	img := dm_lib.Image{}
+func (d *Docker) ImageInfo(ctx context.Context, id string) (cem_lib.Image, error) {
+	img := cem_lib.Image{}
 	i, _, err := d.client.ImageInspectWithRaw(ctx, id)
 	if err != nil {
 		code := http.StatusInternalServerError
