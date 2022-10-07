@@ -1,4 +1,4 @@
-module deployment-manager
+module container-engine-manager
 
 go 1.19
 

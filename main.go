@@ -17,10 +17,10 @@
 package main
 
 import (
+	"container-engine-manager/manager/api"
+	"container-engine-manager/manager/handler/docker"
+	"container-engine-manager/manager/util"
 	"context"
-	"deployment-manager/manager/api"
-	"deployment-manager/manager/handler/docker"
-	"deployment-manager/manager/util"
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/gin-middleware"

@@ -17,8 +17,8 @@
 package docker
 
 import (
+	"container-engine-manager/manager/handler/docker/util"
 	"context"
-	"deployment-manager/manager/handler/docker/util"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"

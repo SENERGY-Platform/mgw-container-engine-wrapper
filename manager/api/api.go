@@ -17,8 +17,8 @@
 package api
 
 import (
-	"deployment-manager/manager/api/util"
-	"deployment-manager/manager/itf"
+	"container-engine-manager/manager/api/util"
+	"container-engine-manager/manager/itf"
 	"github.com/gin-gonic/gin"
 )
 

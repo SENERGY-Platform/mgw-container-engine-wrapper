@@ -17,7 +17,7 @@
 package api
 
 import (
-	"deployment-manager/manager/api/util"
+	"container-engine-manager/manager/api/util"
 	"fmt"
 	"github.com/SENERGY-Platform/mgw-deployment-manager-lib/dm-lib"
 	"github.com/gin-gonic/gin"
