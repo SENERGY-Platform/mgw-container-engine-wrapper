@@ -22,21 +22,24 @@ import (
 )
 
 var StateMap = map[string]cem_lib.ContainerState{
-	"created":    cem_lib.UnknownState,
+	"created":    cem_lib.InitState,
 	"running":    cem_lib.RunningState,
 	"paused":     cem_lib.UnknownState,
-	"restarting": cem_lib.UnknownState,
+	"restarting": cem_lib.RestartingState,
 	"removing":   cem_lib.UnknownState,
 	"exited":     cem_lib.StoppedState,
 	"dead":       cem_lib.UnhealthyState,
 }
 
-var StateRMap = map[cem_lib.ContainerState]string{
-	cem_lib.RunningState:   "running",
-	cem_lib.StoppedState:   "exited",
-	cem_lib.UnhealthyState: "dead",
-	cem_lib.UnknownState:   "created",
-}
+var StateRMap = func() map[cem_lib.ContainerState]string {
+	m := make(map[cem_lib.ContainerState]string)
+	for k, v := range StateMap {
+		if v != cem_lib.UnknownState {
+			m[v] = k
+		}
+	}
+	return m
+}()
 
 var RestartPolicyMap = map[string]cem_lib.RestartStrategy{
 	"no":             cem_lib.RestartNever,
