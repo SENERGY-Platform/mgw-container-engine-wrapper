@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/SENERGY-Platform/gin-middleware v0.0.3
 	github.com/SENERGY-Platform/go-service-base v0.5.1
-	github.com/SENERGY-Platform/mgw-container-engine-manager-lib v0.3.0
+	github.com/SENERGY-Platform/mgw-container-engine-manager-lib v0.4.0
 	github.com/docker/docker v20.10.17+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/gin-gonic/gin v1.8.1
@@ -43,5 +43,6 @@ require (
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.3.0 // indirect
 )
