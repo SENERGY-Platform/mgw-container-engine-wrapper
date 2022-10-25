@@ -91,7 +91,7 @@ func GenMounts(mounts []cem_lib.Mount) ([]mount.Mount, error) {
 		case cem_lib.TmpfsMount:
 			mnt.TmpfsOptions = &mount.TmpfsOptions{
 				SizeBytes: m.Size,
-				Mode:      m.Mode,
+				Mode:      m.Mode.FileMode,
 			}
 		}
 		msl = append(msl, mnt)

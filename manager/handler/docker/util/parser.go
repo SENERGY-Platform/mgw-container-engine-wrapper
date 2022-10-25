@@ -109,7 +109,7 @@ func ParseMounts(mts []mount.Mount) (mounts []cem_lib.Mount) {
 				}
 				if mt.TmpfsOptions != nil {
 					m.Size = mt.TmpfsOptions.SizeBytes
-					m.Mode = mt.TmpfsOptions.Mode
+					m.Mode = cem_lib.FileMode{FileMode: mt.TmpfsOptions.Mode}
 				}
 				mounts = append(mounts, m)
 			}
