@@ -19,6 +19,7 @@ package util
 import (
 	"fmt"
 	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
@@ -151,6 +152,18 @@ func GenTimestamp(t time.Time) string {
 		ns += strings.Repeat("0", 9-nsLen)
 	}
 	return fmt.Sprintf("%s:%s:%s.%sZ", tp[0], tp[1], s, ns)
+}
+
+func GenRestartPolicy(strategy cem_lib.RestartStrategy, retries *int) (rp container.RestartPolicy, err error) {
+	if strategy == cem_lib.RestartOnFail && retries == nil {
+		err = fmt.Errorf("invalid restart strategy configuration: number of retries = %v", retries)
+		return
+	}
+	rp.Name = RestartPolicyRMap[strategy]
+	if retries != nil {
+		rp.MaximumRetryCount = *retries
+	}
+	return
 }
 
 func CheckNetworks(n []cem_lib.ContainerNet) error {
