@@ -19,6 +19,7 @@ package util
 import (
 	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
@@ -155,4 +156,16 @@ func ParseTimestamp(s string) (time.Time, error) {
 
 func ParseContainerName(s string) string {
 	return strings.TrimPrefix(s, "/")
+}
+
+func ParseRestartPolicy(rp container.RestartPolicy) (strategy cem_lib.RestartStrategy, retires *int) {
+	if rp.Name == "" {
+		strategy = cem_lib.RestartNever
+	} else {
+		strategy = RestartPolicyMap[rp.Name]
+	}
+	if strategy == cem_lib.RestartOnFail {
+		retires = &rp.MaximumRetryCount
+	}
+	return
 }
