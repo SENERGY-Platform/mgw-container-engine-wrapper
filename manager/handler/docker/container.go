@@ -74,11 +74,15 @@ func (d *Docker) ListContainers(ctx context.Context, filter cem_lib.ContainerFil
 				ctr.Mounts = util.ParseMounts(ci.HostConfig.Mounts)
 			}
 			ctr.Networks = util.ParseEndpointSettings(ci.NetworkSettings.Networks)
+			strategy, retries := util.ParseRestartPolicy(ci.HostConfig.RestartPolicy)
 			ctr.RunConfig = cem_lib.RunConfig{
-				RestartStrategy: util.RestartPolicyMap[ci.HostConfig.RestartPolicy.Name],
-				Retries:         ci.HostConfig.RestartPolicy.MaximumRetryCount,
+				RestartStrategy: strategy,
+				Retries:         retries,
 				RemoveAfterRun:  ci.HostConfig.AutoRemove,
 				StopTimeout:     util.ParseStopTimeout(ci.Config.StopTimeout),
+			}
+			if ci.Config.StopSignal != "" {
+				ctr.RunConfig.StopSignal = &ci.Config.StopSignal
 			}
 		}
 		csl = append(csl, ctr)
@@ -116,11 +120,15 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (cem_lib.Containe
 		ctr.Ports = ports
 	}
 	ctr.Networks = util.ParseEndpointSettings(c.NetworkSettings.Networks)
+	strategy, retries := util.ParseRestartPolicy(c.HostConfig.RestartPolicy)
 	ctr.RunConfig = cem_lib.RunConfig{
-		RestartStrategy: util.RestartPolicyMap[c.HostConfig.RestartPolicy.Name],
-		Retries:         c.HostConfig.RestartPolicy.MaximumRetryCount,
+		RestartStrategy: strategy,
+		Retries:         retries,
 		RemoveAfterRun:  c.HostConfig.AutoRemove,
 		StopTimeout:     util.ParseStopTimeout(c.Config.StopTimeout),
+	}
+	if c.Config.StopSignal != "" {
+		ctr.RunConfig.StopSignal = &c.Config.StopSignal
 	}
 	if tc, err := util.ParseTimestamp(c.Created); err != nil {
 		srv_base.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
@@ -141,10 +149,14 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf cem_lib.Container)
 	cConfig := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
+		Tty:          ctrConf.RunConfig.PseudoTTY,
 		Env:          util.GenEnv(ctrConf.EnvVars),
 		Image:        ctrConf.Image,
 		Labels:       ctrConf.Labels,
 		StopTimeout:  util.GenStopTimeout(ctrConf.RunConfig.StopTimeout),
+	}
+	if ctrConf.RunConfig.StopSignal != nil {
+		cConfig.StopSignal = *ctrConf.RunConfig.StopSignal
 	}
 	bindings, err := util.GenPortMap(ctrConf.Ports)
 	if err != nil {
@@ -154,14 +166,15 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf cem_lib.Container)
 	if err != nil {
 		return "", srv_base_types.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
 	}
+	rp, err := util.GenRestartPolicy(ctrConf.RunConfig.RestartStrategy, ctrConf.RunConfig.Retries)
+	if err != nil {
+		return "", srv_base_types.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+	}
 	hConfig := &container.HostConfig{
-		PortBindings: bindings,
-		RestartPolicy: container.RestartPolicy{
-			Name:              util.RestartPolicyRMap[ctrConf.RunConfig.RestartStrategy],
-			MaximumRetryCount: ctrConf.RunConfig.Retries,
-		},
-		AutoRemove: ctrConf.RunConfig.RemoveAfterRun,
-		Mounts:     mts,
+		PortBindings:  bindings,
+		RestartPolicy: rp,
+		AutoRemove:    ctrConf.RunConfig.RemoveAfterRun,
+		Mounts:        mts,
 	}
 	err = util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
