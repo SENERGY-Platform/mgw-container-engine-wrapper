@@ -47,4 +47,8 @@ func (a *Api) SetRoutes(e *gin.Engine) {
 	e.POST("/networks", a.PostNetwork)
 	e.GET("/networks/:"+util.NetworkParam, a.GetNetwork)
 	e.DELETE("/networks/:"+util.NetworkParam, a.DeleteNetwork)
+	e.GET("/volumes", a.GetVolumes)
+	e.POST("/volumes", a.PostVolume)
+	e.GET("/volumes/:"+util.VolumeParam, a.GetVolume)
+	e.DELETE("/volumes/:"+util.VolumeParam, a.DeleteVolume)
 }
