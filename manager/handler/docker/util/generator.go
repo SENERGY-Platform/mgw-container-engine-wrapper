@@ -130,6 +130,12 @@ func GenImageFilterArgs(filter cem_lib.ImageFilter) filters.Args {
 	return fArgs
 }
 
+func GenVolumeFilterArgs(filter cem_lib.VolumeFilter) filters.Args {
+	fArgs := filters.NewArgs()
+	genLabelFilterArgs(&fArgs, filter.Labels)
+	return fArgs
+}
+
 func GenNetIPAMConfig(n cem_lib.Network) (c []network.IPAMConfig) {
 	c = append(c, network.IPAMConfig{
 		Subnet:  n.Subnet.KeyStr(),
