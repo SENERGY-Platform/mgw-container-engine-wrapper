@@ -20,4 +20,5 @@ const (
 	ContainerParam = "container"
 	ImageParam     = "image"
 	NetworkParam   = "network"
+	VolumeParam    = "volume"
 )
