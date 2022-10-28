@@ -31,3 +31,7 @@ type ContainerLogQuery struct {
 type ImagesQuery struct {
 	Label []string `form:"label"`
 }
+
+type VolumesQuery struct {
+	Label []string `form:"label"`
+}
