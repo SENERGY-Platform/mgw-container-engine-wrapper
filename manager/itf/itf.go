@@ -26,6 +26,7 @@ type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context) ([]cem_lib.Network, error)
 	ListContainers(ctx context.Context, filter cem_lib.ContainerFilter) ([]cem_lib.Container, error)
 	ListImages(ctx context.Context, filter cem_lib.ImageFilter) ([]cem_lib.Image, error)
+	ListVolumes(ctx context.Context, filter cem_lib.VolumeFilter) ([]cem_lib.Volume, error)
 	NetworkInfo(ctx context.Context, id string) (cem_lib.Network, error)
 	NetworkCreate(ctx context.Context, net cem_lib.Network) error
 	NetworkRemove(ctx context.Context, id string) error
@@ -39,4 +40,7 @@ type ContainerEngineHandler interface {
 	ImageInfo(ctx context.Context, id string) (cem_lib.Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
+	VolumeInfo(ctx context.Context, id string) (cem_lib.Volume, error)
+	VolumeCreate(ctx context.Context, vol cem_lib.Volume) error
+	VolumeRemove(ctx context.Context, id string) error
 }
