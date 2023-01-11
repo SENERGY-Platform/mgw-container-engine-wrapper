@@ -70,6 +70,9 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 }
 
 func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) error {
+	if _, ok := model.NetworkTypeMap[net.Type]; !ok {
+		return srv_base_types.NewError(http.StatusBadRequest, "", fmt.Errorf("invalid network type '%s'", net.Type))
+	}
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         util.NetTypeRMap[net.Type],

@@ -35,8 +35,8 @@ func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (
 			netInfo = append(netInfo, model.ContainerNet{
 				ID:          val.NetworkID,
 				Name:        key,
-				IPAddress:   model.IPAddr{IP: net.ParseIP(val.IPAddress)},
-				Gateway:     model.IPAddr{IP: net.ParseIP(val.Gateway)},
+				IPAddress:   model.IPAddr(net.ParseIP(val.IPAddress)),
+				Gateway:     model.IPAddr(net.ParseIP(val.Gateway)),
 				DomainNames: val.Aliases,
 				MacAddress:  val.MacAddress,
 			})
@@ -61,7 +61,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]model.Port,
 				}
 				p.Bindings = append(p.Bindings, model.PortBinding{
 					Number:    int(num),
-					Interface: model.IPAddr{IP: net.ParseIP(binding.HostIP)},
+					Interface: model.IPAddr(net.ParseIP(binding.HostIP)),
 				})
 			}
 			ports = append(ports, p)
@@ -110,7 +110,7 @@ func ParseMounts(mts []mount.Mount) (mounts []model.Mount) {
 				}
 				if mt.TmpfsOptions != nil {
 					m.Size = mt.TmpfsOptions.SizeBytes
-					m.Mode = model.FileMode{FileMode: mt.TmpfsOptions.Mode}
+					m.Mode = model.FileMode(mt.TmpfsOptions.Mode)
 				}
 				mounts = append(mounts, m)
 			}
@@ -132,7 +132,8 @@ func ParseEnv(ev []string) (env map[string]string) {
 
 func ParseStopTimeout(t *int) *model.Duration {
 	if t != nil {
-		return &model.Duration{Duration: time.Duration(*t * int(time.Second))}
+		d := model.Duration(time.Duration(*t * int(time.Second)))
+		return &d
 	}
 	return nil
 }
@@ -141,11 +142,11 @@ func ParseNetIPAMConfig(c []network.IPAMConfig) (s model.Subnet, gw model.IPAddr
 	if c != nil && len(c) > 0 {
 		sp := strings.Split(c[0].Subnet, "/")
 		if len(sp) == 2 {
-			s.Prefix.IP = net.ParseIP(sp[0])
+			s.Prefix = model.IPAddr(net.ParseIP(sp[0]))
 			i, _ := strconv.ParseInt(sp[1], 10, 0)
 			s.Bits = int(i)
 		}
-		gw.IP = net.ParseIP(c[0].Gateway)
+		gw = model.IPAddr(net.ParseIP(c[0].Gateway))
 	}
 	return
 }

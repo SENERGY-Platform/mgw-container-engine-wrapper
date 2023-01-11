@@ -24,6 +24,8 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
+	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -41,7 +43,7 @@ func GenEnv(ev map[string]string) (env []string) {
 
 func GenStopTimeout(d *model.Duration) *int {
 	if d != nil {
-		t := int(d.Seconds())
+		t := int(time.Duration(*d).Seconds())
 		return &t
 	}
 	return nil
@@ -51,6 +53,9 @@ func GenPortMap(ports []model.Port) (nat.PortMap, error) {
 	pm := make(nat.PortMap)
 	set := make(map[string]struct{})
 	for _, p := range ports {
+		if _, ok := model.PortTypeMap[p.Protocol]; !ok {
+			return pm, fmt.Errorf("invalid port type '%s'", p.Protocol)
+		}
 		if _, ok := set[p.KeyStr()]; ok {
 			return pm, fmt.Errorf("port duplicate '%s'", p.KeyStr())
 		}
@@ -62,7 +67,7 @@ func GenPortMap(ports []model.Port) (nat.PortMap, error) {
 		var bindings []nat.PortBinding
 		for _, binding := range p.Bindings {
 			bindings = append(bindings, nat.PortBinding{
-				HostIP:   binding.Interface.String(),
+				HostIP:   net.IP(binding.Interface).String(),
 				HostPort: strconv.FormatInt(int64(binding.Number), 10),
 			})
 		}
@@ -76,6 +81,9 @@ func GenMounts(mounts []model.Mount) ([]mount.Mount, error) {
 	set := make(map[string]struct{})
 	for i := 0; i < len(mounts); i++ {
 		m := mounts[i]
+		if _, ok := model.MountTypeMap[m.Type]; !ok {
+			return msl, fmt.Errorf("invalid mount type '%s'", m.Type)
+		}
 		if _, ok := set[m.KeyStr()]; ok {
 			return msl, fmt.Errorf("mount duplicate '%s'", m.KeyStr())
 		}
@@ -92,7 +100,7 @@ func GenMounts(mounts []model.Mount) ([]mount.Mount, error) {
 		case model.TmpfsMount:
 			mnt.TmpfsOptions = &mount.TmpfsOptions{
 				SizeBytes: m.Size,
-				Mode:      m.Mode.FileMode,
+				Mode:      os.FileMode(m.Mode),
 			}
 		}
 		msl = append(msl, mnt)
@@ -139,7 +147,7 @@ func GenVolumeFilterArgs(filter model.VolumeFilter) filters.Args {
 func GenNetIPAMConfig(n model.Network) (c []network.IPAMConfig) {
 	c = append(c, network.IPAMConfig{
 		Subnet:  n.Subnet.KeyStr(),
-		Gateway: n.Gateway.String(),
+		Gateway: net.IP(n.Gateway).String(),
 	})
 	return
 }
@@ -161,6 +169,10 @@ func GenTimestamp(t time.Time) string {
 }
 
 func GenRestartPolicy(strategy model.RestartStrategy, retries *int) (rp container.RestartPolicy, err error) {
+	if _, ok := model.RestartStrategyMap[strategy]; !ok {
+		err = fmt.Errorf("invalid restart strategy '%s'", strategy)
+		return
+	}
 	if strategy == model.RestartOnFail && retries == nil {
 		err = fmt.Errorf("invalid restart strategy configuration: number of retries = %v", retries)
 		return

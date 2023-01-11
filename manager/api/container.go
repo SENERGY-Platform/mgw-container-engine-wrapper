@@ -35,13 +35,13 @@ func (a *Api) GetContainers(gc *gin.Context) {
 	}
 	filter := model.ContainerFilter{Name: query.Name}
 	if query.State != "" {
-		cs, ok := model.ContainerStateMap[query.State]
+		_, ok := model.ContainerStateMap[query.State]
 		if !ok {
 			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(fmt.Errorf("unknown container state '%s'", query.State))
 			return
 		}
-		filter.State = cs
+		filter.State = query.State
 	}
 	filter.Labels = util.GenLabels(query.Label)
 	containers, err := a.ceHandler.ListContainers(gc.Request.Context(), filter)
@@ -90,6 +90,9 @@ func (a *Api) PostContainerCtrl(gc *gin.Context) {
 			_ = gc.Error(err)
 			return
 		}
+	default:
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(fmt.Errorf("invalid container state '%s'", ctrl.State))
 	}
 	gc.Status(http.StatusOK)
 }
