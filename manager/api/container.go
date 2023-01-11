@@ -19,7 +19,7 @@ package api
 import (
 	"container-engine-manager/manager/api/util"
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -33,9 +33,9 @@ func (a *Api) GetContainers(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	filter := cem_lib.ContainerFilter{Name: query.Name}
+	filter := model.ContainerFilter{Name: query.Name}
 	if query.State != "" {
-		cs, ok := cem_lib.ContainerStateMap[query.State]
+		cs, ok := model.ContainerStateMap[query.State]
 		if !ok {
 			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(fmt.Errorf("unknown container state '%s'", query.State))
@@ -53,7 +53,7 @@ func (a *Api) GetContainers(gc *gin.Context) {
 }
 
 func (a *Api) PostContainer(gc *gin.Context) {
-	container := cem_lib.Container{}
+	container := model.Container{}
 	if err := gc.ShouldBindJSON(&container); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
@@ -64,28 +64,28 @@ func (a *Api) PostContainer(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	gc.JSON(http.StatusOK, &cem_lib.ContainersPostResponse{ID: id})
+	gc.JSON(http.StatusOK, &model.ContainersPostResponse{ID: id})
 }
 
 func (a *Api) PostContainerCtrl(gc *gin.Context) {
-	ctrl := cem_lib.ContainerCtrlPostRequest{}
+	ctrl := model.ContainerCtrlPostRequest{}
 	if err := gc.ShouldBindJSON(&ctrl); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
 		return
 	}
 	switch ctrl.State {
-	case cem_lib.ContainerStart:
+	case model.ContainerStart:
 		if err := a.ceHandler.ContainerStart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 			_ = gc.Error(err)
 			return
 		}
-	case cem_lib.ContainerRestart:
+	case model.ContainerRestart:
 		if err := a.ceHandler.ContainerRestart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 			_ = gc.Error(err)
 			return
 		}
-	case cem_lib.ContainerStop:
+	case model.ContainerStop:
 		if err := a.ceHandler.ContainerStop(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 			_ = gc.Error(err)
 			return
@@ -118,7 +118,7 @@ func (a *Api) GetContainerLog(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	logOptions := cem_lib.LogOptions{MaxLines: query.MaxLines}
+	logOptions := model.LogOptions{MaxLines: query.MaxLines}
 	if query.Since != "" {
 		since, err := time.Parse(time.RFC3339Nano, query.Since)
 		if err != nil {

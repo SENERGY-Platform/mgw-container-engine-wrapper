@@ -18,7 +18,7 @@ package util
 
 import (
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
@@ -39,7 +39,7 @@ func GenEnv(ev map[string]string) (env []string) {
 	return
 }
 
-func GenStopTimeout(d *cem_lib.Duration) *int {
+func GenStopTimeout(d *model.Duration) *int {
 	if d != nil {
 		t := int(d.Seconds())
 		return &t
@@ -47,7 +47,7 @@ func GenStopTimeout(d *cem_lib.Duration) *int {
 	return nil
 }
 
-func GenPortMap(ports []cem_lib.Port) (nat.PortMap, error) {
+func GenPortMap(ports []model.Port) (nat.PortMap, error) {
 	pm := make(nat.PortMap)
 	set := make(map[string]struct{})
 	for _, p := range ports {
@@ -71,7 +71,7 @@ func GenPortMap(ports []cem_lib.Port) (nat.PortMap, error) {
 	return pm, nil
 }
 
-func GenMounts(mounts []cem_lib.Mount) ([]mount.Mount, error) {
+func GenMounts(mounts []model.Mount) ([]mount.Mount, error) {
 	var msl []mount.Mount
 	set := make(map[string]struct{})
 	for i := 0; i < len(mounts); i++ {
@@ -87,9 +87,9 @@ func GenMounts(mounts []cem_lib.Mount) ([]mount.Mount, error) {
 			ReadOnly: m.ReadOnly,
 		}
 		switch m.Type {
-		case cem_lib.VolumeMount:
+		case model.VolumeMount:
 			mnt.VolumeOptions = &mount.VolumeOptions{Labels: m.Labels}
-		case cem_lib.TmpfsMount:
+		case model.TmpfsMount:
 			mnt.TmpfsOptions = &mount.TmpfsOptions{
 				SizeBytes: m.Size,
 				Mode:      m.Mode.FileMode,
@@ -112,7 +112,7 @@ func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
 	}
 }
 
-func GenContainerFilterArgs(filter cem_lib.ContainerFilter) filters.Args {
+func GenContainerFilterArgs(filter model.ContainerFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	if filter.Name != "" {
 		fArgs.Add("name", filter.Name)
@@ -124,19 +124,19 @@ func GenContainerFilterArgs(filter cem_lib.ContainerFilter) filters.Args {
 	return fArgs
 }
 
-func GenImageFilterArgs(filter cem_lib.ImageFilter) filters.Args {
+func GenImageFilterArgs(filter model.ImageFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs
 }
 
-func GenVolumeFilterArgs(filter cem_lib.VolumeFilter) filters.Args {
+func GenVolumeFilterArgs(filter model.VolumeFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs
 }
 
-func GenNetIPAMConfig(n cem_lib.Network) (c []network.IPAMConfig) {
+func GenNetIPAMConfig(n model.Network) (c []network.IPAMConfig) {
 	c = append(c, network.IPAMConfig{
 		Subnet:  n.Subnet.KeyStr(),
 		Gateway: n.Gateway.String(),
@@ -160,8 +160,8 @@ func GenTimestamp(t time.Time) string {
 	return fmt.Sprintf("%s:%s:%s.%sZ", tp[0], tp[1], s, ns)
 }
 
-func GenRestartPolicy(strategy cem_lib.RestartStrategy, retries *int) (rp container.RestartPolicy, err error) {
-	if strategy == cem_lib.RestartOnFail && retries == nil {
+func GenRestartPolicy(strategy model.RestartStrategy, retries *int) (rp container.RestartPolicy, err error) {
+	if strategy == model.RestartOnFail && retries == nil {
 		err = fmt.Errorf("invalid restart strategy configuration: number of retries = %v", retries)
 		return
 	}
@@ -172,7 +172,7 @@ func GenRestartPolicy(strategy cem_lib.RestartStrategy, retries *int) (rp contai
 	return
 }
 
-func CheckNetworks(n []cem_lib.ContainerNet) error {
+func CheckNetworks(n []model.ContainerNet) error {
 	set := make(map[string]struct{})
 	for _, net := range n {
 		if _, ok := set[net.Name]; ok {

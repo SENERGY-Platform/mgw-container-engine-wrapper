@@ -22,15 +22,15 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"net/http"
 )
 
-func (d *Docker) ListNetworks(ctx context.Context) ([]cem_lib.Network, error) {
-	var n []cem_lib.Network
+func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
+	var n []model.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		return n, srv_base_types.NewError(http.StatusInternalServerError, "listing networks failed", err)
@@ -38,7 +38,7 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]cem_lib.Network, error) {
 	for _, r := range nr {
 		if nType, ok := util.NetTypeMap[r.Driver]; ok {
 			s, gw := util.ParseNetIPAMConfig(r.IPAM.Config)
-			n = append(n, cem_lib.Network{
+			n = append(n, model.Network{
 				ID:      r.ID,
 				Name:    r.Name,
 				Type:    nType,
@@ -50,8 +50,8 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]cem_lib.Network, error) {
 	return n, nil
 }
 
-func (d *Docker) NetworkInfo(ctx context.Context, id string) (cem_lib.Network, error) {
-	n := cem_lib.Network{}
+func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, error) {
+	n := model.Network{}
 	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
 	if err != nil {
 		code := http.StatusInternalServerError
@@ -69,7 +69,7 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (cem_lib.Network, e
 	return n, nil
 }
 
-func (d *Docker) NetworkCreate(ctx context.Context, net cem_lib.Network) error {
+func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) error {
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         util.NetTypeRMap[net.Type],

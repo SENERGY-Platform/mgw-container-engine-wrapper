@@ -22,20 +22,20 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"net/http"
 )
 
-func (d *Docker) ListVolumes(ctx context.Context, filter cem_lib.VolumeFilter) ([]cem_lib.Volume, error) {
-	var vols []cem_lib.Volume
+func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
+	var vols []model.Volume
 	vls, err := d.client.VolumeList(ctx, util.GenVolumeFilterArgs(filter))
 	if err != nil {
 		return vols, srv_base_types.NewError(http.StatusInternalServerError, "listing volumes failed", err)
 	}
 	for _, vl := range vls.Volumes {
-		vol := cem_lib.Volume{
+		vol := model.Volume{
 			Name:   vl.Name,
 			Labels: vl.Labels,
 		}
@@ -49,8 +49,8 @@ func (d *Docker) ListVolumes(ctx context.Context, filter cem_lib.VolumeFilter) (
 	return vols, nil
 }
 
-func (d *Docker) VolumeInfo(ctx context.Context, id string) (cem_lib.Volume, error) {
-	vol := cem_lib.Volume{}
+func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error) {
+	vol := model.Volume{}
 	vl, err := d.client.VolumeInspect(ctx, id)
 	if err != nil {
 		code := http.StatusInternalServerError
@@ -69,7 +69,7 @@ func (d *Docker) VolumeInfo(ctx context.Context, id string) (cem_lib.Volume, err
 	return vol, nil
 }
 
-func (d *Docker) VolumeCreate(ctx context.Context, vol cem_lib.Volume) error {
+func (d *Docker) VolumeCreate(ctx context.Context, vol model.Volume) error {
 	_, err := d.client.VolumeCreate(ctx, volume.VolumeCreateBody{Name: vol.Name, Labels: vol.Labels})
 	if err != nil {
 		return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating volume '%s' failed", vol.Name), err)

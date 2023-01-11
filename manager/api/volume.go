@@ -18,7 +18,7 @@ package api
 
 import (
 	"container-engine-manager/manager/api/util"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -30,7 +30,7 @@ func (a *Api) GetVolumes(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	volumes, err := a.ceHandler.ListVolumes(gc.Request.Context(), cem_lib.VolumeFilter{Labels: util.GenLabels(query.Label)})
+	volumes, err := a.ceHandler.ListVolumes(gc.Request.Context(), model.VolumeFilter{Labels: util.GenLabels(query.Label)})
 	if err != nil {
 		_ = gc.Error(err)
 		return
@@ -39,7 +39,7 @@ func (a *Api) GetVolumes(gc *gin.Context) {
 }
 
 func (a *Api) PostVolume(gc *gin.Context) {
-	volume := cem_lib.Volume{}
+	volume := model.Volume{}
 	if err := gc.ShouldBindJSON(&volume); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)

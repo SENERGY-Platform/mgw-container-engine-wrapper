@@ -17,7 +17,7 @@
 package util
 
 import (
-	"github.com/SENERGY-Platform/mgw-container-engine-manager-lib/cem-lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -29,14 +29,14 @@ import (
 	"time"
 )
 
-func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []cem_lib.ContainerNet) {
+func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []model.ContainerNet) {
 	if len(endptSettings) > 0 {
 		for key, val := range endptSettings {
-			netInfo = append(netInfo, cem_lib.ContainerNet{
+			netInfo = append(netInfo, model.ContainerNet{
 				ID:          val.NetworkID,
 				Name:        key,
-				IPAddress:   cem_lib.IPAddr{IP: net.ParseIP(val.IPAddress)},
-				Gateway:     cem_lib.IPAddr{IP: net.ParseIP(val.Gateway)},
+				IPAddress:   model.IPAddr{IP: net.ParseIP(val.IPAddress)},
+				Gateway:     model.IPAddr{IP: net.ParseIP(val.Gateway)},
 				DomainNames: val.Aliases,
 				MacAddress:  val.MacAddress,
 			})
@@ -45,12 +45,12 @@ func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (
 	return
 }
 
-func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]cem_lib.Port, error) {
-	var ports []cem_lib.Port
+func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]model.Port, error) {
+	var ports []model.Port
 	if len(portSet) > 0 || len(portMap) > 0 {
 		set := make(map[string]struct{})
 		for port, bindings := range portMap {
-			p := cem_lib.Port{
+			p := model.Port{
 				Number:   port.Int(),
 				Protocol: PortTypeMap[port.Proto()],
 			}
@@ -59,9 +59,9 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]cem_lib.Por
 				if err != nil {
 					return ports, err
 				}
-				p.Bindings = append(p.Bindings, cem_lib.PortBinding{
+				p.Bindings = append(p.Bindings, model.PortBinding{
 					Number:    int(num),
-					Interface: cem_lib.IPAddr{IP: net.ParseIP(binding.HostIP)},
+					Interface: model.IPAddr{IP: net.ParseIP(binding.HostIP)},
 				})
 			}
 			ports = append(ports, p)
@@ -69,7 +69,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]cem_lib.Por
 		}
 		for port := range portSet {
 			if _, ok := set[string(port)]; !ok {
-				ports = append(ports, cem_lib.Port{
+				ports = append(ports, model.Port{
 					Number:   port.Int(),
 					Protocol: PortTypeMap[port.Proto()],
 				})
@@ -79,11 +79,11 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]cem_lib.Por
 	return ports, nil
 }
 
-func ParseMountPoints(mountPoints []types.MountPoint) (mounts []cem_lib.Mount) {
+func ParseMountPoints(mountPoints []types.MountPoint) (mounts []model.Mount) {
 	if len(mountPoints) > 0 {
 		for _, mp := range mountPoints {
 			if mType, ok := MountTypeMap[mp.Type]; ok {
-				mounts = append(mounts, cem_lib.Mount{
+				mounts = append(mounts, model.Mount{
 					Type:     mType,
 					Source:   mp.Source,
 					Target:   mp.Destination,
@@ -95,11 +95,11 @@ func ParseMountPoints(mountPoints []types.MountPoint) (mounts []cem_lib.Mount) {
 	return
 }
 
-func ParseMounts(mts []mount.Mount) (mounts []cem_lib.Mount) {
+func ParseMounts(mts []mount.Mount) (mounts []model.Mount) {
 	if len(mts) > 0 {
 		for _, mt := range mts {
 			if mType, ok := MountTypeMap[mt.Type]; ok {
-				m := cem_lib.Mount{
+				m := model.Mount{
 					Type:     mType,
 					Source:   mt.Source,
 					Target:   mt.Target,
@@ -110,7 +110,7 @@ func ParseMounts(mts []mount.Mount) (mounts []cem_lib.Mount) {
 				}
 				if mt.TmpfsOptions != nil {
 					m.Size = mt.TmpfsOptions.SizeBytes
-					m.Mode = cem_lib.FileMode{FileMode: mt.TmpfsOptions.Mode}
+					m.Mode = model.FileMode{FileMode: mt.TmpfsOptions.Mode}
 				}
 				mounts = append(mounts, m)
 			}
@@ -130,14 +130,14 @@ func ParseEnv(ev []string) (env map[string]string) {
 	return
 }
 
-func ParseStopTimeout(t *int) *cem_lib.Duration {
+func ParseStopTimeout(t *int) *model.Duration {
 	if t != nil {
-		return &cem_lib.Duration{Duration: time.Duration(*t * int(time.Second))}
+		return &model.Duration{Duration: time.Duration(*t * int(time.Second))}
 	}
 	return nil
 }
 
-func ParseNetIPAMConfig(c []network.IPAMConfig) (s cem_lib.Subnet, gw cem_lib.IPAddr) {
+func ParseNetIPAMConfig(c []network.IPAMConfig) (s model.Subnet, gw model.IPAddr) {
 	if c != nil && len(c) > 0 {
 		sp := strings.Split(c[0].Subnet, "/")
 		if len(sp) == 2 {
@@ -158,13 +158,13 @@ func ParseContainerName(s string) string {
 	return strings.TrimPrefix(s, "/")
 }
 
-func ParseRestartPolicy(rp container.RestartPolicy) (strategy cem_lib.RestartStrategy, retires *int) {
+func ParseRestartPolicy(rp container.RestartPolicy) (strategy model.RestartStrategy, retires *int) {
 	if rp.Name == "" {
-		strategy = cem_lib.RestartNever
+		strategy = model.RestartNever
 	} else {
 		strategy = RestartPolicyMap[rp.Name]
 	}
-	if strategy == cem_lib.RestartOnFail {
+	if strategy == model.RestartOnFail {
 		retires = &rp.MaximumRetryCount
 	}
 	return
