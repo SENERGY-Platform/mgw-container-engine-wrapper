@@ -22,10 +22,10 @@ const (
 	SctpPort PortType = "sctp"
 )
 
-var PortTypeMap = map[string]PortType{
-	string(TcpPort):  TcpPort,
-	string(UdpPort):  UdpPort,
-	string(SctpPort): SctpPort,
+var PortTypeMap = map[PortType]struct{}{
+	TcpPort:  {},
+	UdpPort:  {},
+	SctpPort: {},
 }
 
 const (
@@ -34,10 +34,10 @@ const (
 	HostNet    NetworkType = "host"
 )
 
-var NetworkTypeMap = map[string]NetworkType{
-	string(BridgeNet):  BridgeNet,
-	string(MACVlanNet): MACVlanNet,
-	string(HostNet):    HostNet,
+var NetworkTypeMap = map[NetworkType]struct{}{
+	BridgeNet:  {},
+	MACVlanNet: {},
+	HostNet:    {},
 }
 
 const (
@@ -47,11 +47,11 @@ const (
 	RestartOnFail     RestartStrategy = "on-fail"
 )
 
-var RestartStrategyMap = map[string]RestartStrategy{
-	string(RestartNever):      RestartNever,
-	string(RestartAlways):     RestartAlways,
-	string(RestartNotStopped): RestartNotStopped,
-	string(RestartOnFail):     RestartOnFail,
+var RestartStrategyMap = map[RestartStrategy]struct{}{
+	RestartNever:      {},
+	RestartAlways:     {},
+	RestartNotStopped: {},
+	RestartOnFail:     {},
 }
 
 const (
@@ -60,10 +60,10 @@ const (
 	TmpfsMount  MountType = "tmpfs"
 )
 
-var MountTypeMap = map[string]MountType{
-	string(BindMount):   BindMount,
-	string(VolumeMount): VolumeMount,
-	string(TmpfsMount):  TmpfsMount,
+var MountTypeMap = map[MountType]struct{}{
+	BindMount:   {},
+	VolumeMount: {},
+	TmpfsMount:  {},
 }
 
 const (
@@ -75,13 +75,13 @@ const (
 	UnknownState    ContainerState = "unknown"
 )
 
-var ContainerStateMap = map[string]ContainerState{
-	string(InitState):       InitState,
-	string(RunningState):    RunningState,
-	string(RestartingState): RestartingState,
-	string(StoppedState):    StoppedState,
-	string(UnhealthyState):  UnhealthyState,
-	string(UnknownState):    UnknownState,
+var ContainerStateMap = map[ContainerState]struct{}{
+	InitState:       {},
+	RunningState:    {},
+	RestartingState: {},
+	StoppedState:    {},
+	UnhealthyState:  {},
+	UnknownState:    {},
 }
 
 const (
