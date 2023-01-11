@@ -25,68 +25,16 @@ import (
 	"time"
 )
 
-func (p Port) KeyStr() string {
+func (p *Port) KeyStr() string {
 	return fmt.Sprintf("%d/%s", p.Number, p.Protocol)
 }
 
-func (m Mount) KeyStr() string {
+func (m *Mount) KeyStr() string {
 	return fmt.Sprintf("%s:%s", m.Source, m.Target)
 }
 
-func (s Subnet) KeyStr() string {
-	return fmt.Sprintf("%s/%d", s.Prefix.String(), s.Bits)
-}
-
-func (p *PortType) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	if t, ok := PortTypeMap[s]; ok {
-		*p = t
-	} else {
-		err = fmt.Errorf("unknown port type '%s'", s)
-	}
-	return
-}
-
-func (n *NetworkType) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	if t, ok := NetworkTypeMap[s]; ok {
-		*n = t
-	} else {
-		err = fmt.Errorf("unknown network type '%s'", s)
-	}
-	return
-}
-
-func (r *RestartStrategy) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	if st, ok := RestartStrategyMap[s]; ok {
-		*r = st
-	} else {
-		return fmt.Errorf("unknown restart strategy '%s'", s)
-	}
-	return nil
-}
-
-func (m *MountType) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	if t, ok := MountTypeMap[s]; ok {
-		*m = t
-	} else {
-		err = fmt.Errorf("unknown mount type '%s'", s)
-	}
-	return
+func (s *Subnet) KeyStr() string {
+	return fmt.Sprintf("%s/%d", net.IP(s.Prefix).String(), s.Bits)
 }
 
 func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
@@ -95,7 +43,7 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 		return
 	}
 	if ip := net.ParseIP(s); ip != nil {
-		i.IP = ip
+		*i = IPAddr(ip)
 	} else {
 		err = fmt.Errorf("invalid IP address '%s'", s)
 	}
@@ -110,26 +58,13 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	if dur, err := time.ParseDuration(s); err != nil {
 		return err
 	} else {
-		d.Duration = dur
+		*d = Duration(dur)
 	}
 	return nil
 }
 
 func (d Duration) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.String())
-}
-
-func (c *ContainerSetState) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	if st, ok := ContainerSetStateMap[s]; ok {
-		*c = st
-	} else {
-		err = fmt.Errorf("unknown container state '%s'", s)
-	}
-	return
+	return json.Marshal(time.Duration(d).String())
 }
 
 func (m *FileMode) UnmarshalJSON(b []byte) (err error) {
@@ -141,10 +76,10 @@ func (m *FileMode) UnmarshalJSON(b []byte) (err error) {
 	if err != nil {
 		return err
 	}
-	m.FileMode = fs.FileMode(i)
+	*m = FileMode(fs.FileMode(i))
 	return nil
 }
 
 func (m FileMode) MarshalJSON() ([]byte, error) {
-	return json.Marshal(strconv.FormatUint(uint64(m.FileMode), 8))
+	return json.Marshal(strconv.FormatUint(uint64(m), 8))
 }

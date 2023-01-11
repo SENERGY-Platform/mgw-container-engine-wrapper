@@ -36,11 +36,9 @@ type ImageFilter struct {
 	Labels map[string]string
 }
 
-type NetworkType string
+type NetworkType = string
 
-type IPAddr struct {
-	net.IP
-}
+type IPAddr net.IP
 
 type Subnet struct {
 	Prefix IPAddr `json:"prefix"`
@@ -55,7 +53,7 @@ type Network struct {
 	Gateway IPAddr      `json:"gateway"`
 }
 
-type PortType string
+type PortType = string
 
 type Port struct {
 	Number   int           `json:"number"`
@@ -68,11 +66,9 @@ type PortBinding struct {
 	Interface IPAddr `json:"interface"`
 }
 
-type MountType string
+type MountType = string
 
-type FileMode struct {
-	fs.FileMode
-}
+type FileMode fs.FileMode
 
 type Mount struct {
 	Type     MountType         `json:"type"`
@@ -84,11 +80,9 @@ type Mount struct {
 	Mode     FileMode          `json:"mode,omitempty"`
 }
 
-type RestartStrategy string
+type RestartStrategy = string
 
-type Duration struct {
-	time.Duration
-}
+type Duration time.Duration
 
 type RunConfig struct {
 	RestartStrategy RestartStrategy `json:"restart_strategy"`
@@ -99,7 +93,7 @@ type RunConfig struct {
 	PseudoTTY       bool            `json:"pseudo_tty"`
 }
 
-type ContainerState string
+type ContainerState = string
 
 type Container struct {
 	ID        string            `json:"id"`
@@ -142,7 +136,7 @@ type ContainersPostResponse struct {
 	ID string `json:"id"`
 }
 
-type ContainerSetState string
+type ContainerSetState = string
 
 type ContainerCtrlPostRequest struct {
 	State ContainerSetState `json:"state"`
