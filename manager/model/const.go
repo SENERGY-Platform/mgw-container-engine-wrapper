@@ -69,7 +69,9 @@ var MountTypeMap = map[MountType]struct{}{
 const (
 	InitState       ContainerState = "initialized"
 	RunningState    ContainerState = "running"
+	PausedState     ContainerState = "paused"
 	RestartingState ContainerState = "restarting"
+	RemovingState   ContainerState = "removing"
 	StoppedState    ContainerState = "stopped"
 	UnhealthyState  ContainerState = "unhealthy"
 	UnknownState    ContainerState = "unknown"
@@ -78,7 +80,9 @@ const (
 var ContainerStateMap = map[ContainerState]struct{}{
 	InitState:       {},
 	RunningState:    {},
+	PausedState:     {},
 	RestartingState: {},
+	RemovingState:   {},
 	StoppedState:    {},
 	UnhealthyState:  {},
 	UnknownState:    {},
