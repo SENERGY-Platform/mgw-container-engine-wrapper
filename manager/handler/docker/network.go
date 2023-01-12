@@ -63,7 +63,7 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 	s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
 	n.ID = nr.ID
 	n.Name = nr.Name
-	n.Type = util.NetTypeMap[nr.Driver]
+	n.Type = util.GetConst(nr.Driver, util.NetTypeMap)
 	n.Subnet = s
 	n.Gateway = gw
 	return n, nil
