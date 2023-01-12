@@ -44,7 +44,7 @@ func NewConfig(path *string) (*Config, error) {
 			Microseconds: true,
 		},
 		Socket: SocketConfig{
-			Path:     "/opt/container-engine-manager/manager.sock",
+			Path:     "/opt/mgw/sockets/cem.sock",
 			GroupID:  os.Getgid(),
 			FileMode: 0660,
 		},
