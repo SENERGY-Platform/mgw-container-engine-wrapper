@@ -24,9 +24,9 @@ import (
 var StateMap = map[string]model.ContainerState{
 	"created":    model.InitState,
 	"running":    model.RunningState,
-	"paused":     model.UnknownState,
+	"paused":     model.PausedState,
 	"restarting": model.RestartingState,
-	"removing":   model.UnknownState,
+	"removing":   model.RemovingState,
 	"exited":     model.StoppedState,
 	"dead":       model.UnhealthyState,
 }
