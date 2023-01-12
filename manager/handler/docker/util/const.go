@@ -95,3 +95,11 @@ var NetTypeRMap = func() map[model.NetworkType]string {
 	}
 	return m
 }()
+
+func GetConst(s string, m map[string]string) string {
+	if c, ok := m[s]; ok {
+		return c
+	} else {
+		return "unknown"
+	}
+}
