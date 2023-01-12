@@ -41,7 +41,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilte
 	for _, c := range cl {
 		ctr := model.Container{
 			ID:       c.ID,
-			State:    util.StateMap[c.State],
+			State:    util.GetConst(c.State, util.StateMap),
 			ImageID:  c.ImageID,
 			Labels:   c.Labels,
 			Mounts:   util.ParseMountPoints(c.Mounts),
