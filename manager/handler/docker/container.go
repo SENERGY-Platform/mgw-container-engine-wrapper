@@ -108,7 +108,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container,
 	}
 	ctr.ID = c.ID
 	ctr.Name = util.ParseContainerName(c.Name)
-	ctr.State = util.StateMap[c.State.Status]
+	ctr.State = util.GetConst(c.State.Status, util.StateMap)
 	ctr.Image = c.Config.Image
 	ctr.ImageID = c.Image
 	ctr.EnvVars = util.ParseEnv(c.Config.Env)
