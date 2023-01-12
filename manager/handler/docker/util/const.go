@@ -34,9 +34,7 @@ var StateMap = map[string]model.ContainerState{
 var StateRMap = func() map[model.ContainerState]string {
 	m := make(map[model.ContainerState]string)
 	for k, v := range StateMap {
-		if v != model.UnknownState {
-			m[v] = k
-		}
+		m[v] = k
 	}
 	return m
 }()
