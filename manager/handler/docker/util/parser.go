@@ -52,7 +52,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]model.Port,
 		for port, bindings := range portMap {
 			p := model.Port{
 				Number:   port.Int(),
-				Protocol: PortTypeMap[port.Proto()],
+				Protocol: GetConst(port.Proto(), PortTypeMap),
 			}
 			for _, binding := range bindings {
 				num, err := strconv.ParseInt(binding.HostPort, 10, 0)
@@ -71,7 +71,7 @@ func ParsePortSetAndMap(portSet nat.PortSet, portMap nat.PortMap) ([]model.Port,
 			if _, ok := set[string(port)]; !ok {
 				ports = append(ports, model.Port{
 					Number:   port.Int(),
-					Protocol: PortTypeMap[port.Proto()],
+					Protocol: GetConst(port.Proto(), PortTypeMap),
 				})
 			}
 		}
