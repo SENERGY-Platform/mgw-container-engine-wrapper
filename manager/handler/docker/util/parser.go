@@ -132,7 +132,7 @@ func ParseEnv(ev []string) (env map[string]string) {
 
 func ParseStopTimeout(t *int) *model.Duration {
 	if t != nil {
-		d := model.Duration(time.Duration(*t * int(time.Second)))
+		d := model.Duration(*t * 1000000000)
 		return &d
 	}
 	return nil

@@ -51,20 +51,16 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (d *Duration) UnmarshalJSON(b []byte) error {
-	var s string
-	if err := json.Unmarshal(b, &s); err != nil {
+	var i int64
+	if err := json.Unmarshal(b, &i); err != nil {
 		return err
 	}
-	if dur, err := time.ParseDuration(s); err != nil {
-		return err
-	} else {
-		*d = Duration(dur)
-	}
+	*d = Duration(i * 1000)
 	return nil
 }
 
 func (d Duration) MarshalJSON() ([]byte, error) {
-	return json.Marshal(time.Duration(d).String())
+	return json.Marshal(time.Duration(d).Microseconds())
 }
 
 func (m *FileMode) UnmarshalJSON(b []byte) (err error) {
