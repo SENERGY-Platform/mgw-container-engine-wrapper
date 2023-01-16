@@ -19,7 +19,6 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-	"io/fs"
 	"net"
 	"strconv"
 	"time"
@@ -76,7 +75,7 @@ func (m *FileMode) UnmarshalJSON(b []byte) (err error) {
 	if err != nil {
 		return err
 	}
-	*m = FileMode(fs.FileMode(i))
+	*m = FileMode(i)
 	return nil
 }
 
