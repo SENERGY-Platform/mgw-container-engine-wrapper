@@ -83,3 +83,17 @@ func (m *FileMode) UnmarshalJSON(b []byte) (err error) {
 func (m FileMode) MarshalJSON() ([]byte, error) {
 	return json.Marshal(strconv.FormatUint(uint64(m), 8))
 }
+
+func (t *Time) UnmarshalJSON(b []byte) error {
+	var i int64
+	err := json.Unmarshal(b, &i)
+	if err != nil {
+		return err
+	}
+	*t = Time(time.UnixMicro(i))
+	return nil
+}
+
+func (t Time) MarshalJSON() ([]byte, error) {
+	return json.Marshal(time.Time(t).UnixMicro())
+}

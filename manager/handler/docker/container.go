@@ -30,6 +30,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
@@ -262,10 +263,10 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogOp
 		ShowStderr: true,
 	}
 	if logOpt.Since != nil {
-		clo.Since = util.GenTimestamp(*logOpt.Since)
+		clo.Since = time.Time(*logOpt.Since).Format(time.RFC3339Nano)
 	}
 	if logOpt.Until != nil {
-		clo.Until = util.GenTimestamp(*logOpt.Until)
+		clo.Until = time.Time(*logOpt.Until).Format(time.RFC3339Nano)
 	}
 	if logOpt.MaxLines > 0 {
 		clo.Tail = strconv.FormatInt(int64(logOpt.MaxLines), 10)

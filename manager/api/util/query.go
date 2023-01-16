@@ -23,9 +23,9 @@ type ContainersQuery struct {
 }
 
 type ContainerLogQuery struct {
-	MaxLines int    `form:"max_lines"`
-	Since    string `form:"since"`
-	Until    string `form:"until"`
+	MaxLines int   `form:"max_lines"`
+	Since    int64 `form:"since"`
+	Until    int64 `form:"until"`
 }
 
 type ImagesQuery struct {

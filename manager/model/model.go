@@ -22,9 +22,11 @@ import (
 	"time"
 )
 
+type Time time.Time
+
 type Image struct {
 	ID      string            `json:"id"`
-	Created time.Time         `json:"created"`
+	Created Time              `json:"created"`
 	Size    int64             `json:"size"`
 	Arch    string            `json:"arch"`
 	Tags    []string          `json:"tags"`
@@ -99,8 +101,8 @@ type Container struct {
 	ID        string            `json:"id"`
 	Name      string            `json:"name"`
 	State     ContainerState    `json:"state"`
-	Created   time.Time         `json:"created"`
-	Started   *time.Time        `json:"started"`
+	Created   Time              `json:"created"`
+	Started   *Time             `json:"started"`
 	Image     string            `json:"image"`
 	ImageID   string            `json:"image_id"`
 	EnvVars   map[string]string `json:"env_vars"`
@@ -128,8 +130,8 @@ type ContainerFilter struct {
 
 type LogOptions struct {
 	MaxLines int
-	Since    *time.Time
-	Until    *time.Time
+	Since    *Time
+	Until    *Time
 }
 
 type ContainersPostResponse struct {
@@ -148,7 +150,7 @@ type ImagesPostRequest struct {
 
 type Volume struct {
 	Name    string            `json:"name"`
-	Created time.Time         `json:"created"`
+	Created Time              `json:"created"`
 	Labels  map[string]string `json:"labels"`
 }
 

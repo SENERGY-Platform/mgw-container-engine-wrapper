@@ -122,22 +122,13 @@ func (a *Api) GetContainerLog(gc *gin.Context) {
 		return
 	}
 	logOptions := model.LogOptions{MaxLines: query.MaxLines}
-	if query.Since != "" {
-		since, err := time.Parse(time.RFC3339Nano, query.Since)
-		if err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
-			return
-		}
+	if query.Since > 0 {
+		fmt.Println(time.UnixMicro(query.Since))
+		since := model.Time(time.UnixMicro(query.Since))
 		logOptions.Since = &since
 	}
-	if query.Until != "" {
-		until, err := time.Parse(time.RFC3339Nano, query.Until)
-		if err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
-			return
-		}
+	if query.Until > 0 {
+		until := model.Time(time.UnixMicro(query.Until))
 		logOptions.Until = &until
 	}
 	rc, err := a.ceHandler.ContainerLog(gc.Request.Context(), gc.Param(util.ContainerParam), logOptions)
