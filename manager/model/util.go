@@ -50,6 +50,10 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 	return
 }
 
+func (i IPAddr) MarshalJSON() ([]byte, error) {
+	return json.Marshal(net.IP(i))
+}
+
 func (d *Duration) UnmarshalJSON(b []byte) error {
 	var i int64
 	if err := json.Unmarshal(b, &i); err != nil {
