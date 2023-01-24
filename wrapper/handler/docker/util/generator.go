@@ -18,7 +18,7 @@ package util
 
 import (
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"

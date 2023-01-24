@@ -17,9 +17,9 @@
 package api
 
 import (
-	"container-engine-manager/manager/api/util"
+	"container-engine-wrapper/wrapper/api/util"
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"

@@ -17,8 +17,8 @@
 package api
 
 import (
-	"container-engine-manager/manager/api/util"
-	"container-engine-manager/manager/itf"
+	"container-engine-wrapper/wrapper/api/util"
+	"container-engine-wrapper/wrapper/itf"
 	"github.com/gin-gonic/gin"
 )
 

@@ -17,14 +17,14 @@
 package docker
 
 import (
-	"container-engine-manager/manager/handler/docker/util"
+	"container-engine-wrapper/wrapper/handler/docker/util"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"

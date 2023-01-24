@@ -18,7 +18,7 @@ package itf
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
 	"io"
 )
 

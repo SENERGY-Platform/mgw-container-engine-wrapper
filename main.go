@@ -17,9 +17,9 @@
 package main
 
 import (
-	"container-engine-manager/manager/api"
-	"container-engine-manager/manager/handler/docker"
-	"container-engine-manager/manager/util"
+	"container-engine-wrapper/wrapper/api"
+	"container-engine-wrapper/wrapper/handler/docker"
+	"container-engine-wrapper/wrapper/util"
 	"context"
 	"errors"
 	"fmt"
@@ -35,7 +35,7 @@ import (
 var version string
 
 func main() {
-	srv_base.PrintInfo("mgw-container-engine-manager", version)
+	srv_base.PrintInfo("mgw-container-engine-wrapper", version)
 
 	flags := util.NewFlags()
 

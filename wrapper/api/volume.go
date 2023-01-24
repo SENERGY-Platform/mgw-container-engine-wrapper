@@ -17,53 +17,52 @@
 package api
 
 import (
-	"container-engine-manager/manager/api/util"
-	"github.com/SENERGY-Platform/mgw-container-engine-manager/manager/model"
+	"container-engine-wrapper/wrapper/api/util"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func (a *Api) GetImages(gc *gin.Context) {
-	query := util.ImagesQuery{}
+func (a *Api) GetVolumes(gc *gin.Context) {
+	query := util.VolumesQuery{}
 	if err := gc.ShouldBindQuery(&query); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
 		return
 	}
-	filter := model.ImageFilter{Labels: util.GenLabels(query.Label)}
-	images, err := a.ceHandler.ListImages(gc.Request.Context(), filter)
+	volumes, err := a.ceHandler.ListVolumes(gc.Request.Context(), model.VolumeFilter{Labels: util.GenLabels(query.Label)})
 	if err != nil {
 		_ = gc.Error(err)
 		return
 	}
-	gc.JSON(http.StatusOK, &images)
+	gc.JSON(http.StatusOK, &volumes)
 }
 
-func (a *Api) PostImage(gc *gin.Context) {
-	req := model.ImagesPostRequest{}
-	if err := gc.ShouldBindJSON(&req); err != nil {
+func (a *Api) PostVolume(gc *gin.Context) {
+	volume := model.Volume{}
+	if err := gc.ShouldBindJSON(&volume); err != nil {
 		gc.Status(http.StatusBadRequest)
 		_ = gc.Error(err)
 		return
 	}
-	if err := a.ceHandler.ImagePull(gc.Request.Context(), req.Image); err != nil {
+	if err := a.ceHandler.VolumeCreate(gc.Request.Context(), volume); err != nil {
 		_ = gc.Error(err)
 		return
 	}
 	gc.Status(http.StatusOK)
 }
 
-func (a *Api) GetImage(gc *gin.Context) {
-	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), gc.Param(util.ImageParam))
+func (a *Api) GetVolume(gc *gin.Context) {
+	volume, err := a.ceHandler.VolumeInfo(gc.Request.Context(), gc.Param(util.VolumeParam))
 	if err != nil {
 		_ = gc.Error(err)
 		return
 	}
-	gc.JSON(http.StatusOK, &image)
+	gc.JSON(http.StatusOK, &volume)
 }
 
-func (a *Api) DeleteImage(gc *gin.Context) {
-	if err := a.ceHandler.ImageRemove(gc.Request.Context(), gc.Param(util.ImageParam)); err != nil {
+func (a *Api) DeleteVolume(gc *gin.Context) {
+	if err := a.ceHandler.VolumeRemove(gc.Request.Context(), gc.Param(util.VolumeParam)); err != nil {
 		_ = gc.Error(err)
 		return
 	}
