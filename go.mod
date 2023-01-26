@@ -4,11 +4,13 @@ go 1.19
 
 require (
 	github.com/SENERGY-Platform/gin-middleware v0.0.3
+	github.com/SENERGY-Platform/go-cc-job-handler v0.1.0
 	github.com/SENERGY-Platform/go-service-base v0.5.1
 	github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model v0.0.4
 	github.com/docker/docker v20.10.17+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/gin-gonic/gin v1.8.1
+	github.com/google/uuid v1.3.0
 	github.com/y-du/go-log-level v0.2.2
 )
 

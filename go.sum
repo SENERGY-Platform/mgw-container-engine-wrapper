@@ -4,6 +4,8 @@ github.com/Microsoft/go-winio v0.5.2 h1:a9IhgEQBCUEk6QCdml9CiJGhAws+YwffDHEMp1VM
 github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=
 github.com/SENERGY-Platform/gin-middleware v0.0.3 h1:4nHTazmr0nwaH07GNxePD5Cx+dSexKBaWJn88D0/5lI=
 github.com/SENERGY-Platform/gin-middleware v0.0.3/go.mod h1:dQhrVQLWQ+o1mcjp8492amf5ISsdxDRI5UnHBmDBMcA=
+github.com/SENERGY-Platform/go-cc-job-handler v0.1.0 h1:JD8FNOo239AUCpiGKF1/E96XrBResRn3k1+c963UTJU=
+github.com/SENERGY-Platform/go-cc-job-handler v0.1.0/go.mod h1:9n2ZEgD4qhPJUIFJPzEDxmkoEY8d5U5oUVHOSnDUglc=
 github.com/SENERGY-Platform/go-service-base v0.5.1 h1:uSWeF4TaYd2RJwDpd0bkUf9um1KloKFOg/uCHRn5sik=
 github.com/SENERGY-Platform/go-service-base v0.5.1/go.mod h1:MzMs3X4xFg9GxYoC1JrRXyKpN6lh3NgWTuwpk6P2Qzs=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
@@ -41,6 +43,8 @@ github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
