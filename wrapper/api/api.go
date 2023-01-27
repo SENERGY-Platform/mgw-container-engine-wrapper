@@ -23,12 +23,14 @@ import (
 )
 
 type Api struct {
-	ceHandler itf.ContainerEngineHandler
+	ceHandler  itf.ContainerEngineHandler
+	jobHandler itf.JobHandler
 }
 
-func New(ceHandler itf.ContainerEngineHandler) *Api {
+func New(ceHandler itf.ContainerEngineHandler, jobHandler itf.JobHandler) *Api {
 	return &Api{
-		ceHandler: ceHandler,
+		ceHandler:  ceHandler,
+		jobHandler: jobHandler,
 	}
 }
 
