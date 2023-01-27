@@ -59,14 +59,14 @@ func (j *Job) Meta() model.Job {
 	return j.meta
 }
 
-func (j *Job) SetStarted() {
+func (j *Job) setStarted() {
 	j.mu.Lock()
 	t := model.Time(time.Now().UTC())
 	j.meta.Started = &t
 	j.mu.Unlock()
 }
 
-func (j *Job) SetCompleted() {
+func (j *Job) setCompleted() {
 	j.mu.Lock()
 	t := model.Time(time.Now().UTC())
 	j.meta.Completed = &t
