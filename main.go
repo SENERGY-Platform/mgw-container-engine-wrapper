@@ -19,17 +19,20 @@ package main
 import (
 	"container-engine-wrapper/wrapper/api"
 	"container-engine-wrapper/wrapper/handler/docker"
+	"container-engine-wrapper/wrapper/handler/job"
 	"container-engine-wrapper/wrapper/util"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/gin-middleware"
+	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"time"
 )
 
 var version string
@@ -75,14 +78,43 @@ func main() {
 	}
 	srv_base.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
 
+	ccHandler := ccjh.New(config.Jobs.BufferSize)
+
+	jobCtx, cFunc := context.WithCancel(context.Background())
+	jobHandler := job.New(jobCtx, ccHandler)
+
+	defer func() {
+		ccHandler.Stop()
+		cFunc()
+		if ccHandler.Active() > 0 {
+			srv_base.Logger.Info("waiting for active jobs to cancel ...")
+			ctx, cf := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cf()
+			for ccHandler.Active() != 0 {
+				if ctx.Err() == context.Canceled {
+					srv_base.Logger.Error("canceling jobs took too long")
+					return
+				}
+				time.Sleep(50 * time.Millisecond)
+			}
+			srv_base.Logger.Info("jobs canceled")
+		}
+	}()
+
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
 	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
 	apiEngine.UseRawPath = true
-	dmApi := api.New(dockerHandler)
+	dmApi := api.New(dockerHandler, jobHandler)
 	dmApi.SetRoutes(apiEngine)
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
+	if err != nil {
+		srv_base.Logger.Error(err)
+		return
+	}
+
+	err = ccHandler.RunAsync(config.Jobs.MaxNumber, 50*time.Millisecond)
 	if err != nil {
 		srv_base.Logger.Error(err)
 		return
