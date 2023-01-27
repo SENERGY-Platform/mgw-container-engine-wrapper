@@ -35,6 +35,7 @@ func (j *Job) SetTarget(f func()) {
 func (j *Job) CallTarget(cbk func()) {
 	j.setStarted()
 	j.tFunc()
+	j.setCompleted()
 	cbk()
 }
 
