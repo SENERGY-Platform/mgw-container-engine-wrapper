@@ -17,8 +17,10 @@
 package itf
 
 import (
+	"container-engine-wrapper/wrapper/handler/job"
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"github.com/google/uuid"
 	"io"
 )
 
@@ -43,4 +45,11 @@ type ContainerEngineHandler interface {
 	VolumeInfo(ctx context.Context, id string) (model.Volume, error)
 	VolumeCreate(ctx context.Context, vol model.Volume) error
 	VolumeRemove(ctx context.Context, id string) error
+}
+
+type JobHandler interface {
+	Add(job *job.Job) error
+	Get(id uuid.UUID) (*job.Job, error)
+	Range(f func(k uuid.UUID, v *job.Job) bool)
+	Context() context.Context
 }
