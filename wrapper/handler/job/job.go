@@ -16,14 +16,12 @@ type Job struct {
 	cFunc context.CancelFunc
 }
 
-func NewJob(ctx context.Context, id uuid.UUID) *Job {
-	c, cf := context.WithCancel(ctx)
+func NewJob(ctx context.Context, cf context.CancelFunc) *Job {
 	return &Job{
 		meta: model.Job{
-			ID:      id,
 			Created: model.Time(time.Now().UTC()),
 		},
-		ctx:   c,
+		ctx:   ctx,
 		cFunc: cf,
 	}
 }
