@@ -23,6 +23,11 @@ import (
 	"os"
 )
 
+type JobsConfig struct {
+	BufferSize int `json:"buffer_size" env_var:"JOBS_BUFFER_SIZE"`
+	MaxNumber  int `json:"max_number" env_var:"JOBS_MAX_NUMBER"`
+}
+
 type SocketConfig struct {
 	Path     string      `json:"path" env_var:"SOCKET_PATH"`
 	GroupID  int         `json:"group_id" env_var:"SOCKET_GROUP_ID"`
@@ -32,6 +37,7 @@ type SocketConfig struct {
 type Config struct {
 	Logger srv_base.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
 	Socket SocketConfig          `json:"socket" env_var:"SOCKET_CONFIG"`
+	Jobs   JobsConfig            `json:"jobs" env_var:"JOBS_CONFIG"`
 }
 
 func NewConfig(path *string) (*Config, error) {
