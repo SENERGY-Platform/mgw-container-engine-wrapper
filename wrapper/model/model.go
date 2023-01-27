@@ -164,7 +164,7 @@ type Job struct {
 	Ref       string    `json:"ref"`
 	Error     string    `json:"error"`
 	Created   Time      `json:"created"`
-	Started   Time      `json:"started"`
-	Completed Time      `json:"completed"`
-	Canceled  Time      `json:"canceled"`
+	Started   *Time     `json:"started"`
+	Completed *Time     `json:"completed"`
+	Canceled  *Time     `json:"canceled"`
 }
