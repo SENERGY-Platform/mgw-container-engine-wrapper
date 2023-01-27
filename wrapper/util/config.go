@@ -54,6 +54,10 @@ func NewConfig(path *string) (*Config, error) {
 			GroupID:  os.Getgid(),
 			FileMode: 0660,
 		},
+		Jobs: JobsConfig{
+			BufferSize: 50,
+			MaxNumber:  10,
+		},
 	}
 	err := srv_base.LoadConfig(path, &cfg, nil, nil, nil)
 	return &cfg, err
