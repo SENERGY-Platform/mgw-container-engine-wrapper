@@ -17,6 +17,7 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"io/fs"
 	"net"
 	"time"
@@ -156,4 +157,14 @@ type Volume struct {
 
 type VolumeFilter struct {
 	Labels map[string]string
+}
+
+type Job struct {
+	ID        uuid.UUID `json:"id"`
+	Ref       string    `json:"ref"`
+	Error     string    `json:"error"`
+	Created   Time      `json:"created"`
+	Started   Time      `json:"started"`
+	Completed Time      `json:"completed"`
+	Canceled  Time      `json:"canceled"`
 }
