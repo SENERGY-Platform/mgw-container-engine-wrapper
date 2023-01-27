@@ -48,7 +48,7 @@ type ContainerEngineHandler interface {
 }
 
 type JobHandler interface {
-	Add(job *job.Job) error
+	Add(job *job.Job) (id uuid.UUID, err error)
 	Get(id uuid.UUID) (*job.Job, error)
 	Range(f func(k uuid.UUID, v *job.Job) bool)
 	Context() context.Context

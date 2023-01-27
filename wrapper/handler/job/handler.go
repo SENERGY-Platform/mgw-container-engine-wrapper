@@ -23,11 +23,20 @@ func New(ctx context.Context, ccHandler *ccjh.Handler) *Handler {
 	}
 }
 
-func (h *Handler) Add(job *Job) error {
+func (h *Handler) Add(job *Job) (id uuid.UUID, err error) {
+	id, err = uuid.NewRandom()
+	if err != nil {
+		return
+	}
+	job.meta.ID = id
+	err = h.ccHandler.Add(job)
+	if err != nil {
+		return
+	}
 	h.mu.Lock()
 	h.jobs[job.meta.ID] = job
 	h.mu.Unlock()
-	return h.ccHandler.Add(job)
+	return
 }
 
 func (h *Handler) Get(id uuid.UUID) (*Job, error) {
