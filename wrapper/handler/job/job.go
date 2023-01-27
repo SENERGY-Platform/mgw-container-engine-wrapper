@@ -3,7 +3,6 @@ package job
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
-	"github.com/google/uuid"
 	"sync"
 	"time"
 )
