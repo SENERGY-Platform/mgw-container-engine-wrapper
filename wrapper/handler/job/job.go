@@ -46,7 +46,8 @@ func (j *Job) IsCanceled() bool {
 func (j *Job) Cancel() {
 	j.cFunc()
 	j.mu.Lock()
-	j.meta.Canceled = model.Time(time.Now().UTC())
+	t := model.Time(time.Now().UTC())
+	j.meta.Canceled = &t
 	j.mu.Unlock()
 }
 
@@ -58,13 +59,15 @@ func (j *Job) Meta() model.Job {
 
 func (j *Job) SetStarted() {
 	j.mu.Lock()
-	j.meta.Started = model.Time(time.Now().UTC())
+	t := model.Time(time.Now().UTC())
+	j.meta.Started = &t
 	j.mu.Unlock()
 }
 
 func (j *Job) SetCompleted() {
 	j.mu.Lock()
-	j.meta.Completed = model.Time(time.Now().UTC())
+	t := model.Time(time.Now().UTC())
+	j.meta.Completed = &t
 	j.mu.Unlock()
 }
 
