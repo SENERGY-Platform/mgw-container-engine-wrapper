@@ -46,7 +46,7 @@ func NewConfig(path *string) (*Config, error) {
 			Level:        level.Warning,
 			Utc:          true,
 			Path:         "/var/log/",
-			FileName:     "mgw-container-engine-manager",
+			FileName:     "mgw-container-engine-wrapper",
 			Microseconds: true,
 		},
 		Socket: SocketConfig{
