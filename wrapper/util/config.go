@@ -50,7 +50,7 @@ func NewConfig(path *string) (*Config, error) {
 			Microseconds: true,
 		},
 		Socket: SocketConfig{
-			Path:     "/opt/mgw/sockets/cem.sock",
+			Path:     "/opt/mgw/sockets/cew.sock",
 			GroupID:  os.Getgid(),
 			FileMode: 0660,
 		},
