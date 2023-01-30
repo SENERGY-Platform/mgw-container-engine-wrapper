@@ -91,11 +91,13 @@ func main() {
 			ctx, cf := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cf()
 			for ccHandler.Active() != 0 {
-				if ctx.Err() == context.Canceled {
+				select {
+				case <-ctx.Done():
 					srv_base.Logger.Error("canceling jobs took too long")
 					return
+				default:
+					time.Sleep(50 * time.Millisecond)
 				}
-				time.Sleep(50 * time.Millisecond)
 			}
 			srv_base.Logger.Info("jobs canceled")
 		}
