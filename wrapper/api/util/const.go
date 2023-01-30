@@ -21,4 +21,5 @@ const (
 	ImageParam     = "image"
 	NetworkParam   = "network"
 	VolumeParam    = "volume"
+	JobParam       = "job"
 )
