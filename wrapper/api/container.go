@@ -67,32 +67,26 @@ func (a *Api) PostContainer(gc *gin.Context) {
 	gc.JSON(http.StatusOK, &model.ContainersPostResponse{ID: id})
 }
 
-func (a *Api) PostContainerCtrl(gc *gin.Context) {
-	ctrl := model.ContainerCtrlPostRequest{}
-	if err := gc.ShouldBindJSON(&ctrl); err != nil {
-		gc.Status(http.StatusBadRequest)
+func (a *Api) PostContainerStart(gc *gin.Context) {
+	if err := a.ceHandler.ContainerStart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
 		_ = gc.Error(err)
 		return
 	}
-	switch ctrl.State {
-	case model.ContainerStart:
-		if err := a.ceHandler.ContainerStart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
-			_ = gc.Error(err)
-			return
-		}
-	case model.ContainerRestart:
-		if err := a.ceHandler.ContainerRestart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
-			_ = gc.Error(err)
-			return
-		}
-	case model.ContainerStop:
-		if err := a.ceHandler.ContainerStop(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
-			_ = gc.Error(err)
-			return
-		}
-	default:
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(fmt.Errorf("invalid container state '%s'", ctrl.State))
+	gc.Status(http.StatusOK)
+}
+
+func (a *Api) PostContainerStop(gc *gin.Context) {
+	if err := a.ceHandler.ContainerStop(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	gc.Status(http.StatusOK)
+}
+
+func (a *Api) PostContainerRestart(gc *gin.Context) {
+	if err := a.ceHandler.ContainerRestart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+		_ = gc.Error(err)
+		return
 	}
 	gc.Status(http.StatusOK)
 }
