@@ -85,9 +85,3 @@ var ContainerStateMap = map[ContainerState]struct{}{
 	StoppedState:    {},
 	UnhealthyState:  {},
 }
-
-const (
-	ContainerStart   ContainerSetState = "start"
-	ContainerStop    ContainerSetState = "stop"
-	ContainerRestart ContainerSetState = "restart"
-)
