@@ -139,12 +139,6 @@ type ContainersPostResponse struct {
 	ID string `json:"id"`
 }
 
-type ContainerSetState = string
-
-type ContainerCtrlPostRequest struct {
-	State ContainerSetState `json:"state"`
-}
-
 type ImagesPostRequest struct {
 	Image string `json:"image"`
 }
