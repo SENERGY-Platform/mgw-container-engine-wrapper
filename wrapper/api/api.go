@@ -55,5 +55,5 @@ func (a *Api) SetRoutes(e *gin.Engine) {
 	e.DELETE("/volumes/:"+util.VolumeParam, a.DeleteVolume)
 	e.GET("/jobs", a.GetJobs)
 	e.GET("/jobs/:"+util.JobParam, a.GetJob)
-	e.POST("/jobs/:"+util.JobParam+"/ctrl", a.PostJobCtrl)
+	e.POST("/jobs/:"+util.JobParam+"/cancel", a.PostJobCancel)
 }
