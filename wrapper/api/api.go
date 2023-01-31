@@ -33,10 +33,11 @@ type RequestHeaders struct {
 	Uri        string
 }
 
-func New(ceHandler itf.ContainerEngineHandler, jobHandler itf.JobHandler) *Api {
+func New(ceHandler itf.ContainerEngineHandler, jobHandler itf.JobHandler, rHeaders RequestHeaders) *Api {
 	return &Api{
 		ceHandler:  ceHandler,
 		jobHandler: jobHandler,
+		rHeaders:   rHeaders,
 	}
 }
 
