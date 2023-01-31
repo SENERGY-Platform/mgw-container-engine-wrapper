@@ -29,7 +29,7 @@ func (a *Api) GetJob(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	gc.JSON(http.StatusOK, &j)
+	gc.JSON(http.StatusOK, j.Meta())
 }
 
 func (a *Api) PostJobCancel(gc *gin.Context) {
