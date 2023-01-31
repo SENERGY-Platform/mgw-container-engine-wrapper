@@ -25,6 +25,12 @@ import (
 type Api struct {
 	ceHandler  itf.ContainerEngineHandler
 	jobHandler itf.JobHandler
+	rHeaders   RequestHeaders
+}
+
+type RequestHeaders struct {
+	RequestUri string
+	Uri        string
 }
 
 func New(ceHandler itf.ContainerEngineHandler, jobHandler itf.JobHandler) *Api {
