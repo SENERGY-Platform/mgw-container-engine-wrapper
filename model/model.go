@@ -35,10 +35,6 @@ type Image struct {
 	Labels  map[string]string `json:"labels"`
 }
 
-type ImageFilter struct {
-	Labels map[string]string
-}
-
 type NetworkType = string
 
 type IPAddr net.IP
@@ -123,18 +119,6 @@ type ContainerNet struct {
 	MacAddress  string   `json:"mac_address"`
 }
 
-type ContainerFilter struct {
-	Name   string
-	State  ContainerState
-	Labels map[string]string
-}
-
-type LogOptions struct {
-	MaxLines int
-	Since    *Time
-	Until    *Time
-}
-
 type ContainersPostResponse struct {
 	ID string `json:"id"`
 }
@@ -147,10 +131,6 @@ type Volume struct {
 	Name    string            `json:"name"`
 	Created Time              `json:"created"`
 	Labels  map[string]string `json:"labels"`
-}
-
-type VolumeFilter struct {
-	Labels map[string]string
 }
 
 type Job struct {

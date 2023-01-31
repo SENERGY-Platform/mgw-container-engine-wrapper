@@ -18,7 +18,8 @@ package api
 
 import (
 	"container-engine-wrapper/wrapper/api/util"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/wrapper/itf"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -30,7 +31,7 @@ func (a *Api) GetVolumes(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	volumes, err := a.ceHandler.ListVolumes(gc.Request.Context(), model.VolumeFilter{Labels: util.GenLabels(query.Label)})
+	volumes, err := a.ceHandler.ListVolumes(gc.Request.Context(), itf.VolumeFilter{Labels: util.GenLabels(query.Label)})
 	if err != nil {
 		_ = gc.Error(err)
 		return

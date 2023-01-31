@@ -18,11 +18,12 @@ package docker
 
 import (
 	"container-engine-wrapper/wrapper/handler/docker/util"
+	"container-engine-wrapper/wrapper/itf"
 	"context"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -33,7 +34,7 @@ import (
 	"time"
 )
 
-func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
+func (d *Docker) ListContainers(ctx context.Context, filter itf.ContainerFilter) ([]model.Container, error) {
 	var csl []model.Container
 	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
 	if err != nil {
@@ -257,7 +258,7 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogOptions) (io.ReadCloser, error) {
+func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOptions) (io.ReadCloser, error) {
 	clo := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,

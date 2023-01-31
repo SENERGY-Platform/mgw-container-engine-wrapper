@@ -19,9 +19,10 @@ package api
 import (
 	"container-engine-wrapper/wrapper/api/util"
 	"container-engine-wrapper/wrapper/handler/job"
+	"container-engine-wrapper/wrapper/itf"
 	"context"
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -36,7 +37,7 @@ func (a *Api) GetContainers(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	filter := model.ContainerFilter{Name: query.Name}
+	filter := itf.ContainerFilter{Name: query.Name}
 	if query.State != "" {
 		_, ok := model.ContainerStateMap[query.State]
 		if !ok {
@@ -138,7 +139,7 @@ func (a *Api) GetContainerLog(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	logOptions := model.LogOptions{MaxLines: query.MaxLines}
+	logOptions := itf.LogOptions{MaxLines: query.MaxLines}
 	if query.Since > 0 {
 		fmt.Println(time.UnixMicro(query.Since))
 		since := model.Time(time.UnixMicro(query.Since))

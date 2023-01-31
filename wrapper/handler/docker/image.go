@@ -18,13 +18,14 @@ package docker
 
 import (
 	"container-engine-wrapper/wrapper/handler/docker/util"
+	"container-engine-wrapper/wrapper/itf"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -32,7 +33,7 @@ import (
 	"net/http"
 )
 
-func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
+func (d *Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]model.Image, error) {
 	var images []model.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {

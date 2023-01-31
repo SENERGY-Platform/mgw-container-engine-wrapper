@@ -17,8 +17,9 @@
 package util
 
 import (
+	"container-engine-wrapper/wrapper/itf"
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
@@ -118,7 +119,7 @@ func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
 	}
 }
 
-func GenContainerFilterArgs(filter model.ContainerFilter) filters.Args {
+func GenContainerFilterArgs(filter itf.ContainerFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	if filter.Name != "" {
 		fArgs.Add("name", filter.Name)
@@ -130,13 +131,13 @@ func GenContainerFilterArgs(filter model.ContainerFilter) filters.Args {
 	return fArgs
 }
 
-func GenImageFilterArgs(filter model.ImageFilter) filters.Args {
+func GenImageFilterArgs(filter itf.ImageFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs
 }
 
-func GenVolumeFilterArgs(filter model.VolumeFilter) filters.Args {
+func GenVolumeFilterArgs(filter itf.VolumeFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs

@@ -18,7 +18,8 @@ package api
 
 import (
 	"container-engine-wrapper/wrapper/api/util"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/wrapper/itf"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -30,7 +31,7 @@ func (a *Api) GetImages(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	filter := model.ImageFilter{Labels: util.GenLabels(query.Label)}
+	filter := itf.ImageFilter{Labels: util.GenLabels(query.Label)}
 	images, err := a.ceHandler.ListImages(gc.Request.Context(), filter)
 	if err != nil {
 		_ = gc.Error(err)

@@ -19,16 +19,16 @@ package itf
 import (
 	"container-engine-wrapper/wrapper/handler/job"
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/google/uuid"
 	"io"
 )
 
 type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context) ([]model.Network, error)
-	ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error)
-	ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
-	ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
+	ListContainers(ctx context.Context, filter ContainerFilter) ([]model.Container, error)
+	ListImages(ctx context.Context, filter ImageFilter) ([]model.Image, error)
+	ListVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
 	NetworkInfo(ctx context.Context, id string) (model.Network, error)
 	NetworkCreate(ctx context.Context, net model.Network) error
 	NetworkRemove(ctx context.Context, id string) error
@@ -38,7 +38,7 @@ type ContainerEngineHandler interface {
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string, logOptions model.LogOptions) (io.ReadCloser, error)
+	ContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
 	ImageInfo(ctx context.Context, id string) (model.Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
