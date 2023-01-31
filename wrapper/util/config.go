@@ -23,6 +23,11 @@ import (
 	"os"
 )
 
+type HeaderConfig struct {
+	RequestUri string `json:"request_uri" env_var:"HEADER_REQUEST_URI"`
+	Uri        string `json:"uri" env_var:"HEADER_URI"`
+}
+
 type JobsConfig struct {
 	BufferSize int `json:"buffer_size" env_var:"JOBS_BUFFER_SIZE"`
 	MaxNumber  int `json:"max_number" env_var:"JOBS_MAX_NUMBER"`
@@ -38,6 +43,7 @@ type Config struct {
 	Logger srv_base.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
 	Socket SocketConfig          `json:"socket" env_var:"SOCKET_CONFIG"`
 	Jobs   JobsConfig            `json:"jobs" env_var:"JOBS_CONFIG"`
+	Header HeaderConfig          `json:"header" env_var:"HEADER_CONFIG"`
 }
 
 func NewConfig(path *string) (*Config, error) {
