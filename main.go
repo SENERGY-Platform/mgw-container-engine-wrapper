@@ -107,7 +107,7 @@ func main() {
 	apiEngine := gin.New()
 	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
 	apiEngine.UseRawPath = true
-	dmApi := api.New(dockerHandler, jobHandler)
+	dmApi := api.New(dockerHandler, jobHandler, api.RequestHeaders(config.Header))
 	dmApi.SetRoutes(apiEngine)
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
