@@ -15,9 +15,10 @@ type Job struct {
 	cFunc context.CancelFunc
 }
 
-func NewJob(ctx context.Context, cf context.CancelFunc) *Job {
+func NewJob(ctx context.Context, cf context.CancelFunc, req model.JobOrgRequest) *Job {
 	return &Job{
 		meta: model.Job{
+			Request: req,
 			Created: model.Time(time.Now().UTC()),
 		},
 		ctx:   ctx,
