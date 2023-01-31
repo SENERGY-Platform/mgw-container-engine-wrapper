@@ -64,6 +64,10 @@ func NewConfig(path *string) (*Config, error) {
 			BufferSize: 50,
 			MaxNumber:  10,
 		},
+		Header: HeaderConfig{
+			RequestUri: "X-Request-Uri",
+			Uri:        "X-Uri",
+		},
 	}
 	err := srv_base.LoadConfig(path, &cfg, nil, nil, nil)
 	return &cfg, err
