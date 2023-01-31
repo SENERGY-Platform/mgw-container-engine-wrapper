@@ -154,11 +154,18 @@ type VolumeFilter struct {
 }
 
 type Job struct {
-	ID        uuid.UUID `json:"id"`
-	Ref       string    `json:"ref"`
-	Error     string    `json:"error"`
-	Created   Time      `json:"created"`
-	Started   *Time     `json:"started"`
-	Completed *Time     `json:"completed"`
-	Canceled  *Time     `json:"canceled"`
+	ID        uuid.UUID     `json:"id"`
+	Request   JobOrgRequest `json:"request"`
+	Result    any           `json:"result"`
+	Error     any           `json:"error"`
+	Created   Time          `json:"created"`
+	Started   *Time         `json:"started"`
+	Completed *Time         `json:"completed"`
+	Canceled  *Time         `json:"canceled"`
+}
+
+type JobOrgRequest struct {
+	Method string `json:"method"`
+	Uri    string `json:"uri"`
+	Body   any    `json:"body"`
 }
