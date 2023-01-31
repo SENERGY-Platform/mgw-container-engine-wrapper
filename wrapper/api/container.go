@@ -25,6 +25,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -96,7 +97,13 @@ func (a *Api) PostContainerStop(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	gc.Status(http.StatusOK)
+	rUri := gc.GetHeader(a.rHeaders.RequestUri)
+	uri := gc.GetHeader(a.rHeaders.Uri)
+	if rUri != "" || uri != "" {
+		gc.Redirect(http.StatusSeeOther, strings.Replace(rUri, uri, "/", 1)+"jobs/"+jID.String())
+	} else {
+		gc.Status(http.StatusOK)
+	}
 }
 
 func (a *Api) PostContainerRestart(gc *gin.Context) {
