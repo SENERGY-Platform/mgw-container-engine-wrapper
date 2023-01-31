@@ -18,6 +18,8 @@ package api
 
 import (
 	"container-engine-wrapper/wrapper/api/util"
+	"container-engine-wrapper/wrapper/handler/job"
+	"context"
 	"fmt"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper/model"
 	"github.com/gin-gonic/gin"
@@ -76,7 +78,21 @@ func (a *Api) PostContainerStart(gc *gin.Context) {
 }
 
 func (a *Api) PostContainerStop(gc *gin.Context) {
-	if err := a.ceHandler.ContainerStop(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
+	ctx, cf := context.WithCancel(a.jobHandler.Context())
+	id := gc.Param(util.ContainerParam)
+	j := job.NewJob(ctx, cf, model.JobOrgRequest{
+		Method: gc.Request.Method,
+		Uri:    gc.Request.RequestURI,
+	})
+	j.SetTarget(func() {
+		e := a.ceHandler.ContainerStop(ctx, id)
+		if e == nil {
+			e = ctx.Err()
+		}
+		j.SetResult(nil, e)
+	})
+	jID, err := a.jobHandler.Add(j)
+	if err != nil {
 		_ = gc.Error(err)
 		return
 	}
