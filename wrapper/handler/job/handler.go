@@ -6,8 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/google/uuid"
+	"sort"
 	"sync"
+	"time"
 )
 
 type Handler struct {
@@ -61,4 +64,43 @@ func (h *Handler) Range(f func(k uuid.UUID, v *Job) bool) {
 
 func (h *Handler) Context() context.Context {
 	return h.ctx
+}
+
+func check(filter itf.JobOptions, job model.Job) bool {
+	jC := time.Time(job.Created)
+	tS := filter.Since
+	tU := filter.Until
+	if !tS.IsZero() && !jC.After(tS) {
+		return false
+	}
+	if !tU.IsZero() && !jC.Before(tU) {
+		return false
+	}
+	switch filter.State {
+	case itf.JobPending:
+		if job.Started != nil || job.Canceled != nil || job.Completed != nil {
+			return false
+		}
+	case itf.JobRunning:
+		if job.Started == nil || job.Canceled != nil || job.Completed != nil {
+			return false
+		}
+	case itf.JobCanceled:
+		if job.Canceled == nil {
+			return false
+		}
+	case itf.JobCompleted:
+		if job.Completed == nil {
+			return false
+		}
+	case itf.JobError:
+		if job.Completed != nil && job.Error == nil {
+			return false
+		}
+	case itf.JobOK:
+		if job.Completed != nil && job.Error != nil {
+			return false
+		}
+	}
+	return true
 }
