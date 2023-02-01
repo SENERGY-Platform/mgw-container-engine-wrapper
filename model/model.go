@@ -146,7 +146,6 @@ type Volume struct {
 type Job struct {
 	ID        uuid.UUID     `json:"id"`
 	Request   JobOrgRequest `json:"request"`
-	Result    any           `json:"result"`
 	Error     any           `json:"error"`
 	Created   Time          `json:"created"`
 	Started   *Time         `json:"started"`
