@@ -68,7 +68,7 @@ func (a *Api) PostImage(gc *gin.Context) {
 		if e == nil {
 			e = ctx.Err()
 		}
-		j.SetResult(nil, e)
+		j.SetError(e)
 	})
 	err = a.jobHandler.Add(jID, j)
 	if err != nil {
