@@ -77,6 +77,27 @@ func (h *Handler) Context() context.Context {
 	return h.ctx
 }
 
+func (h *Handler) PurgeJobs(maxAge int64) int {
+	var l []uuid.UUID
+	tNow := time.Now().UTC()
+	h.mu.RLock()
+	for k, v := range h.jobs {
+		m := v.Meta()
+		if v.IsCanceled() || m.Completed != nil || m.Canceled != nil {
+			if tNow.Sub(time.Time(m.Created)).Microseconds() >= maxAge {
+				l = append(l, k)
+			}
+		}
+	}
+	h.mu.RUnlock()
+	h.mu.Lock()
+	for _, id := range l {
+		delete(h.jobs, id)
+	}
+	h.mu.Unlock()
+	return len(l)
+}
+
 func check(filter itf.JobOptions, job model.Job) bool {
 	jC := time.Time(job.Created)
 	tS := filter.Since
