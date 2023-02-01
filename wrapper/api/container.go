@@ -92,6 +92,7 @@ func (a *Api) PostContainerStop(gc *gin.Context) {
 		Uri:    gc.Request.RequestURI,
 	})
 	j.SetTarget(func() {
+		defer cf()
 		e := a.ceHandler.ContainerStop(ctx, cID)
 		if e == nil {
 			e = ctx.Err()
