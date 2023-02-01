@@ -147,12 +147,10 @@ func (a *Api) GetContainerLog(gc *gin.Context) {
 	}
 	logOptions := itf.LogOptions{MaxLines: query.MaxLines}
 	if query.Since > 0 {
-		since := model.Time(time.UnixMicro(query.Since))
-		logOptions.Since = &since
+		logOptions.Since = time.UnixMicro(query.Since)
 	}
 	if query.Until > 0 {
-		until := model.Time(time.UnixMicro(query.Until))
-		logOptions.Until = &until
+		logOptions.Until = time.UnixMicro(query.Until)
 	}
 	rc, err := a.ceHandler.ContainerLog(gc.Request.Context(), gc.Param(util.ContainerParam), logOptions)
 	if err != nil {

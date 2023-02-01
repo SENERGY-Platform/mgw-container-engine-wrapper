@@ -263,11 +263,11 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt itf.LogOpti
 		ShowStdout: true,
 		ShowStderr: true,
 	}
-	if logOpt.Since != nil {
-		clo.Since = time.Time(*logOpt.Since).Format(time.RFC3339Nano)
+	if !logOpt.Since.IsZero() {
+		clo.Since = logOpt.Since.Format(time.RFC3339Nano)
 	}
-	if logOpt.Until != nil {
-		clo.Until = time.Time(*logOpt.Until).Format(time.RFC3339Nano)
+	if !logOpt.Until.IsZero() {
+		clo.Until = logOpt.Until.Format(time.RFC3339Nano)
 	}
 	if logOpt.MaxLines > 0 {
 		clo.Tail = strconv.FormatInt(int64(logOpt.MaxLines), 10)

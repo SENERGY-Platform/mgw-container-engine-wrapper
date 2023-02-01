@@ -23,8 +23,8 @@ type ImageFilter struct {
 
 type LogOptions struct {
 	MaxLines int
-	Since    *model.Time
-	Until    *model.Time
+	Since    time.Time
+	Until    time.Time
 }
 
 type Job struct {
