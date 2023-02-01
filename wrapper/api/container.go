@@ -146,7 +146,6 @@ func (a *Api) GetContainerLog(gc *gin.Context) {
 	}
 	logOptions := itf.LogOptions{MaxLines: query.MaxLines}
 	if query.Since > 0 {
-		fmt.Println(time.UnixMicro(query.Since))
 		since := model.Time(time.UnixMicro(query.Since))
 		logOptions.Since = &since
 	}
