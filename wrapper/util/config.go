@@ -68,6 +68,7 @@ func NewConfig(path *string) (*Config, error) {
 			MaxNumber:   10,
 			CCHInterval: 500000,
 			JHInterval:  500000,
+			MaxAge:      3600000000,
 		},
 		Header: HeaderConfig{
 			RequestUri: "X-Request-Uri",
