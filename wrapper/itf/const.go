@@ -17,13 +17,3 @@ var JobStateMap = map[JobState]struct{}{
 	JobError:     {},
 	JobOK:        {},
 }
-
-const (
-	SortAscending  SortDirection = "asc"
-	SortDescending SortDirection = "desc"
-)
-
-var SortDirectionMap = map[SortDirection]struct{}{
-	SortAscending:  {},
-	SortDescending: {},
-}
