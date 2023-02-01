@@ -23,7 +23,25 @@ import (
 	"time"
 )
 
+type Duration time.Duration
+
+type FileMode fs.FileMode
+
 type Time time.Time
+
+type IPAddr net.IP
+
+type NetworkType = string
+
+type PortType = string
+
+type MountType = string
+
+type RestartStrategy = string
+
+type ContainerState = string
+
+// Image ---------------------------------------------------------------------------------------
 
 type Image struct {
 	ID      string            `json:"id"`
@@ -35,9 +53,11 @@ type Image struct {
 	Labels  map[string]string `json:"labels"`
 }
 
-type NetworkType = string
+type ImagesPostRequest struct {
+	Image string `json:"image"`
+}
 
-type IPAddr net.IP
+// Network -------------------------------------------------------------------------------------
 
 type Subnet struct {
 	Prefix IPAddr `json:"prefix"`
@@ -52,8 +72,6 @@ type Network struct {
 	Gateway IPAddr      `json:"gateway"`
 }
 
-type PortType = string
-
 type Port struct {
 	Number   int           `json:"number"`
 	Protocol PortType      `json:"protocol"`
@@ -65,9 +83,7 @@ type PortBinding struct {
 	Interface IPAddr `json:"interface"`
 }
 
-type MountType = string
-
-type FileMode fs.FileMode
+// Container -----------------------------------------------------------------------------------
 
 type Mount struct {
 	Type     MountType         `json:"type"`
@@ -79,10 +95,6 @@ type Mount struct {
 	Mode     FileMode          `json:"mode,omitempty"`
 }
 
-type RestartStrategy = string
-
-type Duration time.Duration
-
 type RunConfig struct {
 	RestartStrategy RestartStrategy `json:"restart_strategy"`
 	Retries         *int            `json:"retries"`
@@ -91,8 +103,6 @@ type RunConfig struct {
 	StopSignal      *string         `json:"stop_signal"`
 	PseudoTTY       bool            `json:"pseudo_tty"`
 }
-
-type ContainerState = string
 
 type Container struct {
 	ID        string            `json:"id"`
@@ -123,15 +133,15 @@ type ContainersPostResponse struct {
 	ID string `json:"id"`
 }
 
-type ImagesPostRequest struct {
-	Image string `json:"image"`
-}
+// Volume --------------------------------------------------------------------------------------
 
 type Volume struct {
 	Name    string            `json:"name"`
 	Created Time              `json:"created"`
 	Labels  map[string]string `json:"labels"`
 }
+
+// Job -----------------------------------------------------------------------------------------
 
 type Job struct {
 	ID        uuid.UUID     `json:"id"`
