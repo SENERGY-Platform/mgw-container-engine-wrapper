@@ -19,9 +19,12 @@ package api
 import (
 	"container-engine-wrapper/wrapper/api/util"
 	"container-engine-wrapper/wrapper/itf"
+	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
+	"strings"
 )
 
 func (a *Api) GetImages(gc *gin.Context) {
@@ -47,11 +50,38 @@ func (a *Api) PostImage(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	if err := a.ceHandler.ImagePull(gc.Request.Context(), req.Image); err != nil {
+	img := req.Image
+	jID, err := uuid.NewRandom()
+	if err != nil {
 		_ = gc.Error(err)
 		return
 	}
-	gc.Status(http.StatusOK)
+	ctx, cf := context.WithCancel(a.jobHandler.Context())
+	j := itf.NewJob(ctx, cf, jID, model.JobOrgRequest{
+		Method: gc.Request.Method,
+		Uri:    gc.Request.RequestURI,
+		Body:   req,
+	})
+	j.SetTarget(func() {
+		defer cf()
+		e := a.ceHandler.ImagePull(ctx, img)
+		if e == nil {
+			e = ctx.Err()
+		}
+		j.SetResult(nil, e)
+	})
+	err = a.jobHandler.Add(jID, j)
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
+	rUri := gc.GetHeader(a.rHeaders.RequestUri)
+	uri := gc.GetHeader(a.rHeaders.Uri)
+	if rUri != "" || uri != "" {
+		gc.Redirect(http.StatusSeeOther, strings.Replace(rUri, uri, "/", 1)+"jobs/"+jID.String())
+	} else {
+		gc.Status(http.StatusOK)
+	}
 }
 
 func (a *Api) GetImage(gc *gin.Context) {
