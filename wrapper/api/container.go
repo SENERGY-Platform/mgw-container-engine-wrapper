@@ -80,37 +80,7 @@ func (a *Api) PostContainerStart(gc *gin.Context) {
 }
 
 func (a *Api) PostContainerStop(gc *gin.Context) {
-	cID := gc.Param(util.ContainerParam)
-	jID, err := uuid.NewRandom()
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	ctx, cf := context.WithCancel(a.jobHandler.Context())
-	j := itf.NewJob(ctx, cf, jID, model.JobOrgRequest{
-		Method: gc.Request.Method,
-		Uri:    gc.Request.RequestURI,
-	})
-	j.SetTarget(func() {
-		defer cf()
-		e := a.ceHandler.ContainerStop(ctx, cID)
-		if e == nil {
-			e = ctx.Err()
-		}
-		j.SetResult(nil, e)
-	})
-	err = a.jobHandler.Add(jID, j)
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	rUri := gc.GetHeader(a.rHeaders.RequestUri)
-	uri := gc.GetHeader(a.rHeaders.Uri)
-	if rUri != "" || uri != "" {
-		gc.Redirect(http.StatusSeeOther, strings.Replace(rUri, uri, "/", 1)+"jobs/"+jID.String())
-	} else {
-		gc.Status(http.StatusOK)
-	}
+	a.postContainerJob(gc, a.ceHandler.ContainerStop)
 }
 
 func (a *Api) PostContainerRestart(gc *gin.Context) {
