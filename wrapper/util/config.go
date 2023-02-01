@@ -63,8 +63,10 @@ func NewConfig(path *string) (*Config, error) {
 			FileMode: 0660,
 		},
 		Jobs: JobsConfig{
-			BufferSize: 50,
-			MaxNumber:  10,
+			BufferSize:  50,
+			MaxNumber:   10,
+			CCHInterval: 500000,
+			JHInterval:  500000,
 		},
 		Header: HeaderConfig{
 			RequestUri: "X-Request-Uri",
