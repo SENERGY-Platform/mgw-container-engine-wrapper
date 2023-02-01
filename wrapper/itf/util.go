@@ -66,7 +66,6 @@ func (j *Job) setCompleted() {
 
 func (j *Job) SetResult(res any, err error) {
 	j.mu.Lock()
-	j.meta.Result = res
 	if err != nil {
 		j.meta.Error = err.Error()
 	}
