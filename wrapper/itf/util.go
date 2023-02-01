@@ -3,11 +3,10 @@ package itf
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
-	"github.com/google/uuid"
 	"time"
 )
 
-func NewJob(ctx context.Context, cf context.CancelFunc, id uuid.UUID, req model.JobOrgRequest) *Job {
+func NewJob(ctx context.Context, cf context.CancelFunc, id string, req model.JobOrgRequest) *Job {
 	return &Job{
 		meta: model.Job{
 			ID:      id,

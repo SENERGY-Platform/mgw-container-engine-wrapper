@@ -57,7 +57,7 @@ func (a *Api) PostImage(gc *gin.Context) {
 		return
 	}
 	ctx, cf := context.WithCancel(a.jobHandler.Context())
-	j := itf.NewJob(ctx, cf, jID, model.JobOrgRequest{
+	j := itf.NewJob(ctx, cf, jID.String(), model.JobOrgRequest{
 		Method: gc.Request.Method,
 		Uri:    gc.Request.RequestURI,
 		Body:   req,

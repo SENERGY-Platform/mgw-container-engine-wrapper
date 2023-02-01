@@ -17,7 +17,6 @@
 package model
 
 import (
-	"github.com/google/uuid"
 	"io/fs"
 	"net"
 	"time"
@@ -144,7 +143,7 @@ type Volume struct {
 // Job -----------------------------------------------------------------------------------------
 
 type Job struct {
-	ID        uuid.UUID     `json:"id"`
+	ID        string        `json:"id"`
 	Request   JobOrgRequest `json:"request"`
 	Error     any           `json:"error"`
 	Created   Time          `json:"created"`
