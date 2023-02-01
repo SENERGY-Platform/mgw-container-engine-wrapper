@@ -2,19 +2,47 @@ package api
 
 import (
 	"container-engine-wrapper/wrapper/api/util"
-	"container-engine-wrapper/wrapper/handler/job"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"container-engine-wrapper/wrapper/itf"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
+	"time"
 )
 
 func (a *Api) GetJobs(gc *gin.Context) {
-	var jobs []model.Job
-	a.jobHandler.Range(func(_ uuid.UUID, v *job.Job) bool {
-		jobs = append(jobs, v.Meta())
-		return true
-	})
+	query := util.JobsQuery{}
+	if err := gc.ShouldBindQuery(&query); err != nil {
+		gc.Status(http.StatusBadRequest)
+		_ = gc.Error(err)
+		return
+	}
+	jobOptions := itf.JobOptions{}
+	if query.State != "" {
+		_, ok := itf.JobStateMap[query.State]
+		if !ok {
+			gc.Status(http.StatusBadRequest)
+			_ = gc.Error(fmt.Errorf("unknown job state '%s'", query.State))
+			return
+		}
+		jobOptions.State = query.State
+	}
+	if query.Sort != "" {
+		_, ok := itf.SortDirectionMap[query.Sort]
+		if !ok {
+			gc.Status(http.StatusBadRequest)
+			_ = gc.Error(fmt.Errorf("unknown sort direction '%s'", query.Sort))
+			return
+		}
+		jobOptions.Sort = query.Sort
+	}
+	if query.Since > 0 {
+		jobOptions.Since = time.UnixMicro(query.Since)
+	}
+	if query.Until > 0 {
+		jobOptions.Until = time.UnixMicro(query.Until)
+	}
+	jobs := a.jobHandler.List(jobOptions)
 	gc.JSON(http.StatusOK, jobs)
 }
 
