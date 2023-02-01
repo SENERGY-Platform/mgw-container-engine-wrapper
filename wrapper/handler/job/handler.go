@@ -63,11 +63,11 @@ func (h *Handler) List(filter itf.JobOptions) []model.Job {
 	}
 	if filter.SortDesc {
 		sort.Slice(jobs, func(i, j int) bool {
-			return time.Time(jobs[i].Created).Before(time.Time(jobs[j].Created))
+			return time.Time(jobs[i].Created).After(time.Time(jobs[j].Created))
 		})
 	} else {
 		sort.Slice(jobs, func(i, j int) bool {
-			return time.Time(jobs[i].Created).After(time.Time(jobs[j].Created))
+			return time.Time(jobs[i].Created).Before(time.Time(jobs[j].Created))
 		})
 	}
 	return jobs
