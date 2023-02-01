@@ -18,14 +18,14 @@ func (a *Api) GetJobs(gc *gin.Context) {
 		return
 	}
 	jobOptions := itf.JobOptions{SortDesc: query.SortDesc}
-	if query.State != "" {
-		_, ok := itf.JobStateMap[query.State]
+	if query.Status != "" {
+		_, ok := itf.JobStateMap[query.Status]
 		if !ok {
 			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(fmt.Errorf("unknown job state '%s'", query.State))
+			_ = gc.Error(fmt.Errorf("unknown job state '%s'", query.Status))
 			return
 		}
-		jobOptions.State = query.State
+		jobOptions.Status = query.Status
 	}
 	if query.Since > 0 {
 		jobOptions.Since = time.UnixMicro(query.Since)

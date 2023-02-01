@@ -87,7 +87,7 @@ func check(filter itf.JobOptions, job model.Job) bool {
 	if !tU.IsZero() && !jC.Before(tU) {
 		return false
 	}
-	switch filter.State {
+	switch filter.Status {
 	case itf.JobPending:
 		if job.Started != nil || job.Canceled != nil || job.Completed != nil {
 			return false

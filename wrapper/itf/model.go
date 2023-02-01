@@ -35,12 +35,12 @@ type Job struct {
 	cFunc context.CancelFunc
 }
 
-type JobState = string
+type JobStatus = string
 
 type SortDirection = string
 
 type JobOptions struct {
-	State    JobState
+	Status   JobStatus
 	SortDesc bool
 	Since    time.Time
 	Until    time.Time

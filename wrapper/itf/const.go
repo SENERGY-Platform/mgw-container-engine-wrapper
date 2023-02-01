@@ -1,15 +1,15 @@
 package itf
 
 const (
-	JobPending   JobState = "pending"
-	JobRunning   JobState = "running"
-	JobCanceled  JobState = "canceled"
-	JobCompleted JobState = "completed"
-	JobError     JobState = "error"
-	JobOK        JobState = "ok"
+	JobPending   JobStatus = "pending"
+	JobRunning   JobStatus = "running"
+	JobCanceled  JobStatus = "canceled"
+	JobCompleted JobStatus = "completed"
+	JobError     JobStatus = "error"
+	JobOK        JobStatus = "ok"
 )
 
-var JobStateMap = map[JobState]struct{}{
+var JobStateMap = map[JobStatus]struct{}{
 	JobPending:   {},
 	JobRunning:   {},
 	JobCanceled:  {},
