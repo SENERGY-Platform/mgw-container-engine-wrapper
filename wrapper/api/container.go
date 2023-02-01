@@ -84,11 +84,7 @@ func (a *Api) PostContainerStop(gc *gin.Context) {
 }
 
 func (a *Api) PostContainerRestart(gc *gin.Context) {
-	if err := a.ceHandler.ContainerRestart(gc.Request.Context(), gc.Param(util.ContainerParam)); err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.Status(http.StatusOK)
+	a.postContainerJob(gc, a.ceHandler.ContainerRestart)
 }
 
 func (a *Api) DeleteContainer(gc *gin.Context) {
