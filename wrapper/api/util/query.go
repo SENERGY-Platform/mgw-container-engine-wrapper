@@ -37,8 +37,8 @@ type VolumesQuery struct {
 }
 
 type JobsQuery struct {
-	State string `form:"state"`
-	Sort  string `form:"sort"`
-	Since int64  `form:"since"`
-	Until int64  `form:"until"`
+	State    string `form:"state"`
+	SortDesc bool   `form:"sort_desc"`
+	Since    int64  `form:"since"`
+	Until    int64  `form:"until"`
 }

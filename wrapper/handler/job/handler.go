@@ -61,7 +61,7 @@ func (h *Handler) List(filter itf.JobOptions) []model.Job {
 			jobs = append(jobs, v.Meta())
 		}
 	}
-	if filter.Sort == itf.SortDescending {
+	if filter.SortDesc {
 		sort.Slice(jobs, func(i, j int) bool {
 			return time.Time(jobs[i].Created).Before(time.Time(jobs[j].Created))
 		})

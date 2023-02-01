@@ -17,7 +17,7 @@ func (a *Api) GetJobs(gc *gin.Context) {
 		_ = gc.Error(err)
 		return
 	}
-	jobOptions := itf.JobOptions{}
+	jobOptions := itf.JobOptions{SortDesc: query.SortDesc}
 	if query.State != "" {
 		_, ok := itf.JobStateMap[query.State]
 		if !ok {
@@ -26,15 +26,6 @@ func (a *Api) GetJobs(gc *gin.Context) {
 			return
 		}
 		jobOptions.State = query.State
-	}
-	if query.Sort != "" {
-		_, ok := itf.SortDirectionMap[query.Sort]
-		if !ok {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(fmt.Errorf("unknown sort direction '%s'", query.Sort))
-			return
-		}
-		jobOptions.Sort = query.Sort
 	}
 	if query.Since > 0 {
 		jobOptions.Since = time.UnixMicro(query.Since)

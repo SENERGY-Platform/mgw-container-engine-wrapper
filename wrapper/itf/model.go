@@ -40,8 +40,8 @@ type JobState = string
 type SortDirection = string
 
 type JobOptions struct {
-	State JobState
-	Sort  SortDirection
-	Since time.Time
-	Until time.Time
+	State    JobState
+	SortDesc bool
+	Since    time.Time
+	Until    time.Time
 }
