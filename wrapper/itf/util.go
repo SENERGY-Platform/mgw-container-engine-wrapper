@@ -1,23 +1,16 @@
-package job
+package itf
 
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
-	"sync"
+	"github.com/google/uuid"
 	"time"
 )
 
-type Job struct {
-	mu    sync.RWMutex
-	meta  model.Job
-	tFunc func()
-	ctx   context.Context
-	cFunc context.CancelFunc
-}
-
-func NewJob(ctx context.Context, cf context.CancelFunc, req model.JobOrgRequest) *Job {
+func NewJob(ctx context.Context, cf context.CancelFunc, id uuid.UUID, req model.JobOrgRequest) *Job {
 	return &Job{
 		meta: model.Job{
+			ID:      id,
 			Request: req,
 			Created: model.Time(time.Now().UTC()),
 		},

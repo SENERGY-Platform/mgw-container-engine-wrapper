@@ -1,6 +1,7 @@
 package job
 
 import (
+	"container-engine-wrapper/wrapper/itf"
 	"context"
 	"fmt"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
@@ -12,14 +13,14 @@ type Handler struct {
 	mu        sync.RWMutex
 	ctx       context.Context
 	ccHandler *ccjh.Handler
-	jobs      map[uuid.UUID]*Job
+	jobs      map[uuid.UUID]*itf.Job
 }
 
 func New(ctx context.Context, ccHandler *ccjh.Handler) *Handler {
 	return &Handler{
 		ctx:       ctx,
 		ccHandler: ccHandler,
-		jobs:      make(map[uuid.UUID]*Job),
+		jobs:      make(map[uuid.UUID]*itf.Job),
 	}
 }
 
@@ -39,7 +40,7 @@ func (h *Handler) Add(job *Job) (id uuid.UUID, err error) {
 	return
 }
 
-func (h *Handler) Get(id uuid.UUID) (*Job, error) {
+func (h *Handler) Get(id uuid.UUID) (*itf.Job, error) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	j, ok := h.jobs[id]

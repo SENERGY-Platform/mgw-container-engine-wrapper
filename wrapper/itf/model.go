@@ -1,6 +1,11 @@
 package itf
 
-import "github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+import (
+	"context"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"sync"
+	"time"
+)
 
 type ContainerFilter struct {
 	Name   string
@@ -20,4 +25,23 @@ type LogOptions struct {
 	MaxLines int
 	Since    *model.Time
 	Until    *model.Time
+}
+
+type Job struct {
+	mu    sync.RWMutex
+	meta  model.Job
+	tFunc func()
+	ctx   context.Context
+	cFunc context.CancelFunc
+}
+
+type JobState = string
+
+type SortDirection = string
+
+type JobOptions struct {
+	State JobState
+	Sort  SortDirection
+	Since time.Time
+	Until time.Time
 }

@@ -17,7 +17,6 @@
 package itf
 
 import (
-	"container-engine-wrapper/wrapper/handler/job"
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/google/uuid"
@@ -48,8 +47,8 @@ type ContainerEngineHandler interface {
 }
 
 type JobHandler interface {
-	Add(job *job.Job) (id uuid.UUID, err error)
-	Get(id uuid.UUID) (*job.Job, error)
-	Range(f func(k uuid.UUID, v *job.Job) bool)
+	Add(id uuid.UUID, job *Job) error
+	Get(id uuid.UUID) (*Job, error)
+	List(filter JobOptions) []model.Job
 	Context() context.Context
 }
