@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"strings"
@@ -79,20 +80,25 @@ func (a *Api) PostContainerStart(gc *gin.Context) {
 }
 
 func (a *Api) PostContainerStop(gc *gin.Context) {
+	cID := gc.Param(util.ContainerParam)
+	jID, err := uuid.NewRandom()
+	if err != nil {
+		_ = gc.Error(err)
+		return
+	}
 	ctx, cf := context.WithCancel(a.jobHandler.Context())
-	id := gc.Param(util.ContainerParam)
-	j := job.NewJob(ctx, cf, model.JobOrgRequest{
+	j := itf.NewJob(ctx, cf, jID, model.JobOrgRequest{
 		Method: gc.Request.Method,
 		Uri:    gc.Request.RequestURI,
 	})
 	j.SetTarget(func() {
-		e := a.ceHandler.ContainerStop(ctx, id)
+		e := a.ceHandler.ContainerStop(ctx, cID)
 		if e == nil {
 			e = ctx.Err()
 		}
 		j.SetResult(nil, e)
 	})
-	jID, err := a.jobHandler.Add(j)
+	err = a.jobHandler.Add(jID, j)
 	if err != nil {
 		_ = gc.Error(err)
 		return
