@@ -3,6 +3,7 @@ package job
 import (
 	"container-engine-wrapper/wrapper/itf"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
 	"github.com/google/uuid"
@@ -24,20 +25,18 @@ func New(ctx context.Context, ccHandler *ccjh.Handler) *Handler {
 	}
 }
 
-func (h *Handler) Add(job *Job) (id uuid.UUID, err error) {
-	id, err = uuid.NewRandom()
-	if err != nil {
-		return
-	}
-	job.meta.ID = id
-	err = h.ccHandler.Add(job)
-	if err != nil {
-		return
-	}
+func (h *Handler) Add(id uuid.UUID, job *itf.Job) error {
 	h.mu.Lock()
-	h.jobs[job.meta.ID] = job
-	h.mu.Unlock()
-	return
+	defer h.mu.Unlock()
+	if _, ok := h.jobs[id]; ok {
+		return errors.New("duplicate job id")
+	}
+	err := h.ccHandler.Add(job)
+	if err != nil {
+		return err
+	}
+	h.jobs[id] = job
+	return nil
 }
 
 func (h *Handler) Get(id uuid.UUID) (*itf.Job, error) {
