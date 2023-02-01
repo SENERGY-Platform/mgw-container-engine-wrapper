@@ -35,3 +35,10 @@ type ImagesQuery struct {
 type VolumesQuery struct {
 	Label []string `form:"label"`
 }
+
+type JobsQuery struct {
+	State string `form:"state"`
+	Sort  string `form:"sort"`
+	Since int64  `form:"since"`
+	Until int64  `form:"until"`
+}
