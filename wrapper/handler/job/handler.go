@@ -52,14 +52,25 @@ func (h *Handler) Get(id uuid.UUID) (*itf.Job, error) {
 	return j, nil
 }
 
-func (h *Handler) Range(f func(k uuid.UUID, v *Job) bool) {
+func (h *Handler) List(filter itf.JobOptions) []model.Job {
+	var jobs []model.Job
 	h.mu.RLock()
-	for k, v := range h.jobs {
-		if !f(k, v) {
-			break
+	defer h.mu.RUnlock()
+	for _, v := range h.jobs {
+		if check(filter, v.Meta()) {
+			jobs = append(jobs, v.Meta())
 		}
 	}
-	h.mu.RUnlock()
+	if filter.Sort == itf.SortDescending {
+		sort.Slice(jobs, func(i, j int) bool {
+			return time.Time(jobs[i].Created).Before(time.Time(jobs[j].Created))
+		})
+	} else {
+		sort.Slice(jobs, func(i, j int) bool {
+			return time.Time(jobs[i].Created).After(time.Time(jobs[j].Created))
+		})
+	}
+	return jobs
 }
 
 func (h *Handler) Context() context.Context {
