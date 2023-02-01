@@ -29,10 +29,11 @@ type HeaderConfig struct {
 }
 
 type JobsConfig struct {
-	BufferSize  int `json:"buffer_size" env_var:"JOBS_BUFFER_SIZE"`
-	MaxNumber   int `json:"max_number" env_var:"JOBS_MAX_NUMBER"`
-	CCHInterval int `json:"cch_interval" env_var:"JOBS_CCH_INTERVAL"`
-	JHInterval  int `json:"jh_interval" env_var:"JOBS_JH_INTERVAL"`
+	BufferSize  int   `json:"buffer_size" env_var:"JOBS_BUFFER_SIZE"`
+	MaxNumber   int   `json:"max_number" env_var:"JOBS_MAX_NUMBER"`
+	CCHInterval int   `json:"cch_interval" env_var:"JOBS_CCH_INTERVAL"`
+	JHInterval  int   `json:"jh_interval" env_var:"JOBS_JH_INTERVAL"`
+	MaxAge      int64 `json:"max_age" env_var:"JOBS_MAX_AGE"`
 }
 
 type SocketConfig struct {
