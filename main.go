@@ -116,7 +116,7 @@ func main() {
 		return
 	}
 
-	err = ccHandler.RunAsync(config.Jobs.MaxNumber, 50*time.Millisecond)
+	err = ccHandler.RunAsync(config.Jobs.MaxNumber, time.Duration(config.Jobs.JHInterval*1000))
 	if err != nil {
 		srv_base.Logger.Error(err)
 		return
