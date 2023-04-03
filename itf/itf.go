@@ -52,3 +52,29 @@ type JobHandler interface {
 	List(filter JobOptions) []model.Job
 	Context() context.Context
 }
+
+type Api interface {
+	GetContainers(ctx context.Context, filter ContainerFilter) ([]model.Container, error)
+	GetContainer(ctx context.Context, id string) (model.Container, error)
+	CreateContainer(ctx context.Context, container model.Container) (id string, err error)
+	StartContainer(ctx context.Context, id string) error
+	StopContainer(ctx context.Context, id string) (jobId string, err error)
+	RestartContainer(ctx context.Context, id string) (jobId string, err error)
+	RemoveContainer(ctx context.Context, id string) error
+	GetContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
+	GetImages(ctx context.Context, filter ImageFilter) ([]model.Image, error)
+	GetImage(ctx context.Context, id string) (model.Image, error)
+	AddImage(ctx context.Context, id string) (jobId string, err error)
+	RemoveImage(ctx context.Context, id string) error
+	GetNetworks(ctx context.Context) ([]model.Network, error)
+	GetNetwork(ctx context.Context, id string) (model.Network, error)
+	CreateNetwork(ctx context.Context, net model.Network) error
+	RemoveNetwork(ctx context.Context, id string) error
+	GetVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
+	GetVolume(ctx context.Context, id string) (model.Volume, error)
+	CreateVolume(ctx context.Context, vol model.Volume) error
+	RemoveVolume(ctx context.Context, id string) error
+	GetJobs(filter JobOptions) []model.Job
+	GetJob(id string) (*Job, error)
+	CancelJob(id string) error
+}
