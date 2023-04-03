@@ -18,7 +18,7 @@ package api
 
 import (
 	"container-engine-wrapper/wrapper/api/util"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"container-engine-wrapper/wrapper/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

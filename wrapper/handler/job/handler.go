@@ -2,11 +2,11 @@ package job
 
 import (
 	"container-engine-wrapper/wrapper/itf"
+	"container-engine-wrapper/wrapper/model"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/google/uuid"
 	"sort"
 	"sync"

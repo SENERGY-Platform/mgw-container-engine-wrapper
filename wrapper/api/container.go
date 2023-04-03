@@ -19,9 +19,9 @@ package api
 import (
 	"container-engine-wrapper/wrapper/api/util"
 	"container-engine-wrapper/wrapper/itf"
+	"container-engine-wrapper/wrapper/model"
 	"context"
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"io"

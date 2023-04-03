@@ -17,8 +17,8 @@
 package itf
 
 import (
+	"container-engine-wrapper/wrapper/model"
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/google/uuid"
 	"io"
 )
