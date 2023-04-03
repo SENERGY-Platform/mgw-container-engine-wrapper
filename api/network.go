@@ -17,8 +17,8 @@
 package api
 
 import (
-	"container-engine-wrapper/wrapper/api/util"
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/api/util"
+	"container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

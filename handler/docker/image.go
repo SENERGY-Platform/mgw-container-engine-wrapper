@@ -17,9 +17,9 @@
 package docker
 
 import (
-	"container-engine-wrapper/wrapper/handler/docker/util"
-	"container-engine-wrapper/wrapper/itf"
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/handler/docker/util"
+	"container-engine-wrapper/itf"
+	"container-engine-wrapper/model"
 	"context"
 	"encoding/json"
 	"errors"

@@ -17,8 +17,8 @@
 package docker
 
 import (
-	"container-engine-wrapper/wrapper/handler/docker/util"
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/handler/docker/util"
+	"container-engine-wrapper/model"
 	"context"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"

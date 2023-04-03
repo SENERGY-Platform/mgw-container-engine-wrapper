@@ -17,10 +17,10 @@
 package main
 
 import (
-	"container-engine-wrapper/wrapper/api"
-	"container-engine-wrapper/wrapper/handler/docker"
-	"container-engine-wrapper/wrapper/handler/job"
-	"container-engine-wrapper/wrapper/util"
+	"container-engine-wrapper/api"
+	"container-engine-wrapper/handler/docker"
+	"container-engine-wrapper/handler/job"
+	"container-engine-wrapper/util"
 	"context"
 	"errors"
 	"fmt"

@@ -17,8 +17,8 @@
 package util
 
 import (
-	"container-engine-wrapper/wrapper/itf"
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/itf"
+	"container-engine-wrapper/model"
 	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"

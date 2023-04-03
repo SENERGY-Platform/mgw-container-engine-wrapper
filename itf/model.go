@@ -1,7 +1,7 @@
 package itf
 
 import (
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/model"
 	"context"
 	"sync"
 	"time"

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"container-engine-wrapper/wrapper/api/util"
-	"container-engine-wrapper/wrapper/itf"
+	"container-engine-wrapper/api/util"
+	"container-engine-wrapper/itf"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

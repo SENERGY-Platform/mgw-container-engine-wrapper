@@ -17,7 +17,7 @@
 package util
 
 import (
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"

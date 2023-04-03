@@ -17,9 +17,9 @@
 package api
 
 import (
-	"container-engine-wrapper/wrapper/api/util"
-	"container-engine-wrapper/wrapper/itf"
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/api/util"
+	"container-engine-wrapper/itf"
+	"container-engine-wrapper/model"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"

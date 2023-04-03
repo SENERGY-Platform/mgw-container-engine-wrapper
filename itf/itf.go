@@ -17,7 +17,7 @@
 package itf
 
 import (
-	"container-engine-wrapper/wrapper/model"
+	"container-engine-wrapper/model"
 	"context"
 	"github.com/google/uuid"
 	"io"
