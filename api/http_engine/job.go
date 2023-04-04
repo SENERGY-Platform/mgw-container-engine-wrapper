@@ -58,23 +58,22 @@ func getJobsH(a itf.Api) gin.HandlerFunc {
 
 func getJobH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		j, err := a.GetJob(gc.Request.Context(), gc.Param(jobIdParam))
+		job, err := a.GetJob(gc.Request.Context(), gc.Param(jobIdParam))
 		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, j.Meta())
+		gc.JSON(http.StatusOK, job)
 	}
 }
 
 func postJobCancelH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		j, err := a.GetJob(gc.Request.Context(), gc.Param(jobIdParam))
+		err := a.CancelJob(gc.Request.Context(), gc.Param(jobIdParam))
 		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		j.Cancel()
 		gc.Status(http.StatusOK)
 	}
 }
