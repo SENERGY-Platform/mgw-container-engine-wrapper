@@ -33,7 +33,7 @@ func getImagesH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		filter := itf.ImageFilter{Labels: GenLabels(query.Label)}
+		filter := model.ImageFilter{Labels: GenLabels(query.Label)}
 		images, err := a.GetImages(gc.Request.Context(), filter)
 		if err != nil {
 			_ = gc.Error(err)
@@ -45,7 +45,7 @@ func getImagesH(a itf.Api) gin.HandlerFunc {
 
 func postImageH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		req := model.ImagesPostRequest{}
+		req := model.ImageRequest{}
 		if err := gc.ShouldBindJSON(&req); err != nil {
 			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(err)

@@ -18,7 +18,6 @@ package docker
 
 import (
 	"container-engine-wrapper/handler/docker/util"
-	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
 	"fmt"
@@ -29,7 +28,7 @@ import (
 	"net/http"
 )
 
-func (d *Docker) ListVolumes(ctx context.Context, filter itf.VolumeFilter) ([]model.Volume, error) {
+func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
 	var vols []model.Volume
 	vls, err := d.client.VolumeList(ctx, util.GenVolumeFilterArgs(filter))
 	if err != nil {

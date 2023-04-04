@@ -17,7 +17,6 @@
 package util
 
 import (
-	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"fmt"
 	"github.com/docker/docker/api/types/container"
@@ -119,7 +118,7 @@ func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
 	}
 }
 
-func GenContainerFilterArgs(filter itf.ContainerFilter) filters.Args {
+func GenContainerFilterArgs(filter model.ContainerFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	if filter.Name != "" {
 		fArgs.Add("name", filter.Name)
@@ -131,13 +130,13 @@ func GenContainerFilterArgs(filter itf.ContainerFilter) filters.Args {
 	return fArgs
 }
 
-func GenImageFilterArgs(filter itf.ImageFilter) filters.Args {
+func GenImageFilterArgs(filter model.ImageFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs
 }
 
-func GenVolumeFilterArgs(filter itf.VolumeFilter) filters.Args {
+func GenVolumeFilterArgs(filter model.VolumeFilter) filters.Args {
 	fArgs := filters.NewArgs()
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs

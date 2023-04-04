@@ -24,9 +24,9 @@ import (
 
 type ContainerEngineHandler interface {
 	ListNetworks(ctx context.Context) ([]model.Network, error)
-	ListContainers(ctx context.Context, filter ContainerFilter) ([]model.Container, error)
-	ListImages(ctx context.Context, filter ImageFilter) ([]model.Image, error)
-	ListVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
+	ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error)
+	ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
+	ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
 	NetworkInfo(ctx context.Context, id string) (model.Network, error)
 	NetworkCreate(ctx context.Context, net model.Network) error
 	NetworkRemove(ctx context.Context, id string) error
@@ -36,7 +36,7 @@ type ContainerEngineHandler interface {
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
+	ContainerLog(ctx context.Context, id string, logOptions model.LogOptions) (io.ReadCloser, error)
 	ImageInfo(ctx context.Context, id string) (model.Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
@@ -53,15 +53,15 @@ type JobHandler interface {
 }
 
 type Api interface {
-	GetContainers(ctx context.Context, filter ContainerFilter) ([]model.Container, error)
+	GetContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error)
 	GetContainer(ctx context.Context, id string) (model.Container, error)
 	CreateContainer(ctx context.Context, container model.Container) (id string, err error)
 	StartContainer(ctx context.Context, id string) error
 	StopContainer(ctx context.Context, id string) (jobId string, err error)
 	RestartContainer(ctx context.Context, id string) (jobId string, err error)
 	RemoveContainer(ctx context.Context, id string) error
-	GetContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
-	GetImages(ctx context.Context, filter ImageFilter) ([]model.Image, error)
+	GetContainerLog(ctx context.Context, id string, logOptions model.LogOptions) (io.ReadCloser, error)
+	GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
 	GetImage(ctx context.Context, id string) (model.Image, error)
 	AddImage(ctx context.Context, img string) (jobId string, err error)
 	RemoveImage(ctx context.Context, id string) error
@@ -69,11 +69,11 @@ type Api interface {
 	GetNetwork(ctx context.Context, id string) (model.Network, error)
 	CreateNetwork(ctx context.Context, net model.Network) error
 	RemoveNetwork(ctx context.Context, id string) error
-	GetVolumes(ctx context.Context, filter VolumeFilter) ([]model.Volume, error)
+	GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
 	GetVolume(ctx context.Context, id string) (model.Volume, error)
 	CreateVolume(ctx context.Context, vol model.Volume) error
 	RemoveVolume(ctx context.Context, id string) error
-	GetJobs(ctx context.Context, filter JobOptions) []model.Job
-	GetJob(ctx context.Context, id string) (*Job, error)
+	GetJobs(ctx context.Context, filter model.JobOptions) []model.Job
+	GetJob(ctx context.Context, id string) (model.Job, error)
 	CancelJob(ctx context.Context, id string) error
 }

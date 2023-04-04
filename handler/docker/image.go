@@ -18,7 +18,6 @@ package docker
 
 import (
 	"container-engine-wrapper/handler/docker/util"
-	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
 	"encoding/json"
@@ -33,7 +32,7 @@ import (
 	"net/http"
 )
 
-func (d *Docker) ListImages(ctx context.Context, filter itf.ImageFilter) ([]model.Image, error) {
+func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	var images []model.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {

@@ -17,13 +17,12 @@
 package api
 
 import (
-	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
 	"fmt"
 )
 
-func (a *Api) GetImages(ctx context.Context, filter itf.ImageFilter) ([]model.Image, error) {
+func (a *Api) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	return a.ceHandler.ListImages(ctx, filter)
 }
 

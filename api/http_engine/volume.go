@@ -33,7 +33,7 @@ func getVolumesH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		volumes, err := a.GetVolumes(gc.Request.Context(), itf.VolumeFilter{Labels: GenLabels(query.Label)})
+		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: GenLabels(query.Label)})
 		if err != nil {
 			_ = gc.Error(err)
 			return

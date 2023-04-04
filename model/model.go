@@ -52,7 +52,11 @@ type Image struct {
 	Labels  map[string]string `json:"labels"`
 }
 
-type ImagesPostRequest struct {
+type ImageFilter struct {
+	Labels map[string]string
+}
+
+type ImageRequest struct {
 	Image string `json:"image"`
 }
 
@@ -128,8 +132,16 @@ type ContainerNet struct {
 	MacAddress  string   `json:"mac_address"`
 }
 
-type ContainersPostResponse struct {
-	ID string `json:"id"`
+type ContainerFilter struct {
+	Name   string
+	State  ContainerState
+	Labels map[string]string
+}
+
+type LogOptions struct {
+	MaxLines int
+	Since    time.Time
+	Until    time.Time
 }
 
 // Volume --------------------------------------------------------------------------------------
@@ -140,20 +152,27 @@ type Volume struct {
 	Labels  map[string]string `json:"labels"`
 }
 
+type VolumeFilter struct {
+	Labels map[string]string
+}
+
 // Job -----------------------------------------------------------------------------------------
 
 type Job struct {
-	ID        string        `json:"id"`
-	Request   JobOrgRequest `json:"request"`
-	Error     any           `json:"error"`
-	Created   Time          `json:"created"`
-	Started   *Time         `json:"started"`
-	Completed *Time         `json:"completed"`
-	Canceled  *Time         `json:"canceled"`
+	ID          string `json:"id"`
+	Error       any    `json:"error"`
+	Created     Time   `json:"created"`
+	Started     *Time  `json:"started"`
+	Completed   *Time  `json:"completed"`
+	Canceled    *Time  `json:"canceled"`
+	Description string `json:"description"`
 }
 
-type JobOrgRequest struct {
-	Method string `json:"method"`
-	Uri    string `json:"uri"`
-	Body   any    `json:"body"`
+type JobStatus = string
+
+type JobOptions struct {
+	Status   JobStatus
+	SortDesc bool
+	Since    time.Time
+	Until    time.Time
 }

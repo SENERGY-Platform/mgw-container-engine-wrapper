@@ -39,7 +39,7 @@ func getContainersH(a itf.Api) gin.HandlerFunc {
 			_ = c.Error(err)
 			return
 		}
-		filter := itf.ContainerFilter{Name: query.Name}
+		filter := model.ContainerFilter{Name: query.Name}
 		if query.State != "" {
 			_, ok := model.ContainerStateMap[query.State]
 			if !ok {
@@ -105,7 +105,7 @@ func getContainerLogH(a itf.Api) gin.HandlerFunc {
 			_ = c.Error(err)
 			return
 		}
-		logOptions := itf.LogOptions{MaxLines: query.MaxLines}
+		logOptions := model.LogOptions{MaxLines: query.MaxLines}
 		if query.Since > 0 {
 			logOptions.Since = time.UnixMicro(query.Since)
 		}
@@ -161,7 +161,7 @@ func postContainerCtrlH(a itf.Api) gin.HandlerFunc {
 			return
 		}
 		ctx, cf := context.WithCancel(jh.Context())
-		j := itf.NewJob(ctx, cf, jId.String(), model.JobOrgRequest{
+		j := model.NewJob(ctx, cf, jId.String(), model.JobOrgRequest{
 			Method: gc.Request.Method,
 			Uri:    gc.Request.RequestURI,
 		})

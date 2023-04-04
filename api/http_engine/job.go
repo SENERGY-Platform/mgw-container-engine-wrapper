@@ -2,6 +2,7 @@ package http_engine
 
 import (
 	"container-engine-wrapper/itf"
+	"container-engine-wrapper/model"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,9 +19,9 @@ func getJobsH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		jobOptions := itf.JobOptions{SortDesc: query.SortDesc}
+		jobOptions := model.JobOptions{SortDesc: query.SortDesc}
 		if query.Status != "" {
-			_, ok := itf.JobStateMap[query.Status]
+			_, ok := model.JobStateMap[query.Status]
 			if !ok {
 				gc.Status(http.StatusBadRequest)
 				_ = gc.Error(fmt.Errorf("unknown job state '%s'", query.Status))

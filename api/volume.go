@@ -17,12 +17,11 @@
 package api
 
 import (
-	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
 )
 
-func (a *Api) GetVolumes(ctx context.Context, filter itf.VolumeFilter) ([]model.Volume, error) {
+func (a *Api) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
 	return a.ceHandler.ListVolumes(ctx, filter)
 }
 
