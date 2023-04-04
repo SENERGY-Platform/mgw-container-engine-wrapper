@@ -28,18 +28,6 @@ type FileMode fs.FileMode
 
 type Time time.Time
 
-type IPAddr net.IP
-
-type NetworkType = string
-
-type PortType = string
-
-type MountType = string
-
-type RestartStrategy = string
-
-type ContainerState = string
-
 // Image ---------------------------------------------------------------------------------------
 
 type Image struct {
@@ -62,10 +50,14 @@ type ImageRequest struct {
 
 // Network -------------------------------------------------------------------------------------
 
+type IPAddr net.IP
+
 type Subnet struct {
 	Prefix IPAddr `json:"prefix"`
 	Bits   int    `json:"bits"`
 }
+
+type NetworkType = string
 
 type Network struct {
 	ID      string      `json:"id"`
@@ -74,6 +66,8 @@ type Network struct {
 	Subnet  Subnet      `json:"subnet"`
 	Gateway IPAddr      `json:"gateway"`
 }
+
+type PortType = string
 
 type Port struct {
 	Number   int           `json:"number"`
@@ -88,6 +82,8 @@ type PortBinding struct {
 
 // Container -----------------------------------------------------------------------------------
 
+type MountType = string
+
 type Mount struct {
 	Type     MountType         `json:"type"`
 	Source   string            `json:"source"`
@@ -98,6 +94,8 @@ type Mount struct {
 	Mode     FileMode          `json:"mode,omitempty"`
 }
 
+type RestartStrategy = string
+
 type RunConfig struct {
 	RestartStrategy RestartStrategy `json:"restart_strategy"`
 	Retries         *int            `json:"retries"`
@@ -106,6 +104,8 @@ type RunConfig struct {
 	StopSignal      *string         `json:"stop_signal"`
 	PseudoTTY       bool            `json:"pseudo_tty"`
 }
+
+type ContainerState = string
 
 type Container struct {
 	ID        string            `json:"id"`
