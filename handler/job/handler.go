@@ -60,8 +60,12 @@ func (h *Handler) Create(desc string, tFunc func(context.Context, context.Cancel
 		cFunc: cf,
 	}
 	h.mu.Lock()
-	h.jobs[id] = &j
 	defer h.mu.Unlock()
+	err = h.ccHandler.Add(&j)
+	if err != nil {
+		return "", err
+	}
+	h.jobs[id] = &j
 	return id, nil
 }
 
