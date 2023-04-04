@@ -19,7 +19,6 @@ package itf
 import (
 	"container-engine-wrapper/model"
 	"context"
-	"github.com/google/uuid"
 	"io"
 )
 
@@ -47,10 +46,10 @@ type ContainerEngineHandler interface {
 }
 
 type JobHandler interface {
-	Add(id uuid.UUID, job *Job) error
-	Get(id uuid.UUID) (*Job, error)
-	List(filter JobOptions) []model.Job
-	Context() context.Context
+	List(filter model.JobOptions) []model.Job
+	Get(id string) (model.Job, error)
+	Create(desc string, tFunc func(context.Context, context.CancelFunc) error) (string, error)
+	Cancel(id string) error
 }
 
 type Api interface {
