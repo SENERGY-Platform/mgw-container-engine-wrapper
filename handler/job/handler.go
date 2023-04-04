@@ -3,9 +3,9 @@ package job
 import (
 	"container-engine-wrapper/model"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
+	"github.com/google/uuid"
 	"sort"
 	"sync"
 	"time"
@@ -15,39 +15,59 @@ type Handler struct {
 	mu        sync.RWMutex
 	ctx       context.Context
 	ccHandler *ccjh.Handler
-	jobs      map[string]*model.JobInternal
+	jobs      map[string]*job
 }
 
 func New(ctx context.Context, ccHandler *ccjh.Handler) *Handler {
 	return &Handler{
 		ctx:       ctx,
 		ccHandler: ccHandler,
-		jobs:      make(map[string]*model.JobInternal),
+		jobs:      make(map[string]*job),
 	}
 }
 
-func (h *Handler) Add(id string, job *model.JobInternal) error {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	if _, ok := h.jobs[id]; ok {
-		return errors.New("duplicate job id")
-	}
-	err := h.ccHandler.Add(job)
+func (h *Handler) Create(desc string, tFunc func(context.Context, context.CancelFunc) error) (string, error) {
+	uid, err := uuid.NewRandom()
 	if err != nil {
-		return err
+		return "", err
 	}
-	h.jobs[id] = job
-	return nil
+	id := uid.String()
+	ctx, cf := context.WithCancel(h.ctx)
+	j := job{
+		meta: model.Job{
+			ID:          id,
+			Created:     model.Time(time.Now().UTC()),
+			Description: desc,
+		},
+		tFunc: tFunc,
+		ctx:   ctx,
+		cFunc: cf,
+	}
+	h.mu.Lock()
+	h.jobs[id] = &j
+	defer h.mu.Unlock()
+	return id, nil
 }
 
-func (h *Handler) Get(id string) (*model.JobInternal, error) {
+func (h *Handler) Get(id string) (model.Job, error) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	j, ok := h.jobs[id]
 	if !ok {
-		return nil, fmt.Errorf("%s not found", id)
+		return model.Job{}, fmt.Errorf("%s not found", id)
 	}
-	return j, nil
+	return j.Meta(), nil
+}
+
+func (h *Handler) Cancel(id string) error {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	j, ok := h.jobs[id]
+	if !ok {
+		return fmt.Errorf("%s not found", id)
+	}
+	j.Cancel()
+	return nil
 }
 
 func (h *Handler) List(filter model.JobOptions) []model.Job {
@@ -69,10 +89,6 @@ func (h *Handler) List(filter model.JobOptions) []model.Job {
 		})
 	}
 	return jobs
-}
-
-func (h *Handler) Context() context.Context {
-	return h.ctx
 }
 
 func (h *Handler) PurgeJobs(maxAge int64) int {
