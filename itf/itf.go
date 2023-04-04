@@ -64,7 +64,7 @@ type Api interface {
 	GetContainerLog(ctx context.Context, id string, logOptions LogOptions) (io.ReadCloser, error)
 	GetImages(ctx context.Context, filter ImageFilter) ([]model.Image, error)
 	GetImage(ctx context.Context, id string) (model.Image, error)
-	AddImage(ctx context.Context, id string) (jobId string, err error)
+	AddImage(ctx context.Context, img string) (jobId string, err error)
 	RemoveImage(ctx context.Context, id string) error
 	GetNetworks(ctx context.Context) ([]model.Network, error)
 	GetNetwork(ctx context.Context, id string) (model.Network, error)
