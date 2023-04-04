@@ -22,6 +22,10 @@ import (
 	"net/http"
 )
 
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type Client struct {
 	httpClient HttpClient
 	baseUrl    string
