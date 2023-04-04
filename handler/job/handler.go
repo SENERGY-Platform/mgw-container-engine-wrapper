@@ -1,13 +1,11 @@
 package job
 
 import (
-	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
-	"github.com/google/uuid"
 	"sort"
 	"sync"
 	"time"
@@ -17,18 +15,18 @@ type Handler struct {
 	mu        sync.RWMutex
 	ctx       context.Context
 	ccHandler *ccjh.Handler
-	jobs      map[uuid.UUID]*itf.Job
+	jobs      map[string]*model.JobInternal
 }
 
 func New(ctx context.Context, ccHandler *ccjh.Handler) *Handler {
 	return &Handler{
 		ctx:       ctx,
 		ccHandler: ccHandler,
-		jobs:      make(map[uuid.UUID]*itf.Job),
+		jobs:      make(map[string]*model.JobInternal),
 	}
 }
 
-func (h *Handler) Add(id uuid.UUID, job *itf.Job) error {
+func (h *Handler) Add(id string, job *model.JobInternal) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if _, ok := h.jobs[id]; ok {
@@ -42,7 +40,7 @@ func (h *Handler) Add(id uuid.UUID, job *itf.Job) error {
 	return nil
 }
 
-func (h *Handler) Get(id uuid.UUID) (*itf.Job, error) {
+func (h *Handler) Get(id string) (*model.JobInternal, error) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	j, ok := h.jobs[id]
@@ -52,7 +50,7 @@ func (h *Handler) Get(id uuid.UUID) (*itf.Job, error) {
 	return j, nil
 }
 
-func (h *Handler) List(filter itf.JobOptions) []model.Job {
+func (h *Handler) List(filter model.JobOptions) []model.Job {
 	var jobs []model.Job
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -78,7 +76,7 @@ func (h *Handler) Context() context.Context {
 }
 
 func (h *Handler) PurgeJobs(maxAge int64) int {
-	var l []uuid.UUID
+	var l []string
 	tNow := time.Now().UTC()
 	h.mu.RLock()
 	for k, v := range h.jobs {
@@ -98,7 +96,7 @@ func (h *Handler) PurgeJobs(maxAge int64) int {
 	return len(l)
 }
 
-func check(filter itf.JobOptions, job model.Job) bool {
+func check(filter model.JobOptions, job model.Job) bool {
 	jC := time.Time(job.Created)
 	tS := filter.Since
 	tU := filter.Until
@@ -109,27 +107,27 @@ func check(filter itf.JobOptions, job model.Job) bool {
 		return false
 	}
 	switch filter.Status {
-	case itf.JobPending:
+	case model.JobPending:
 		if job.Started != nil || job.Canceled != nil || job.Completed != nil {
 			return false
 		}
-	case itf.JobRunning:
+	case model.JobRunning:
 		if job.Started == nil || job.Canceled != nil || job.Completed != nil {
 			return false
 		}
-	case itf.JobCanceled:
+	case model.JobCanceled:
 		if job.Canceled == nil {
 			return false
 		}
-	case itf.JobCompleted:
+	case model.JobCompleted:
 		if job.Completed == nil {
 			return false
 		}
-	case itf.JobError:
+	case model.JobError:
 		if job.Completed != nil && job.Error == nil {
 			return false
 		}
-	case itf.JobOK:
+	case model.JobOK:
 		if job.Completed != nil && job.Error != nil {
 			return false
 		}
