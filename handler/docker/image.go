@@ -53,7 +53,7 @@ func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]mo
 			if ti, err := util.ParseTimestamp(i.Created); err != nil {
 				srv_base.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
 			} else {
-				img.Created = ti
+				img.Created = ti.UTC()
 			}
 			img.Arch = i.Architecture
 		}
@@ -81,7 +81,7 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) 
 	if ti, err := util.ParseTimestamp(i.Created); err != nil {
 		srv_base.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
 	} else {
-		img.Created = ti
+		img.Created = ti.UTC()
 	}
 	return img, nil
 }

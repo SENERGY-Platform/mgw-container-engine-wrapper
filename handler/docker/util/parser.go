@@ -153,7 +153,7 @@ func ParseNetIPAMConfig(c []network.IPAMConfig) (s model.Subnet, gw model.IPAddr
 
 func ParseTimestamp(s string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339Nano, s)
-	return t, err
+	return t.UTC(), err
 }
 
 func ParseContainerName(s string) string {
