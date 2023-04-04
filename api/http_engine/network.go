@@ -32,7 +32,7 @@ func getNetworksH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, &networks)
+		gc.JSON(http.StatusOK, networks)
 	}
 }
 
@@ -59,7 +59,7 @@ func getNetworkH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, &network)
+		gc.JSON(http.StatusOK, network)
 	}
 }
 

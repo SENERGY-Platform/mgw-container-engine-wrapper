@@ -39,7 +39,7 @@ func getImagesH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, &images)
+		gc.JSON(http.StatusOK, images)
 	}
 }
 
@@ -67,7 +67,7 @@ func getImageH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, &image)
+		gc.JSON(http.StatusOK, image)
 	}
 }
 

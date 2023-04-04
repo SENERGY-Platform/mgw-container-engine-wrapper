@@ -38,7 +38,7 @@ func getVolumesH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, &volumes)
+		gc.JSON(http.StatusOK, volumes)
 	}
 }
 
@@ -65,7 +65,7 @@ func getVolumeH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		gc.JSON(http.StatusOK, &volume)
+		gc.JSON(http.StatusOK, volume)
 	}
 }
 

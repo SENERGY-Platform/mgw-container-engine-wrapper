@@ -55,7 +55,7 @@ func getContainersH(a itf.Api) gin.HandlerFunc {
 			_ = c.Error(err)
 			return
 		}
-		c.JSON(http.StatusOK, &containers)
+		c.JSON(http.StatusOK, containers)
 	}
 }
 
@@ -93,7 +93,7 @@ func getContainerH(a itf.Api) gin.HandlerFunc {
 			_ = c.Error(err)
 			return
 		}
-		c.JSON(http.StatusOK, &container)
+		c.JSON(http.StatusOK, container)
 	}
 }
 
