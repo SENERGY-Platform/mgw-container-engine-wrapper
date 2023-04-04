@@ -74,7 +74,7 @@ type Api interface {
 	GetVolume(ctx context.Context, id string) (model.Volume, error)
 	CreateVolume(ctx context.Context, vol model.Volume) error
 	RemoveVolume(ctx context.Context, id string) error
-	GetJobs(filter JobOptions) []model.Job
-	GetJob(id string) (*Job, error)
-	CancelJob(id string) error
+	GetJobs(ctx context.Context, filter JobOptions) []model.Job
+	GetJob(ctx context.Context, id string) (*Job, error)
+	CancelJob(ctx context.Context, id string) error
 }
