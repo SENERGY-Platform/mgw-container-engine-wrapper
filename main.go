@@ -18,6 +18,7 @@ package main
 
 import (
 	"container-engine-wrapper/api"
+	"container-engine-wrapper/api/http_engine"
 	"container-engine-wrapper/handler/docker"
 	"container-engine-wrapper/handler/job"
 	"container-engine-wrapper/util"
@@ -107,8 +108,9 @@ func main() {
 	apiEngine := gin.New()
 	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler, gin.Recovery())
 	apiEngine.UseRawPath = true
-	cewApi := api.New(dockerHandler, jobHandler, api.RequestHeaders(config.Header))
-	cewApi.SetRoutes(apiEngine)
+	cewApi := api.New(dockerHandler, jobHandler)
+
+	http_engine.SetRoutes(apiEngine, cewApi)
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {

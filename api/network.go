@@ -17,48 +17,22 @@
 package api
 
 import (
-	"container-engine-wrapper/api/util"
 	"container-engine-wrapper/model"
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"context"
 )
 
-func (a *Api) GetNetworks(gc *gin.Context) {
-	networks, err := a.ceHandler.ListNetworks(gc.Request.Context())
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, &networks)
+func (a *Api) GetNetworks(ctx context.Context) ([]model.Network, error) {
+	return a.ceHandler.ListNetworks(ctx)
 }
 
-func (a *Api) PostNetwork(gc *gin.Context) {
-	network := model.Network{}
-	if err := gc.ShouldBindJSON(&network); err != nil {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(err)
-		return
-	}
-	if err := a.ceHandler.NetworkCreate(gc.Request.Context(), network); err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.Status(http.StatusOK)
+func (a *Api) GetNetwork(ctx context.Context, id string) (model.Network, error) {
+	return a.ceHandler.NetworkInfo(ctx, id)
 }
 
-func (a *Api) GetNetwork(gc *gin.Context) {
-	network, err := a.ceHandler.NetworkInfo(gc.Request.Context(), gc.Param(util.NetworkParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, &network)
+func (a *Api) CreateNetwork(ctx context.Context, net model.Network) error {
+	return a.ceHandler.NetworkCreate(ctx, net)
 }
 
-func (a *Api) DeleteNetwork(gc *gin.Context) {
-	if err := a.ceHandler.NetworkRemove(gc.Request.Context(), gc.Param(util.NetworkParam)); err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.Status(http.StatusOK)
+func (a *Api) RemoveNetwork(ctx context.Context, id string) error {
+	return a.ceHandler.NetworkRemove(ctx, id)
 }

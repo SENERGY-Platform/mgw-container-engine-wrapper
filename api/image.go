@@ -17,47 +17,27 @@
 package api
 
 import (
-	"container-engine-wrapper/api/util"
 	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"net/http"
-	"strings"
 )
 
-func (a *Api) GetImages(gc *gin.Context) {
-	query := util.ImagesQuery{}
-	if err := gc.ShouldBindQuery(&query); err != nil {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(err)
-		return
-	}
-	filter := itf.ImageFilter{Labels: util.GenLabels(query.Label)}
-	images, err := a.ceHandler.ListImages(gc.Request.Context(), filter)
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, &images)
+func (a *Api) GetImages(ctx context.Context, filter itf.ImageFilter) ([]model.Image, error) {
+	return a.ceHandler.ListImages(ctx, filter)
 }
 
-func (a *Api) PostImage(gc *gin.Context) {
-	req := model.ImagesPostRequest{}
-	if err := gc.ShouldBindJSON(&req); err != nil {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(err)
-		return
-	}
-	img := req.Image
-	jID, err := uuid.NewRandom()
+func (a *Api) GetImage(ctx context.Context, id string) (model.Image, error) {
+	return a.ceHandler.ImageInfo(ctx, id)
+}
+
+func (a *Api) AddImage(_ context.Context, img string) (string, error) {
+	jId, err := uuid.NewRandom()
 	if err != nil {
-		_ = gc.Error(err)
-		return
+		return "", err
 	}
 	ctx, cf := context.WithCancel(a.jobHandler.Context())
-	j := itf.NewJob(ctx, cf, jID.String(), model.JobOrgRequest{
+	j := itf.NewJob(ctx, cf, jId.String(), model.JobOrgRequest{
 		Method: gc.Request.Method,
 		Uri:    gc.Request.RequestURI,
 		Body:   req,
@@ -70,33 +50,13 @@ func (a *Api) PostImage(gc *gin.Context) {
 		}
 		j.SetError(e)
 	})
-	err = a.jobHandler.Add(jID, j)
+	err = a.jobHandler.Add(jId.String(), j)
 	if err != nil {
-		_ = gc.Error(err)
-		return
+		return "", err
 	}
-	rUri := gc.GetHeader(a.rHeaders.RequestUri)
-	uri := gc.GetHeader(a.rHeaders.Uri)
-	if rUri != "" || uri != "" {
-		gc.Redirect(http.StatusSeeOther, strings.Replace(rUri, uri, "/", 1)+"jobs/"+jID.String())
-	} else {
-		gc.Status(http.StatusOK)
-	}
+	return jId.String(), nil
 }
 
-func (a *Api) GetImage(gc *gin.Context) {
-	image, err := a.ceHandler.ImageInfo(gc.Request.Context(), gc.Param(util.ImageParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, &image)
-}
-
-func (a *Api) DeleteImage(gc *gin.Context) {
-	if err := a.ceHandler.ImageRemove(gc.Request.Context(), gc.Param(util.ImageParam)); err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.Status(http.StatusOK)
+func (a *Api) RemoveImage(ctx context.Context, id string) error {
+	return a.ceHandler.ImageRemove(ctx, id)
 }

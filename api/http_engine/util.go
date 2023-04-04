@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package util
+package http_engine
 
-const (
-	ContainerParam = "container"
-	ImageParam     = "image"
-	NetworkParam   = "network"
-	VolumeParam    = "volume"
-	JobParam       = "job"
+import (
+	"strings"
 )
+
+func GenLabels(sl []string) (l map[string]string) {
+	if sl != nil && len(sl) > 0 {
+		l = make(map[string]string)
+		for _, s := range sl {
+			p := strings.Split(s, "=")
+			if len(p) > 1 {
+				l[p[0]] = p[1]
+			} else {
+				l[p[0]] = ""
+			}
+		}
+	}
+	return
+}

@@ -1,67 +1,24 @@
 package api
 
 import (
-	"container-engine-wrapper/api/util"
 	"container-engine-wrapper/itf"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"net/http"
-	"time"
+	"container-engine-wrapper/model"
+	"context"
 )
 
-func (a *Api) GetJobs(gc *gin.Context) {
-	query := util.JobsQuery{}
-	if err := gc.ShouldBindQuery(&query); err != nil {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(err)
-		return
-	}
-	jobOptions := itf.JobOptions{SortDesc: query.SortDesc}
-	if query.Status != "" {
-		_, ok := itf.JobStateMap[query.Status]
-		if !ok {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(fmt.Errorf("unknown job state '%s'", query.Status))
-			return
-		}
-		jobOptions.Status = query.Status
-	}
-	if query.Since > 0 {
-		jobOptions.Since = time.UnixMicro(query.Since)
-	}
-	if query.Until > 0 {
-		jobOptions.Until = time.UnixMicro(query.Until)
-	}
-	jobs := a.jobHandler.List(jobOptions)
-	gc.JSON(http.StatusOK, jobs)
+func (a *Api) GetJobs(_ context.Context, filter itf.JobOptions) []model.Job {
+	return a.jobHandler.List(filter)
 }
 
-func (a *Api) GetJob(gc *gin.Context) {
-	id, err := uuid.Parse(gc.Param(util.JobParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	j, err := a.jobHandler.Get(id)
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, j.Meta())
+func (a *Api) GetJob(_ context.Context, id string) (*itf.Job, error) {
+	return a.jobHandler.Get(id)
 }
 
-func (a *Api) PostJobCancel(gc *gin.Context) {
-	id, err := uuid.Parse(gc.Param(util.JobParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
+func (a *Api) CancelJob(ctx context.Context, id string) error {
 	j, err := a.jobHandler.Get(id)
 	if err != nil {
-		_ = gc.Error(err)
-		return
+		return err
 	}
 	j.Cancel()
-	gc.Status(http.StatusOK)
+	return nil
 }

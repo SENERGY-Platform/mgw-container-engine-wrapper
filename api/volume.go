@@ -17,55 +17,23 @@
 package api
 
 import (
-	"container-engine-wrapper/api/util"
 	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"context"
 )
 
-func (a *Api) GetVolumes(gc *gin.Context) {
-	query := util.VolumesQuery{}
-	if err := gc.ShouldBindQuery(&query); err != nil {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(err)
-		return
-	}
-	volumes, err := a.ceHandler.ListVolumes(gc.Request.Context(), itf.VolumeFilter{Labels: util.GenLabels(query.Label)})
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, &volumes)
+func (a *Api) GetVolumes(ctx context.Context, filter itf.VolumeFilter) ([]model.Volume, error) {
+	return a.ceHandler.ListVolumes(ctx, filter)
 }
 
-func (a *Api) PostVolume(gc *gin.Context) {
-	volume := model.Volume{}
-	if err := gc.ShouldBindJSON(&volume); err != nil {
-		gc.Status(http.StatusBadRequest)
-		_ = gc.Error(err)
-		return
-	}
-	if err := a.ceHandler.VolumeCreate(gc.Request.Context(), volume); err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.Status(http.StatusOK)
+func (a *Api) CreateVolume(ctx context.Context, vol model.Volume) error {
+	return a.ceHandler.VolumeCreate(ctx, vol)
 }
 
-func (a *Api) GetVolume(gc *gin.Context) {
-	volume, err := a.ceHandler.VolumeInfo(gc.Request.Context(), gc.Param(util.VolumeParam))
-	if err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.JSON(http.StatusOK, &volume)
+func (a *Api) GetVolume(ctx context.Context, id string) (model.Volume, error) {
+	return a.ceHandler.VolumeInfo(ctx, id)
 }
 
-func (a *Api) DeleteVolume(gc *gin.Context) {
-	if err := a.ceHandler.VolumeRemove(gc.Request.Context(), gc.Param(util.VolumeParam)); err != nil {
-		_ = gc.Error(err)
-		return
-	}
-	gc.Status(http.StatusOK)
+func (a *Api) RemoveVolume(ctx context.Context, id string) error {
+	return a.ceHandler.VolumeRemove(ctx, id)
 }
