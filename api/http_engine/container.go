@@ -19,13 +19,10 @@ package http_engine
 import (
 	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -166,36 +163,38 @@ func getContainerLogH(a itf.Api) gin.HandlerFunc {
 
 func postContainerCtrlH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		cId := gc.Param(ctrIdParam)
-		jId, err := uuid.NewRandom()
-		if err != nil {
+		var ctrlReq model.ContainerCtrlRequest
+		if err := gc.ShouldBindJSON(&ctrlReq); err != nil {
+			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(err)
 			return
 		}
-		ctx, cf := context.WithCancel(jh.Context())
-		j := model.NewJob(ctx, cf, jId.String(), model.JobOrgRequest{
-			Method: gc.Request.Method,
-			Uri:    gc.Request.RequestURI,
-		})
-		j.SetTarget(func() {
-			defer cf()
-			e := f(ctx, cId)
-			if e == nil {
-				e = ctx.Err()
+		switch ctrlReq.State {
+		case model.RunningState:
+			err := a.StartContainer(gc.Request.Context(), gc.Param(ctrIdParam))
+			if err != nil {
+				_ = gc.Error(err)
+				return
 			}
-			j.SetError(e)
-		})
-		err = jh.Add(jId, j)
-		if err != nil {
-			_ = gc.Error(err)
-			return
-		}
-		rUri := gc.GetHeader(a.rHeaders.RequestUri)
-		uri := gc.GetHeader(a.rHeaders.Uri)
-		if rUri != "" || uri != "" {
-			gc.Redirect(http.StatusSeeOther, strings.Replace(rUri, uri, "/", 1)+"jobs/"+jId.String())
-		} else {
 			gc.Status(http.StatusOK)
+		case model.StoppedState:
+			id, err := a.StopContainer(gc.Request.Context(), gc.Param(ctrIdParam))
+			if err != nil {
+				_ = gc.Error(err)
+				return
+			}
+			gc.String(http.StatusOK, id)
+		case model.RestartingState:
+			id, err := a.RestartContainer(gc.Request.Context(), gc.Param(ctrIdParam))
+			if err != nil {
+				_ = gc.Error(err)
+				return
+			}
+			gc.String(http.StatusOK, id)
+		default:
+			gc.Status(http.StatusBadRequest)
+			_ = gc.Error(fmt.Errorf("unknown container state '%s'", ctrlReq.State))
+			return
 		}
 	}
 }
