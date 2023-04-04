@@ -34,8 +34,8 @@ func New(httpClient HttpClient, baseUrl string) *Client {
 	}
 }
 
-func (c *Client) execRequest(req *http.Request) ([]byte, error) {
-	resp, err := c.httpClient.Do(req)
+func execRequest(httpClient HttpClient, req *http.Request) ([]byte, error) {
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

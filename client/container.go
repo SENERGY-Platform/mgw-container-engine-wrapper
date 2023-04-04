@@ -36,7 +36,7 @@ func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter
 	if err != nil {
 		return nil, err
 	}
-	body, err := c.execRequest(req)
+	body, err := execRequest(c.httpClient, req)
 	if err != nil {
 		return nil, err
 	}
