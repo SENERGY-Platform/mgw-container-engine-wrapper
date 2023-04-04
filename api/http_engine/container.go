@@ -31,9 +31,21 @@ import (
 
 const ctrIdParam = "c"
 
+type containersQuery struct {
+	Name  string   `form:"name"`
+	State string   `form:"state"`
+	Label []string `form:"label"`
+}
+
+type containerLogQuery struct {
+	MaxLines int   `form:"max_lines"`
+	Since    int64 `form:"since"`
+	Until    int64 `form:"until"`
+}
+
 func getContainersH(a itf.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		query := ContainersQuery{}
+		query := containersQuery{}
 		if err := c.ShouldBindQuery(&query); err != nil {
 			c.Status(http.StatusBadRequest)
 			_ = c.Error(err)
@@ -99,7 +111,7 @@ func getContainerH(a itf.Api) gin.HandlerFunc {
 
 func getContainerLogH(a itf.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		query := ContainerLogQuery{}
+		query := containerLogQuery{}
 		if err := c.ShouldBindQuery(&query); err != nil {
 			c.Status(http.StatusBadRequest)
 			_ = c.Error(err)

@@ -25,9 +25,13 @@ import (
 
 const imgIdParam = "i"
 
+type imagesQuery struct {
+	Label []string `form:"label"`
+}
+
 func getImagesH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		query := ImagesQuery{}
+		query := imagesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
 			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(err)

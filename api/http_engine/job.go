@@ -27,9 +27,16 @@ import (
 
 const jobIdParam = "j"
 
+type jobsQuery struct {
+	Status   string `form:"status"`
+	SortDesc bool   `form:"sort_desc"`
+	Since    int64  `form:"since"`
+	Until    int64  `form:"until"`
+}
+
 func getJobsH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		query := JobsQuery{}
+		query := jobsQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
 			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(err)

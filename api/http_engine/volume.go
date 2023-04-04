@@ -25,9 +25,13 @@ import (
 
 const volIdParam = "v"
 
+type volumesQuery struct {
+	Label []string `form:"label"`
+}
+
 func getVolumesH(a itf.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		query := VolumesQuery{}
+		query := volumesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
 			gc.Status(http.StatusBadRequest)
 			_ = gc.Error(err)
