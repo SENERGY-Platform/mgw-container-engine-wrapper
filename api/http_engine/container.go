@@ -72,7 +72,7 @@ func postContainerH(a itf.Api) gin.HandlerFunc {
 			_ = c.Error(err)
 			return
 		}
-		c.JSON(http.StatusOK, &model.ContainersPostResponse{ID: id})
+		c.String(http.StatusOK, id)
 	}
 }
 
