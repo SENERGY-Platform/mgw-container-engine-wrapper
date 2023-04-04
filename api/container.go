@@ -41,11 +41,25 @@ func (a *Api) StartContainer(ctx context.Context, id string) error {
 }
 
 func (a *Api) StopContainer(_ context.Context, id string) (string, error) {
-	return a.ctrlCtrAsJob(id, a.ceHandler.ContainerStop)
+	return a.jobHandler.Create(fmt.Sprintf("stop container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
+		defer cf()
+		err := a.ceHandler.ContainerStop(ctx, id)
+		if err == nil {
+			err = ctx.Err()
+		}
+		return err
+	})
 }
 
 func (a *Api) RestartContainer(_ context.Context, id string) (string, error) {
-	return a.ctrlCtrAsJob(id, a.ceHandler.ContainerRestart)
+	return a.jobHandler.Create(fmt.Sprintf("restart container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
+		defer cf()
+		err := a.ceHandler.ContainerRestart(ctx, id)
+		if err == nil {
+			err = ctx.Err()
+		}
+		return err
+	})
 }
 
 func (a *Api) RemoveContainer(ctx context.Context, id string) error {
@@ -54,29 +68,4 @@ func (a *Api) RemoveContainer(ctx context.Context, id string) error {
 
 func (a *Api) GetContainerLog(ctx context.Context, id string, logOptions itf.LogOptions) (io.ReadCloser, error) {
 	return a.ceHandler.ContainerLog(ctx, id, logOptions)
-}
-
-func (a *Api) ctrlCtrAsJob(id string, f func(context.Context, string) error) (string, error) {
-	jId, err := uuid.NewRandom()
-	if err != nil {
-		return "", err
-	}
-	ctx, cf := context.WithCancel(a.jobHandler.Context())
-	j := itf.NewJob(ctx, cf, jId.String(), model.JobOrgRequest{
-		Method: gc.Request.Method,
-		Uri:    gc.Request.RequestURI,
-	})
-	j.SetTarget(func() {
-		defer cf()
-		e := f(ctx, id)
-		if e == nil {
-			e = ctx.Err()
-		}
-		j.SetError(e)
-	})
-	err = a.jobHandler.Add(jId.String(), j)
-	if err != nil {
-		return "", err
-	}
-	return jId.String(), err
 }

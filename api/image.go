@@ -20,7 +20,7 @@ import (
 	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
 	"context"
-	"github.com/google/uuid"
+	"fmt"
 )
 
 func (a *Api) GetImages(ctx context.Context, filter itf.ImageFilter) ([]model.Image, error) {
@@ -32,29 +32,14 @@ func (a *Api) GetImage(ctx context.Context, id string) (model.Image, error) {
 }
 
 func (a *Api) AddImage(_ context.Context, img string) (string, error) {
-	jId, err := uuid.NewRandom()
-	if err != nil {
-		return "", err
-	}
-	ctx, cf := context.WithCancel(a.jobHandler.Context())
-	j := itf.NewJob(ctx, cf, jId.String(), model.JobOrgRequest{
-		Method: gc.Request.Method,
-		Uri:    gc.Request.RequestURI,
-		Body:   req,
-	})
-	j.SetTarget(func() {
+	return a.jobHandler.Create(fmt.Sprintf("add image '%s'", img), func(ctx context.Context, cf context.CancelFunc) error {
 		defer cf()
-		e := a.ceHandler.ImagePull(ctx, img)
-		if e == nil {
-			e = ctx.Err()
+		err := a.ceHandler.ImagePull(ctx, img)
+		if err == nil {
+			err = ctx.Err()
 		}
-		j.SetError(e)
+		return err
 	})
-	err = a.jobHandler.Add(jId.String(), j)
-	if err != nil {
-		return "", err
-	}
-	return jId.String(), nil
 }
 
 func (a *Api) RemoveImage(ctx context.Context, id string) error {
