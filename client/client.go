@@ -44,7 +44,7 @@ func (c *Client) execRequest(req *http.Request) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode >= 300 {
+	if resp.StatusCode >= 400 {
 		return body, errors.New(resp.Status)
 	}
 	return body, nil
