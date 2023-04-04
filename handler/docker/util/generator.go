@@ -25,7 +25,6 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
 	"net"
-	"os"
 	"strconv"
 	"time"
 )
@@ -39,9 +38,9 @@ func GenEnv(ev map[string]string) (env []string) {
 	return
 }
 
-func GenStopTimeout(d *model.Duration) *int {
+func GenStopTimeout(d *time.Duration) *int {
 	if d != nil {
-		t := int(time.Duration(*d).Seconds())
+		t := int(d.Seconds())
 		return &t
 	}
 	return nil
@@ -98,7 +97,7 @@ func GenMounts(mounts []model.Mount) ([]mount.Mount, error) {
 		case model.TmpfsMount:
 			mnt.TmpfsOptions = &mount.TmpfsOptions{
 				SizeBytes: m.Size,
-				Mode:      os.FileMode(m.Mode),
+				Mode:      m.Mode,
 			}
 		}
 		msl = append(msl, mnt)

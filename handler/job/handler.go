@@ -52,7 +52,7 @@ func (h *Handler) Create(desc string, tFunc func(context.Context, context.Cancel
 	j := job{
 		meta: model.Job{
 			ID:          id,
-			Created:     model.Time(time.Now().UTC()),
+			Created:     time.Now().UTC(),
 			Description: desc,
 		},
 		tFunc: tFunc,
@@ -101,11 +101,11 @@ func (h *Handler) List(filter model.JobFilter) []model.Job {
 	}
 	if filter.SortDesc {
 		sort.Slice(jobs, func(i, j int) bool {
-			return time.Time(jobs[i].Created).After(time.Time(jobs[j].Created))
+			return jobs[i].Created.After(jobs[j].Created)
 		})
 	} else {
 		sort.Slice(jobs, func(i, j int) bool {
-			return time.Time(jobs[i].Created).Before(time.Time(jobs[j].Created))
+			return jobs[i].Created.Before(jobs[j].Created)
 		})
 	}
 	return jobs
@@ -118,7 +118,7 @@ func (h *Handler) PurgeJobs(maxAge int64) int {
 	for k, v := range h.jobs {
 		m := v.Meta()
 		if v.IsCanceled() || m.Completed != nil || m.Canceled != nil {
-			if tNow.Sub(time.Time(m.Created)).Microseconds() >= maxAge {
+			if tNow.Sub(m.Created).Microseconds() >= maxAge {
 				l = append(l, k)
 			}
 		}
@@ -133,13 +133,10 @@ func (h *Handler) PurgeJobs(maxAge int64) int {
 }
 
 func check(filter model.JobFilter, job model.Job) bool {
-	jC := time.Time(job.Created)
-	tS := filter.Since
-	tU := filter.Until
-	if !tS.IsZero() && !jC.After(tS) {
+	if !filter.Since.IsZero() && !job.Created.After(filter.Since) {
 		return false
 	}
-	if !tU.IsZero() && !jC.Before(tU) {
+	if !filter.Until.IsZero() && !job.Created.Before(filter.Until) {
 		return false
 	}
 	switch filter.Status {

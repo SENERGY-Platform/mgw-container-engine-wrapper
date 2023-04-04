@@ -22,17 +22,11 @@ import (
 	"time"
 )
 
-type Duration time.Duration
-
-type FileMode fs.FileMode
-
-type Time time.Time
-
 // Image ---------------------------------------------------------------------------------------
 
 type Image struct {
 	ID      string            `json:"id"`
-	Created Time              `json:"created"`
+	Created time.Time         `json:"created"`
 	Size    int64             `json:"size"`
 	Arch    string            `json:"arch"`
 	Tags    []string          `json:"tags"`
@@ -91,7 +85,7 @@ type Mount struct {
 	ReadOnly bool              `json:"read_only"`
 	Labels   map[string]string `json:"labels,omitempty"`
 	Size     int64             `json:"size,omitempty"`
-	Mode     FileMode          `json:"mode,omitempty"`
+	Mode     fs.FileMode       `json:"mode,omitempty"`
 }
 
 type RestartStrategy = string
@@ -100,7 +94,7 @@ type RunConfig struct {
 	RestartStrategy RestartStrategy `json:"restart_strategy"`
 	Retries         *int            `json:"retries"`
 	RemoveAfterRun  bool            `json:"remove_after_run"`
-	StopTimeout     *Duration       `json:"stop_timeout"`
+	StopTimeout     *time.Duration  `json:"stop_timeout"`
 	StopSignal      *string         `json:"stop_signal"`
 	PseudoTTY       bool            `json:"pseudo_tty"`
 }
@@ -111,8 +105,8 @@ type Container struct {
 	ID        string            `json:"id"`
 	Name      string            `json:"name"`
 	State     ContainerState    `json:"state"`
-	Created   Time              `json:"created"`
-	Started   *Time             `json:"started"`
+	Created   time.Time         `json:"created"`
+	Started   *time.Time        `json:"started"`
 	Image     string            `json:"image"`
 	ImageID   string            `json:"image_id"`
 	EnvVars   map[string]string `json:"env_vars"`
@@ -152,7 +146,7 @@ type LogFilter struct {
 
 type Volume struct {
 	Name    string            `json:"name"`
-	Created Time              `json:"created"`
+	Created time.Time         `json:"created"`
 	Labels  map[string]string `json:"labels"`
 }
 
@@ -163,13 +157,13 @@ type VolumeFilter struct {
 // Job -----------------------------------------------------------------------------------------
 
 type Job struct {
-	ID          string `json:"id"`
-	Error       any    `json:"error"`
-	Created     Time   `json:"created"`
-	Started     *Time  `json:"started"`
-	Completed   *Time  `json:"completed"`
-	Canceled    *Time  `json:"canceled"`
-	Description string `json:"description"`
+	ID          string     `json:"id"`
+	Error       any        `json:"error"`
+	Created     time.Time  `json:"created"`
+	Started     *time.Time `json:"started"`
+	Completed   *time.Time `json:"completed"`
+	Canceled    *time.Time `json:"canceled"`
+	Description string     `json:"description"`
 }
 
 type JobStatus = string

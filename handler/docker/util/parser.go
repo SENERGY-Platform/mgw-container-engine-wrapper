@@ -110,7 +110,7 @@ func ParseMounts(mts []mount.Mount) (mounts []model.Mount) {
 				}
 				if mt.TmpfsOptions != nil {
 					m.Size = mt.TmpfsOptions.SizeBytes
-					m.Mode = model.FileMode(mt.TmpfsOptions.Mode)
+					m.Mode = mt.TmpfsOptions.Mode
 				}
 				mounts = append(mounts, m)
 			}
@@ -130,9 +130,9 @@ func ParseEnv(ev []string) (env map[string]string) {
 	return
 }
 
-func ParseStopTimeout(t *int) *model.Duration {
+func ParseStopTimeout(t *int) *time.Duration {
 	if t != nil {
-		d := model.Duration(*t * 1000000000)
+		d := time.Duration(*t) * time.Second
 		return &d
 	}
 	return nil
@@ -151,9 +151,9 @@ func ParseNetIPAMConfig(c []network.IPAMConfig) (s model.Subnet, gw model.IPAddr
 	return
 }
 
-func ParseTimestamp(s string) (model.Time, error) {
+func ParseTimestamp(s string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339Nano, s)
-	return model.Time(t), err
+	return t, err
 }
 
 func ParseContainerName(s string) string {

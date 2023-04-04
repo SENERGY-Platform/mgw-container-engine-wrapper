@@ -20,8 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"strconv"
-	"time"
 )
 
 func (p *Port) KeyStr() string {
@@ -51,48 +49,4 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 
 func (i IPAddr) MarshalJSON() ([]byte, error) {
 	return json.Marshal(net.IP(i))
-}
-
-func (d *Duration) UnmarshalJSON(b []byte) error {
-	var i int64
-	if err := json.Unmarshal(b, &i); err != nil {
-		return err
-	}
-	*d = Duration(i * 1000)
-	return nil
-}
-
-func (d Duration) MarshalJSON() ([]byte, error) {
-	return json.Marshal(time.Duration(d).Microseconds())
-}
-
-func (m *FileMode) UnmarshalJSON(b []byte) (err error) {
-	var s string
-	if err = json.Unmarshal(b, &s); err != nil {
-		return
-	}
-	i, err := strconv.ParseUint(s, 8, 32)
-	if err != nil {
-		return err
-	}
-	*m = FileMode(i)
-	return nil
-}
-
-func (m FileMode) MarshalJSON() ([]byte, error) {
-	return json.Marshal(strconv.FormatUint(uint64(m), 8))
-}
-
-func (t *Time) UnmarshalJSON(b []byte) error {
-	var i int64
-	err := json.Unmarshal(b, &i)
-	if err != nil {
-		return err
-	}
-	*t = Time(time.UnixMicro(i))
-	return nil
-}
-
-func (t Time) MarshalJSON() ([]byte, error) {
-	return json.Marshal(time.Time(t).UnixMicro())
 }

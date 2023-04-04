@@ -33,7 +33,7 @@ type job struct {
 
 func (j *job) CallTarget(cbk func()) {
 	j.mu.Lock()
-	t := model.Time(time.Now().UTC())
+	t := time.Now().UTC()
 	j.meta.Started = &t
 	j.mu.Unlock()
 	err := j.tFunc(j.ctx, j.cFunc)
@@ -41,7 +41,7 @@ func (j *job) CallTarget(cbk func()) {
 	if err != nil {
 		j.meta.Error = err.Error()
 	}
-	t = model.Time(time.Now().UTC())
+	t = time.Now().UTC()
 	j.meta.Completed = &t
 	j.mu.Unlock()
 	cbk()
@@ -56,7 +56,7 @@ func (j *job) IsCanceled() bool {
 func (j *job) Cancel() {
 	j.cFunc()
 	j.mu.Lock()
-	t := model.Time(time.Now().UTC())
+	t := time.Now().UTC()
 	j.meta.Canceled = &t
 	j.mu.Unlock()
 }
