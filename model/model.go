@@ -170,7 +170,7 @@ type Job struct {
 
 type JobStatus = string
 
-type JobOptions struct {
+type JobFilter struct {
 	Status   JobStatus
 	SortDesc bool
 	Since    time.Time

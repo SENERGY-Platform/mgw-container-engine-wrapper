@@ -86,7 +86,7 @@ func (h *Handler) Cancel(id string) error {
 	return nil
 }
 
-func (h *Handler) List(filter model.JobOptions) []model.Job {
+func (h *Handler) List(filter model.JobFilter) []model.Job {
 	var jobs []model.Job
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -128,7 +128,7 @@ func (h *Handler) PurgeJobs(maxAge int64) int {
 	return len(l)
 }
 
-func check(filter model.JobOptions, job model.Job) bool {
+func check(filter model.JobFilter, job model.Job) bool {
 	jC := time.Time(job.Created)
 	tS := filter.Since
 	tU := filter.Until

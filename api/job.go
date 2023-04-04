@@ -21,7 +21,7 @@ import (
 	"context"
 )
 
-func (a *Api) GetJobs(_ context.Context, filter model.JobOptions) []model.Job {
+func (a *Api) GetJobs(_ context.Context, filter model.JobFilter) []model.Job {
 	return a.jobHandler.List(filter)
 }
 

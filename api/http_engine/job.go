@@ -35,7 +35,7 @@ func getJobsH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		jobOptions := model.JobOptions{SortDesc: query.SortDesc}
+		jobOptions := model.JobFilter{SortDesc: query.SortDesc}
 		if query.Status != "" {
 			_, ok := model.JobStateMap[query.Status]
 			if !ok {
