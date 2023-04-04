@@ -257,7 +257,7 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogOptions) (io.ReadCloser, error) {
+func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFilter) (io.ReadCloser, error) {
 	clo := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,

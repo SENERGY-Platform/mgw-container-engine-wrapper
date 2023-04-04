@@ -105,7 +105,7 @@ func getContainerLogH(a itf.Api) gin.HandlerFunc {
 			_ = c.Error(err)
 			return
 		}
-		logOptions := model.LogOptions{MaxLines: query.MaxLines}
+		logOptions := model.LogFilter{MaxLines: query.MaxLines}
 		if query.Since > 0 {
 			logOptions.Since = time.UnixMicro(query.Since)
 		}

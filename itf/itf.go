@@ -36,7 +36,7 @@ type ContainerEngineHandler interface {
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error
-	ContainerLog(ctx context.Context, id string, logOptions model.LogOptions) (io.ReadCloser, error)
+	ContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error)
 	ImageInfo(ctx context.Context, id string) (model.Image, error)
 	ImagePull(ctx context.Context, id string) error
 	ImageRemove(ctx context.Context, id string) error
@@ -60,7 +60,7 @@ type Api interface {
 	StopContainer(ctx context.Context, id string) (jobId string, err error)
 	RestartContainer(ctx context.Context, id string) (jobId string, err error)
 	RemoveContainer(ctx context.Context, id string) error
-	GetContainerLog(ctx context.Context, id string, logOptions model.LogOptions) (io.ReadCloser, error)
+	GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error)
 	GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
 	GetImage(ctx context.Context, id string) (model.Image, error)
 	AddImage(ctx context.Context, img string) (jobId string, err error)

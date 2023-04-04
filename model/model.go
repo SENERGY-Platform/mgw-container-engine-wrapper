@@ -138,7 +138,7 @@ type ContainerFilter struct {
 	Labels map[string]string
 }
 
-type LogOptions struct {
+type LogFilter struct {
 	MaxLines int
 	Since    time.Time
 	Until    time.Time
