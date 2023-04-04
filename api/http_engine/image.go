@@ -19,11 +19,8 @@ package http_engine
 import (
 	"container-engine-wrapper/itf"
 	"container-engine-wrapper/model"
-	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
-	"strings"
 )
 
 const imgIdParam = "i"
@@ -54,38 +51,12 @@ func postImageH(a itf.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		img := req.Image
-		jID, err := uuid.NewRandom()
+		id, err := a.AddImage(gc.Request.Context(), req.Image)
 		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		ctx, cf := context.WithCancel(jh.Context())
-		j := itf.NewJob(ctx, cf, jID.String(), model.JobOrgRequest{
-			Method: gc.Request.Method,
-			Uri:    gc.Request.RequestURI,
-			Body:   req,
-		})
-		j.SetTarget(func() {
-			defer cf()
-			e := a.AddImage(ctx, img)
-			if e == nil {
-				e = ctx.Err()
-			}
-			j.SetError(e)
-		})
-		err = a.jobHandler.Add(jID, j)
-		if err != nil {
-			_ = gc.Error(err)
-			return
-		}
-		rUri := gc.GetHeader(a.rHeaders.RequestUri)
-		uri := gc.GetHeader(a.rHeaders.Uri)
-		if rUri != "" || uri != "" {
-			gc.Redirect(http.StatusSeeOther, strings.Replace(rUri, uri, "/", 1)+"jobs/"+jID.String())
-		} else {
-			gc.Status(http.StatusOK)
-		}
+		gc.String(http.StatusOK, id)
 	}
 }
 
