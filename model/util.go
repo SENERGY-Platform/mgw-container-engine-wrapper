@@ -39,11 +39,7 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 	if err = json.Unmarshal(b, &s); err != nil {
 		return
 	}
-	if ip := net.ParseIP(s); ip != nil {
-		*i = IPAddr(ip)
-	} else {
-		err = fmt.Errorf("invalid IP address '%s'", s)
-	}
+	*i = IPAddr(net.ParseIP(s))
 	return
 }
 
