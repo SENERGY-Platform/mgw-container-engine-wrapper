@@ -43,7 +43,20 @@ func (c *Client) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]m
 }
 
 func (c *Client) GetVolume(ctx context.Context, id string) (model.Volume, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.VolumesPath, id)
+	if err != nil {
+		return model.Volume{}, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return model.Volume{}, err
+	}
+	var volume model.Volume
+	err = execRequestJSONResp(c.httpClient, req, &volume)
+	if err != nil {
+		return model.Volume{}, err
+	}
+	return volume, nil
 }
 
 func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, error) {
