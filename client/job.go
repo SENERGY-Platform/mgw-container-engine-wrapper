@@ -17,8 +17,8 @@
 package client
 
 import (
-	"container-engine-wrapper/model"
 	"context"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 )
 
 func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) []model.Job {

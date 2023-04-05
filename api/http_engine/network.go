@@ -17,8 +17,8 @@
 package http_engine
 
 import (
-	"container-engine-wrapper/itf"
-	"container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

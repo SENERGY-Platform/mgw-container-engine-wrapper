@@ -17,8 +17,8 @@
 package job
 
 import (
-	"container-engine-wrapper/model"
 	"context"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 	"sync"
 	"time"
 )

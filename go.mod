@@ -1,4 +1,4 @@
-module container-engine-wrapper
+module github.com/SENERGY-Platform/mgw-container-engine-wrapper
 
 go 1.19
 

@@ -17,11 +17,6 @@
 package main
 
 import (
-	"container-engine-wrapper/api"
-	"container-engine-wrapper/api/http_engine"
-	"container-engine-wrapper/handler/docker"
-	"container-engine-wrapper/handler/job"
-	"container-engine-wrapper/util"
 	"context"
 	"errors"
 	"fmt"
@@ -29,6 +24,11 @@ import (
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api/http_engine"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/job"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 	"net/http"

@@ -17,8 +17,8 @@
 package client
 
 import (
-	"container-engine-wrapper/model"
 	"context"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 )
 
 func (c *Client) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {

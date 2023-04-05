@@ -17,7 +17,7 @@
 package api
 
 import (
-	"container-engine-wrapper/itf"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
 )
 
 type Api struct {

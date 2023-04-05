@@ -17,9 +17,9 @@
 package api
 
 import (
-	"container-engine-wrapper/model"
 	"context"
 	"fmt"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
 )
 
 func (a *Api) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
