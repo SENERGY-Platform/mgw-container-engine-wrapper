@@ -72,11 +72,11 @@ func (c *Client) StartContainer(ctx context.Context, id string) error {
 }
 
 func (c *Client) StopContainer(ctx context.Context, id string) (jobId string, err error) {
-	panic("not implemented")
+	return c.postContainerCtrl(ctx, id, model.StoppedState)
 }
 
 func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string, err error) {
-	panic("not implemented")
+	return c.postContainerCtrl(ctx, id, model.RestartingState)
 }
 
 func (c *Client) RemoveContainer(ctx context.Context, id string) error {
