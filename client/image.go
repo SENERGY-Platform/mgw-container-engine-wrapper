@@ -43,7 +43,20 @@ func (c *Client) GetImages(ctx context.Context, filter model.ImageFilter) ([]mod
 }
 
 func (c *Client) GetImage(ctx context.Context, id string) (model.Image, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.ImagesPath, id)
+	if err != nil {
+		return model.Image{}, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return model.Image{}, err
+	}
+	var image model.Image
+	err = execRequestJSONResp(c.httpClient, req, &image)
+	if err != nil {
+		return model.Image{}, err
+	}
+	return image, nil
 }
 
 func (c *Client) AddImage(ctx context.Context, img string) (jobId string, err error) {
