@@ -83,7 +83,19 @@ func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, er
 }
 
 func (c *Client) RemoveVolume(ctx context.Context, id string) error {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.VolumesPath, id)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
+	if err != nil {
+		return err
+	}
+	_, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func genVolumesQuery(filter model.VolumeFilter) string {
