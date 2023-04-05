@@ -21,8 +21,8 @@ import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
-func (a *Api) GetJobs(_ context.Context, filter model.JobFilter) []model.Job {
-	return a.jobHandler.List(filter)
+func (a *Api) GetJobs(_ context.Context, filter model.JobFilter) ([]model.Job, error) {
+	return a.jobHandler.List(filter), nil
 }
 
 func (a *Api) GetJob(_ context.Context, id string) (model.Job, error) {
