@@ -17,6 +17,7 @@
 package client
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -52,4 +53,16 @@ func execRequest(httpClient HttpClient, req *http.Request) ([]byte, error) {
 		return body, errors.New(resp.Status)
 	}
 	return body, nil
+}
+
+func execRequestJSONResp(httpClient HttpClient, req *http.Request, v any) error {
+	body, err := execRequest(httpClient, req)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(body, v)
+	if err != nil {
+		return err
+	}
+	return nil
 }
