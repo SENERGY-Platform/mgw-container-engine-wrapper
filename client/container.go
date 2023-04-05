@@ -44,7 +44,20 @@ func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter
 }
 
 func (c *Client) GetContainer(ctx context.Context, id string) (model.Container, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, "containers", id)
+	if err != nil {
+		return model.Container{}, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return model.Container{}, err
+	}
+	var container model.Container
+	err = execRequestJSONResp(c.httpClient, req, &container)
+	if err != nil {
+		return model.Container{}, err
+	}
+	return container, nil
 }
 
 func (c *Client) CreateContainer(ctx context.Context, container model.Container) (id string, err error) {
