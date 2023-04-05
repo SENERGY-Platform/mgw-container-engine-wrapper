@@ -103,3 +103,14 @@ var JobStateMap = map[JobStatus]struct{}{
 	JobError:     {},
 	JobOK:        {},
 }
+
+const (
+	ContainersPath    = "containers"
+	ContainerCtrlPath = "ctrl"
+	ContainerLogsPath = "logs"
+	ImagesPath        = "images"
+	NetworksPath      = "networks"
+	VolumesPath       = "volumes"
+	JobsPath          = "jobs"
+	JobsCancelPath    = "cancel"
+)
