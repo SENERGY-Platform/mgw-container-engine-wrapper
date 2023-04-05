@@ -28,7 +28,7 @@ import (
 )
 
 func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
-	u, err := url.JoinPath(c.baseUrl, "containers")
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter
 }
 
 func (c *Client) GetContainer(ctx context.Context, id string) (model.Container, error) {
-	u, err := url.JoinPath(c.baseUrl, "containers", id)
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id)
 	if err != nil {
 		return model.Container{}, err
 	}
@@ -63,7 +63,7 @@ func (c *Client) GetContainer(ctx context.Context, id string) (model.Container, 
 }
 
 func (c *Client) CreateContainer(ctx context.Context, container model.Container) (id string, err error) {
-	u, err := url.JoinPath(c.baseUrl, "containers")
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath)
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +97,7 @@ func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string,
 }
 
 func (c *Client) RemoveContainer(ctx context.Context, id string) error {
-	u, err := url.JoinPath(c.baseUrl, "containers", id)
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions mode
 }
 
 func (c *Client) postContainerCtrl(ctx context.Context, id string, state model.ContainerState) (string, error) {
-	u, err := url.JoinPath(c.baseUrl, "containers", id, "ctrl")
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id, model.ContainerCtrlPath)
 	if err != nil {
 		return "", err
 	}
