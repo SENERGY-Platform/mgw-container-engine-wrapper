@@ -19,10 +19,25 @@ package client
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"net/http"
+	"net/url"
 )
 
 func (c *Client) GetNetworks(ctx context.Context) ([]model.Network, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.NetworksPath)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	var networks []model.Network
+	err = execRequestJSONResp(c.httpClient, req, &networks)
+	if err != nil {
+		return nil, err
+	}
+	return networks, nil
 }
 
 func (c *Client) GetNetwork(ctx context.Context, id string) (model.Network, error) {
