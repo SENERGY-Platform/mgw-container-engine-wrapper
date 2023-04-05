@@ -58,7 +58,7 @@ func getJobsH(a lib.Api) gin.HandlerFunc {
 		if query.Until > 0 {
 			jobOptions.Until = time.UnixMicro(query.Until)
 		}
-		jobs := a.GetJobs(gc.Request.Context(), jobOptions)
+		jobs, _ := a.GetJobs(gc.Request.Context(), jobOptions)
 		gc.JSON(http.StatusOK, jobs)
 	}
 }
