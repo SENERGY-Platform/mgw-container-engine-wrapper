@@ -69,12 +69,12 @@ func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error
 	return vol, nil
 }
 
-func (d *Docker) VolumeCreate(ctx context.Context, vol model.Volume) error {
-	_, err := d.client.VolumeCreate(ctx, volume.VolumeCreateBody{Name: vol.Name, Labels: vol.Labels})
+func (d *Docker) VolumeCreate(ctx context.Context, vol model.Volume) (string, error) {
+	res, err := d.client.VolumeCreate(ctx, volume.CreateOptions{Name: vol.Name, Labels: vol.Labels})
 	if err != nil {
-		return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating volume '%s' failed", vol.Name), err)
+		return "", srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating volume '%s' failed", vol.Name), err)
 	}
-	return nil
+	return res.Name, nil
 }
 
 func (d *Docker) VolumeRemove(ctx context.Context, id string) error {
