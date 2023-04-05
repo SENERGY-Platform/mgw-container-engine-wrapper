@@ -19,10 +19,27 @@ package client
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"net/http"
+	"net/url"
+	"strings"
 )
 
 func (c *Client) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.ImagesPath)
+	if err != nil {
+		return nil, err
+	}
+	u += genImagesQuery(filter)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	var images []model.Image
+	err = execRequestJSONResp(c.httpClient, req, &images)
+	if err != nil {
+		return nil, err
+	}
+	return images, nil
 }
 
 func (c *Client) GetImage(ctx context.Context, id string) (model.Image, error) {
