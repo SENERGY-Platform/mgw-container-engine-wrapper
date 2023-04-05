@@ -19,10 +19,27 @@ package client
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"net/http"
+	"net/url"
+	"strings"
 )
 
 func (c *Client) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.VolumesPath)
+	if err != nil {
+		return nil, err
+	}
+	u += genVolumesQuery(filter)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	var volumes []model.Volume
+	err = execRequestJSONResp(c.httpClient, req, &volumes)
+	if err != nil {
+		return nil, err
+	}
+	return volumes, nil
 }
 
 func (c *Client) GetVolume(ctx context.Context, id string) (model.Volume, error) {
@@ -35,4 +52,21 @@ func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, er
 
 func (c *Client) RemoveVolume(ctx context.Context, id string) error {
 	panic("not implemented")
+}
+
+func genVolumesQuery(filter model.VolumeFilter) string {
+	var q []string
+	if len(filter.Labels) > 0 {
+		for k, v := range filter.Labels {
+			if v != "" {
+				q = append(q, "label="+k+"="+v)
+			} else {
+				q = append(q, "label="+k)
+			}
+		}
+	}
+	if len(q) > 0 {
+		return "?" + strings.Join(q, "&")
+	}
+	return ""
 }
