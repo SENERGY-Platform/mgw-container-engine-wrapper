@@ -54,11 +54,12 @@ func postVolumeH(a lib.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		if err := a.CreateVolume(gc.Request.Context(), volume); err != nil {
+		id, err := a.CreateVolume(gc.Request.Context(), volume)
+		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		gc.Status(http.StatusOK)
+		gc.String(http.StatusOK, id)
 	}
 }
 
