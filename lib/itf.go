@@ -37,11 +37,11 @@ type Api interface {
 	RemoveImage(ctx context.Context, id string) error
 	GetNetworks(ctx context.Context) ([]model.Network, error)
 	GetNetwork(ctx context.Context, id string) (model.Network, error)
-	CreateNetwork(ctx context.Context, net model.Network) error
+	CreateNetwork(ctx context.Context, net model.Network) (string, error)
 	RemoveNetwork(ctx context.Context, id string) error
 	GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
 	GetVolume(ctx context.Context, id string) (model.Volume, error)
-	CreateVolume(ctx context.Context, vol model.Volume) error
+	CreateVolume(ctx context.Context, vol model.Volume) (string, error)
 	RemoveVolume(ctx context.Context, id string) error
 	GetJobs(ctx context.Context, filter model.JobFilter) ([]model.Job, error)
 	GetJob(ctx context.Context, id string) (model.Job, error)
