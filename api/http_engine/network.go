@@ -44,11 +44,12 @@ func postNetworkH(a lib.Api) gin.HandlerFunc {
 			_ = gc.Error(err)
 			return
 		}
-		if err := a.CreateNetwork(gc.Request.Context(), network); err != nil {
+		id, err := a.CreateNetwork(gc.Request.Context(), network)
+		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		gc.Status(http.StatusOK)
+		gc.String(http.StatusOK, id)
 	}
 }
 
