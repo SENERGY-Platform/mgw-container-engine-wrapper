@@ -21,7 +21,7 @@ import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
-func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) []model.Job {
+func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.Job, error) {
 	panic("not implemented")
 }
 
