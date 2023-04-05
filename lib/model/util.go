@@ -46,3 +46,23 @@ func (i *IPAddr) UnmarshalJSON(b []byte) (err error) {
 func (i IPAddr) MarshalJSON() ([]byte, error) {
 	return json.Marshal(net.IP(i))
 }
+
+func (e *cError) Error() string {
+	return e.err.Error()
+}
+
+func (e *cError) Unwrap() error {
+	return e.err
+}
+
+func NewInternalError(err error) *InternalError {
+	return &InternalError{cError{err: err}}
+}
+
+func NewNotFoundError(err error) *NotFoundError {
+	return &NotFoundError{cError{err: err}}
+}
+
+func NewInvalidInputError(err error) *InvalidInputError {
+	return &InvalidInputError{cError{err: err}}
+}

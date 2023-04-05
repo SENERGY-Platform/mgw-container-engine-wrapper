@@ -174,3 +174,21 @@ type JobFilter struct {
 	Since    time.Time
 	Until    time.Time
 }
+
+// Error -----------------------------------------------------------------------------------------
+
+type cError struct {
+	err error
+}
+
+type InternalError struct {
+	cError
+}
+
+type NotFoundError struct {
+	cError
+}
+
+type InvalidInputError struct {
+	cError
+}
