@@ -64,7 +64,19 @@ func (c *Client) AddImage(ctx context.Context, img string) (jobId string, err er
 }
 
 func (c *Client) RemoveImage(ctx context.Context, id string) error {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.ImagesPath, id)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
+	if err != nil {
+		return err
+	}
+	_, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func genImagesQuery(filter model.ImageFilter) string {
