@@ -62,7 +62,24 @@ func (c *Client) GetVolume(ctx context.Context, id string) (model.Volume, error)
 }
 
 func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.VolumesPath)
+	if err != nil {
+		return "", err
+	}
+	body, err := json.Marshal(vol)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewBuffer(body))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	body, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
 
 func (c *Client) RemoveVolume(ctx context.Context, id string) error {
