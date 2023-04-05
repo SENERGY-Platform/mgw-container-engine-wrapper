@@ -67,7 +67,8 @@ func (c *Client) CreateContainer(ctx context.Context, container model.Container)
 }
 
 func (c *Client) StartContainer(ctx context.Context, id string) error {
-	return c.postContainerCtrl(ctx, id, model.RunningState)
+	_, err := c.postContainerCtrl(ctx, id, model.RunningState)
+	return err
 }
 
 func (c *Client) StopContainer(ctx context.Context, id string) (jobId string, err error) {
@@ -86,25 +87,25 @@ func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions mode
 	panic("not implemented")
 }
 
-func (c *Client) postContainerCtrl(ctx context.Context, id string, state model.ContainerState) error {
+func (c *Client) postContainerCtrl(ctx context.Context, id string, state model.ContainerState) (string, error) {
 	u, err := url.JoinPath(c.baseUrl, "containers", id, "ctrl")
 	if err != nil {
-		return err
+		return "", err
 	}
 	body, err := json.Marshal(model.ContainerCtrlRequest{State: state})
 	if err != nil {
-		return err
+		return "", err
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewBuffer(body))
 	if err != nil {
-		return err
+		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	_, err = execRequest(c.httpClient, req)
+	body, err = execRequest(c.httpClient, req)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return string(body), nil
 }
 
 func genGetContainersQuery(filter model.ContainerFilter) string {
