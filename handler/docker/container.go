@@ -236,7 +236,7 @@ func (d *Docker) ContainerStart(ctx context.Context, id string) error {
 }
 
 func (d *Docker) ContainerStop(ctx context.Context, id string) error {
-	if err := d.client.ContainerStop(ctx, id, nil); err != nil {
+	if err := d.client.ContainerStop(ctx, id, container.StopOptions{}); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
@@ -247,7 +247,7 @@ func (d *Docker) ContainerStop(ctx context.Context, id string) error {
 }
 
 func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
-	if err := d.client.ContainerRestart(ctx, id, nil); err != nil {
+	if err := d.client.ContainerRestart(ctx, id, container.StopOptions{}); err != nil {
 		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
 			code = http.StatusNotFound
