@@ -45,7 +45,7 @@ func New(ctx context.Context, ccHandler *ccjh.Handler) *Handler {
 func (h *Handler) Create(desc string, tFunc func(context.Context, context.CancelFunc) error) (string, error) {
 	uid, err := uuid.NewRandom()
 	if err != nil {
-		return "", err
+		return "", model.NewInternalError(err)
 	}
 	id := uid.String()
 	ctx, cf := context.WithCancel(h.ctx)
@@ -63,7 +63,7 @@ func (h *Handler) Create(desc string, tFunc func(context.Context, context.Cancel
 	defer h.mu.Unlock()
 	err = h.ccHandler.Add(&j)
 	if err != nil {
-		return "", err
+		return "", model.NewInternalError(err)
 	}
 	h.jobs[id] = &j
 	return id, nil
@@ -74,7 +74,7 @@ func (h *Handler) Get(id string) (model.Job, error) {
 	defer h.mu.RUnlock()
 	j, ok := h.jobs[id]
 	if !ok {
-		return model.Job{}, fmt.Errorf("%s not found", id)
+		return model.Job{}, model.NewNotFoundError(fmt.Errorf("%s not found", id))
 	}
 	return j.Meta(), nil
 }
@@ -84,7 +84,7 @@ func (h *Handler) Cancel(id string) error {
 	defer h.mu.RUnlock()
 	j, ok := h.jobs[id]
 	if !ok {
-		return fmt.Errorf("%s not found", id)
+		return model.NewNotFoundError(fmt.Errorf("%s not found", id))
 	}
 	j.Cancel()
 	return nil
