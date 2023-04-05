@@ -17,7 +17,9 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 	"net/url"
@@ -60,7 +62,25 @@ func (c *Client) GetImage(ctx context.Context, id string) (model.Image, error) {
 }
 
 func (c *Client) AddImage(ctx context.Context, img string) (jobId string, err error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.ImagesPath)
+	if err != nil {
+		return "", err
+	}
+	imgReq := model.ImageRequest{Image: img}
+	body, err := json.Marshal(imgReq)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewBuffer(body))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	body, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
 
 func (c *Client) RemoveImage(ctx context.Context, id string) error {
