@@ -17,7 +17,9 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 	"net/http"
@@ -65,7 +67,24 @@ func (c *Client) CreateContainer(ctx context.Context, container model.Container)
 }
 
 func (c *Client) StartContainer(ctx context.Context, id string) error {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, "containers", id, "ctrl")
+	if err != nil {
+		return err
+	}
+	body, err := json.Marshal(model.ContainerCtrlRequest{State: model.RunningState})
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	_, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Client) StopContainer(ctx context.Context, id string) (jobId string, err error) {
