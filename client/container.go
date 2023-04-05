@@ -18,7 +18,6 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 	"net/http"
@@ -36,12 +35,8 @@ func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter
 	if err != nil {
 		return nil, err
 	}
-	body, err := execRequest(c.httpClient, req)
-	if err != nil {
-		return nil, err
-	}
 	var containers []model.Container
-	err = json.Unmarshal(body, &containers)
+	err = execRequestJSONResp(c.httpClient, req, &containers)
 	if err != nil {
 		return nil, err
 	}
