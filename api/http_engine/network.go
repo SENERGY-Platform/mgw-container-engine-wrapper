@@ -40,8 +40,7 @@ func postNetworkH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		network := model.Network{}
 		if err := gc.ShouldBindJSON(&network); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		id, err := a.CreateNetwork(gc.Request.Context(), network)

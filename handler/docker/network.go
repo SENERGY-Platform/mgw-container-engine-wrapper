@@ -20,20 +20,18 @@ import (
 	"context"
 	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"net/http"
 )
 
 func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
 	var n []model.Network
 	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
-		return n, srv_base_types.NewError(http.StatusInternalServerError, "listing networks failed", err)
+		return nil, model.NewInternalError(err)
 	}
 	for _, r := range nr {
 		if nType, ok := util.NetTypeMap[r.Driver]; ok {
@@ -54,11 +52,10 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 	n := model.Network{}
 	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
 	if err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.Network{}, model.NewNotFoundError(err)
 		}
-		return n, srv_base_types.NewError(code, fmt.Sprintf("retrieving info for network '%s' failed", id), err)
+		return model.Network{}, model.NewInternalError(err)
 	}
 	s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
 	n.ID = nr.ID
@@ -71,7 +68,7 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 
 func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, error) {
 	if _, ok := model.NetworkTypeMap[net.Type]; !ok {
-		return "", srv_base_types.NewError(http.StatusBadRequest, "", fmt.Errorf("invalid network type '%s'", net.Type))
+		return "", model.NewInvalidInputError(fmt.Errorf("invalid network type '%s'", net.Type))
 	}
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
@@ -82,7 +79,7 @@ func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, 
 		},
 	})
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
+		return "", model.NewInternalError(err)
 	}
 	if res.Warning != "" {
 		srv_base.Logger.Warningf("encountered warnings during creation of network '%s': %s", net.Name, res.Warning)
@@ -92,11 +89,10 @@ func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, 
 
 func (d *Docker) NetworkRemove(ctx context.Context, id string) error {
 	if err := d.client.NetworkRemove(ctx, id); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("removing network '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }

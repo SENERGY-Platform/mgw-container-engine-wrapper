@@ -18,9 +18,7 @@ package docker
 
 import (
 	"context"
-	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/docker/docker/api/types"
@@ -28,7 +26,6 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"io"
-	"net/http"
 	"strconv"
 	"time"
 )
@@ -37,7 +34,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilte
 	var csl []model.Container
 	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
 	if err != nil {
-		return csl, srv_base_types.NewError(http.StatusInternalServerError, "listing containers failed", err)
+		return nil, model.NewInternalError(err)
 	}
 	for _, c := range cl {
 		ctr := model.Container{
@@ -95,11 +92,10 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container,
 	ctr := model.Container{}
 	c, err := d.client.ContainerInspect(ctx, id)
 	if err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.Container{}, model.NewNotFoundError(err)
 		}
-		return ctr, srv_base_types.NewError(code, fmt.Sprintf("retrieving info for container '%s' failed", id), err)
+		return model.Container{}, model.NewInternalError(err)
 	}
 	var mts []model.Mount
 	if len(c.HostConfig.Mounts) > 0 {
@@ -161,15 +157,15 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	}
 	bindings, err := util.GenPortMap(ctrConf.Ports)
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", model.NewInvalidInputError(err)
 	}
 	mts, err := util.GenMounts(ctrConf.Mounts)
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", model.NewInvalidInputError(err)
 	}
 	rp, err := util.GenRestartPolicy(ctrConf.RunConfig.RestartStrategy, ctrConf.RunConfig.Retries)
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", model.NewInvalidInputError(err)
 	}
 	hConfig := &container.HostConfig{
 		PortBindings:  bindings,
@@ -179,7 +175,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	}
 	err = util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusBadRequest, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", model.NewInvalidInputError(err)
 	}
 	var nConfig *network.NetworkingConfig
 	if len(ctrConf.Networks) > 0 {
@@ -191,7 +187,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	}
 	res, err := d.client.ContainerCreate(ctx, cConfig, hConfig, nConfig, nil, ctrConf.Name)
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+		return "", model.NewInternalError(err)
 	}
 	if len(ctrConf.Networks) > 1 {
 		for i := 1; i < len(ctrConf.Networks); i++ {
@@ -203,7 +199,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 				if err2 != nil {
 					srv_base.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
-				return "", srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating container '%s' failed", ctrConf.Name), err)
+				return "", model.NewInternalError(err)
 			}
 		}
 	}
@@ -215,44 +211,40 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 
 func (d *Docker) ContainerRemove(ctx context.Context, id string) error {
 	if err := d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{RemoveVolumes: true}); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("removing container '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }
 
 func (d *Docker) ContainerStart(ctx context.Context, id string) error {
 	if err := d.client.ContainerStart(ctx, id, types.ContainerStartOptions{}); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("starting container '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }
 
 func (d *Docker) ContainerStop(ctx context.Context, id string) error {
 	if err := d.client.ContainerStop(ctx, id, container.StopOptions{}); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("stopping container '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }
 
 func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	if err := d.client.ContainerRestart(ctx, id, container.StopOptions{}); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("restarting container '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }
@@ -273,11 +265,10 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 	}
 	rc, err := d.client.ContainerLogs(ctx, id, clo)
 	if err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return nil, model.NewNotFoundError(err)
 		}
-		return nil, srv_base_types.NewError(code, fmt.Sprintf("retrieving log for container '%s' failed", id), err)
+		return nil, model.NewInternalError(err)
 	}
 	return util.NewLogReader(rc), nil
 }

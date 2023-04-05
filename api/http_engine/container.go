@@ -44,16 +44,14 @@ func getContainersH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := containersQuery{}
 		if err := c.ShouldBindQuery(&query); err != nil {
-			c.Status(http.StatusBadRequest)
-			_ = c.Error(err)
+			_ = c.Error(model.NewInvalidInputError(err))
 			return
 		}
 		filter := model.ContainerFilter{Name: query.Name}
 		if query.State != "" {
 			_, ok := model.ContainerStateMap[query.State]
 			if !ok {
-				c.Status(http.StatusBadRequest)
-				_ = c.Error(fmt.Errorf("unknown container state '%s'", query.State))
+				_ = c.Error(model.NewInvalidInputError(fmt.Errorf("unknown container state '%s'", query.State)))
 				return
 			}
 			filter.State = query.State
@@ -72,8 +70,7 @@ func postContainerH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		container := model.Container{}
 		if err := c.ShouldBindJSON(&container); err != nil {
-			c.Status(http.StatusBadRequest)
-			_ = c.Error(err)
+			_ = c.Error(model.NewInvalidInputError(err))
 			return
 		}
 		id, err := a.CreateContainer(c.Request.Context(), container)
@@ -110,16 +107,14 @@ func getContainerLogH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := containerLogQuery{}
 		if err := c.ShouldBindQuery(&query); err != nil {
-			c.Status(http.StatusBadRequest)
-			_ = c.Error(err)
+			_ = c.Error(model.NewInvalidInputError(err))
 			return
 		}
 		logOptions := model.LogFilter{MaxLines: query.MaxLines}
 		if query.Since != "" {
 			t, err := time.Parse(time.RFC3339Nano, query.Since)
 			if err != nil {
-				c.Status(http.StatusBadRequest)
-				_ = c.Error(err)
+				_ = c.Error(model.NewInvalidInputError(err))
 				return
 			}
 			logOptions.Since = t
@@ -127,8 +122,7 @@ func getContainerLogH(a lib.Api) gin.HandlerFunc {
 		if query.Until != "" {
 			t, err := time.Parse(time.RFC3339Nano, query.Until)
 			if err != nil {
-				c.Status(http.StatusBadRequest)
-				_ = c.Error(err)
+				_ = c.Error(model.NewInvalidInputError(err))
 				return
 			}
 			logOptions.Until = t
@@ -150,22 +144,19 @@ func getContainerLogH(a lib.Api) gin.HandlerFunc {
 					if n > 0 {
 						_, wErr := c.Writer.Write(b[:n])
 						if wErr != nil {
-							c.Status(http.StatusInternalServerError)
-							_ = c.Error(wErr)
+							_ = c.Error(model.NewInternalError(wErr))
 							return
 						}
 						c.Writer.Flush()
 					}
 					break
 				}
-				c.Status(http.StatusInternalServerError)
-				_ = c.Error(rErr)
+				_ = c.Error(model.NewInternalError(rErr))
 				return
 			}
 			_, wErr := c.Writer.Write(b)
 			if wErr != nil {
-				c.Status(http.StatusInternalServerError)
-				_ = c.Error(wErr)
+				_ = c.Error(model.NewInternalError(wErr))
 				return
 			}
 			c.Writer.Flush()
@@ -177,8 +168,7 @@ func postContainerCtrlH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		var ctrlReq model.ContainerCtrlRequest
 		if err := gc.ShouldBindJSON(&ctrlReq); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		switch ctrlReq.State {
@@ -204,8 +194,7 @@ func postContainerCtrlH(a lib.Api) gin.HandlerFunc {
 			}
 			gc.String(http.StatusOK, id)
 		default:
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(fmt.Errorf("unknown container state '%s'", ctrlReq.State))
+			_ = gc.Error(model.NewInvalidInputError(fmt.Errorf("unknown container state '%s'", ctrlReq.State)))
 			return
 		}
 	}

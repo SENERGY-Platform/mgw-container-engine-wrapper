@@ -18,21 +18,18 @@ package docker
 
 import (
 	"context"
-	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
-	"net/http"
 )
 
 func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
 	var vols []model.Volume
 	vls, err := d.client.VolumeList(ctx, util.GenVolumeFilterArgs(filter))
 	if err != nil {
-		return vols, srv_base_types.NewError(http.StatusInternalServerError, "listing volumes failed", err)
+		return nil, model.NewInternalError(err)
 	}
 	for _, vl := range vls.Volumes {
 		vol := model.Volume{
@@ -53,11 +50,10 @@ func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error
 	vol := model.Volume{}
 	vl, err := d.client.VolumeInspect(ctx, id)
 	if err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.Volume{}, model.NewNotFoundError(err)
 		}
-		return vol, srv_base_types.NewError(code, fmt.Sprintf("retrieving info for volume '%s' failed", id), err)
+		return model.Volume{}, model.NewInternalError(err)
 	}
 	vol.Name = vl.Name
 	vol.Labels = vl.Labels
@@ -72,18 +68,17 @@ func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error
 func (d *Docker) VolumeCreate(ctx context.Context, vol model.Volume) (string, error) {
 	res, err := d.client.VolumeCreate(ctx, volume.CreateOptions{Name: vol.Name, Labels: vol.Labels})
 	if err != nil {
-		return "", srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating volume '%s' failed", vol.Name), err)
+		return "", model.NewInternalError(err)
 	}
 	return res.Name, nil
 }
 
 func (d *Docker) VolumeRemove(ctx context.Context, id string) error {
 	if err := d.client.VolumeRemove(ctx, id, false); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("removing volume '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }

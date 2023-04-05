@@ -33,8 +33,7 @@ func getImagesH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := imagesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		filter := model.ImageFilter{Labels: GenLabels(query.Label)}
@@ -51,8 +50,7 @@ func postImageH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		req := model.ImageRequest{}
 		if err := gc.ShouldBindJSON(&req); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		id, err := a.AddImage(gc.Request.Context(), req.Image)

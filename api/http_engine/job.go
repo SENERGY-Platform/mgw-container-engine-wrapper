@@ -38,16 +38,14 @@ func getJobsH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := jobsQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		jobOptions := model.JobFilter{SortDesc: query.SortDesc}
 		if query.Status != "" {
 			_, ok := model.JobStateMap[query.Status]
 			if !ok {
-				gc.Status(http.StatusBadRequest)
-				_ = gc.Error(fmt.Errorf("unknown job state '%s'", query.Status))
+				_ = gc.Error(model.NewInvalidInputError(fmt.Errorf("unknown job state '%s'", query.Status)))
 				return
 			}
 			jobOptions.Status = query.Status
@@ -55,8 +53,7 @@ func getJobsH(a lib.Api) gin.HandlerFunc {
 		if query.Since != "" {
 			t, err := time.Parse(time.RFC3339Nano, query.Since)
 			if err != nil {
-				gc.Status(http.StatusBadRequest)
-				_ = gc.Error(err)
+				_ = gc.Error(model.NewInvalidInputError(err))
 				return
 			}
 			jobOptions.Since = t
@@ -64,8 +61,7 @@ func getJobsH(a lib.Api) gin.HandlerFunc {
 		if query.Until != "" {
 			t, err := time.Parse(time.RFC3339Nano, query.Until)
 			if err != nil {
-				gc.Status(http.StatusBadRequest)
-				_ = gc.Error(err)
+				_ = gc.Error(model.NewInvalidInputError(err))
 				return
 			}
 			jobOptions.Until = t

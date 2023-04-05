@@ -20,23 +20,20 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"io"
-	"net/http"
 )
 
 func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	var images []model.Image
 	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
 	if err != nil {
-		return images, srv_base_types.NewError(http.StatusInternalServerError, "listing images failed", err)
+		return images, model.NewInternalError(err)
 	}
 	for _, is := range il {
 		img := model.Image{
@@ -66,11 +63,10 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) 
 	img := model.Image{}
 	i, _, err := d.client.ImageInspectWithRaw(ctx, id)
 	if err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.Image{}, model.NewNotFoundError(err)
 		}
-		return img, srv_base_types.NewError(code, fmt.Sprintf("retrieving info for image '%s' failed", id), err)
+		return model.Image{}, model.NewInternalError(err)
 	}
 	img.ID = i.ID
 	img.Size = i.Size
@@ -89,13 +85,10 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) 
 func (d *Docker) ImagePull(ctx context.Context, id string) error {
 	rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{})
 	if err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
-		} else if client.IsErrUnauthorized(err) {
-			code = http.StatusUnauthorized
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("pulling image '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	defer rc.Close()
 	jd := json.NewDecoder(rc)
@@ -105,24 +98,23 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 			if err == io.EOF {
 				break
 			} else {
-				return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), err)
+				return model.NewInternalError(err)
 			}
 		}
 		srv_base.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
-		return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("pulling image '%s' failed", id), errors.New(msg.Message))
+		return model.NewInternalError(errors.New(msg.Message))
 	}
 	return nil
 }
 
 func (d *Docker) ImageRemove(ctx context.Context, id string) error {
 	if _, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
-		code := http.StatusInternalServerError
 		if client.IsErrNotFound(err) {
-			code = http.StatusNotFound
+			return model.NewNotFoundError(err)
 		}
-		return srv_base_types.NewError(code, fmt.Sprintf("removing image '%s' failed", id), err)
+		return model.NewInternalError(err)
 	}
 	return nil
 }

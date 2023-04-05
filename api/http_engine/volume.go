@@ -33,8 +33,7 @@ func getVolumesH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := volumesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: GenLabels(query.Label)})
@@ -50,8 +49,7 @@ func postVolumeH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		volume := model.Volume{}
 		if err := gc.ShouldBindJSON(&volume); err != nil {
-			gc.Status(http.StatusBadRequest)
-			_ = gc.Error(err)
+			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
 		id, err := a.CreateVolume(gc.Request.Context(), volume)
