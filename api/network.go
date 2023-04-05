@@ -29,7 +29,7 @@ func (a *Api) GetNetwork(ctx context.Context, id string) (model.Network, error) 
 	return a.ceHandler.NetworkInfo(ctx, id)
 }
 
-func (a *Api) CreateNetwork(ctx context.Context, net model.Network) error {
+func (a *Api) CreateNetwork(ctx context.Context, net model.Network) (string, error) {
 	return a.ceHandler.NetworkCreate(ctx, net)
 }
 

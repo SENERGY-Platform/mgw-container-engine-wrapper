@@ -25,7 +25,7 @@ func (a *Api) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]mode
 	return a.ceHandler.ListVolumes(ctx, filter)
 }
 
-func (a *Api) CreateVolume(ctx context.Context, vol model.Volume) error {
+func (a *Api) CreateVolume(ctx context.Context, vol model.Volume) (string, error) {
 	return a.ceHandler.VolumeCreate(ctx, vol)
 }
 
