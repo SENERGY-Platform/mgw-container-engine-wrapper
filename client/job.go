@@ -44,7 +44,20 @@ func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.J
 }
 
 func (c *Client) GetJob(ctx context.Context, id string) (model.Job, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.JobsPath, id)
+	if err != nil {
+		return model.Job{}, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return model.Job{}, err
+	}
+	var job model.Job
+	err = execRequestJSONResp(c.httpClient, req, &job)
+	if err != nil {
+		return model.Job{}, err
+	}
+	return job, nil
 }
 
 func (c *Client) CancelJob(ctx context.Context, id string) error {
