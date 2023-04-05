@@ -17,7 +17,9 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 	"net/url"
@@ -57,8 +59,25 @@ func (c *Client) GetNetwork(ctx context.Context, id string) (model.Network, erro
 	return network, nil
 }
 
-func (c *Client) CreateNetwork(ctx context.Context, net model.Network) error {
-	panic("not implemented")
+func (c *Client) CreateNetwork(ctx context.Context, net model.Network) (string, error) {
+	u, err := url.JoinPath(c.baseUrl, model.NetworksPath)
+	if err != nil {
+		return "", err
+	}
+	body, err := json.Marshal(net)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewBuffer(body))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	body, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
 
 func (c *Client) RemoveNetwork(ctx context.Context, id string) error {
