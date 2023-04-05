@@ -17,7 +17,9 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 	"net/url"
