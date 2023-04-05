@@ -69,9 +69,9 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 	return n, nil
 }
 
-func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) error {
+func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, error) {
 	if _, ok := model.NetworkTypeMap[net.Type]; !ok {
-		return srv_base_types.NewError(http.StatusBadRequest, "", fmt.Errorf("invalid network type '%s'", net.Type))
+		return "", srv_base_types.NewError(http.StatusBadRequest, "", fmt.Errorf("invalid network type '%s'", net.Type))
 	}
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
@@ -82,12 +82,12 @@ func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) error {
 		},
 	})
 	if err != nil {
-		return srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
+		return "", srv_base_types.NewError(http.StatusInternalServerError, fmt.Sprintf("creating network '%s' failed", net.Name), err)
 	}
 	if res.Warning != "" {
 		srv_base.Logger.Warningf("encountered warnings during creation of network '%s': %s", net.Name, res.Warning)
 	}
-	return nil
+	return res.ID, nil
 }
 
 func (d *Docker) NetworkRemove(ctx context.Context, id string) error {
