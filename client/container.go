@@ -80,7 +80,19 @@ func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string,
 }
 
 func (c *Client) RemoveContainer(ctx context.Context, id string) error {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, "containers", id)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
+	if err != nil {
+		return err
+	}
+	_, err = execRequest(c.httpClient, req)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {
