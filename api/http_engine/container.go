@@ -35,9 +35,9 @@ type containersQuery struct {
 }
 
 type containerLogQuery struct {
-	MaxLines int   `form:"max_lines"`
-	Since    int64 `form:"since"`
-	Until    int64 `form:"until"`
+	MaxLines int    `form:"max_lines"`
+	Since    string `form:"since"`
+	Until    string `form:"until"`
 }
 
 func getContainersH(a lib.Api) gin.HandlerFunc {
@@ -115,11 +115,23 @@ func getContainerLogH(a lib.Api) gin.HandlerFunc {
 			return
 		}
 		logOptions := model.LogFilter{MaxLines: query.MaxLines}
-		if query.Since > 0 {
-			logOptions.Since = time.UnixMicro(query.Since)
+		if query.Since != "" {
+			t, err := time.Parse(time.RFC3339Nano, query.Since)
+			if err != nil {
+				c.Status(http.StatusBadRequest)
+				_ = c.Error(err)
+				return
+			}
+			logOptions.Since = t
 		}
-		if query.Until > 0 {
-			logOptions.Until = time.UnixMicro(query.Until)
+		if query.Until != "" {
+			t, err := time.Parse(time.RFC3339Nano, query.Until)
+			if err != nil {
+				c.Status(http.StatusBadRequest)
+				_ = c.Error(err)
+				return
+			}
+			logOptions.Until = t
 		}
 		rc, err := a.GetContainerLog(c.Request.Context(), c.Param(ctrIdParam), logOptions)
 		if err != nil {

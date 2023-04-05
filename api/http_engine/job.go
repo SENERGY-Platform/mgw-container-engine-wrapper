@@ -30,8 +30,8 @@ const jobIdParam = "j"
 type jobsQuery struct {
 	Status   string `form:"status"`
 	SortDesc bool   `form:"sort_desc"`
-	Since    int64  `form:"since"`
-	Until    int64  `form:"until"`
+	Since    string `form:"since"`
+	Until    string `form:"until"`
 }
 
 func getJobsH(a lib.Api) gin.HandlerFunc {
@@ -52,11 +52,23 @@ func getJobsH(a lib.Api) gin.HandlerFunc {
 			}
 			jobOptions.Status = query.Status
 		}
-		if query.Since > 0 {
-			jobOptions.Since = time.UnixMicro(query.Since)
+		if query.Since != "" {
+			t, err := time.Parse(time.RFC3339Nano, query.Since)
+			if err != nil {
+				gc.Status(http.StatusBadRequest)
+				_ = gc.Error(err)
+				return
+			}
+			jobOptions.Since = t
 		}
-		if query.Until > 0 {
-			jobOptions.Until = time.UnixMicro(query.Until)
+		if query.Until != "" {
+			t, err := time.Parse(time.RFC3339Nano, query.Until)
+			if err != nil {
+				gc.Status(http.StatusBadRequest)
+				_ = gc.Error(err)
+				return
+			}
+			jobOptions.Until = t
 		}
 		jobs, _ := a.GetJobs(gc.Request.Context(), jobOptions)
 		gc.JSON(http.StatusOK, jobs)
