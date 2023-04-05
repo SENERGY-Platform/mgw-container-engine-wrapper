@@ -29,7 +29,7 @@ func (c *Client) GetVolume(ctx context.Context, id string) (model.Volume, error)
 	panic("not implemented")
 }
 
-func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) error {
+func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, error) {
 	panic("not implemented")
 }
 
