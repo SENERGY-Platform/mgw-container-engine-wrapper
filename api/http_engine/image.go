@@ -17,8 +17,8 @@
 package http_engine
 
 import (
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -29,7 +29,7 @@ type imagesQuery struct {
 	Label []string `form:"label"`
 }
 
-func getImagesH(a itf.Api) gin.HandlerFunc {
+func getImagesH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := imagesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
@@ -47,7 +47,7 @@ func getImagesH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func postImageH(a itf.Api) gin.HandlerFunc {
+func postImageH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		req := model.ImageRequest{}
 		if err := gc.ShouldBindJSON(&req); err != nil {
@@ -64,7 +64,7 @@ func postImageH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func getImageH(a itf.Api) gin.HandlerFunc {
+func getImageH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		image, err := a.GetImage(gc.Request.Context(), gc.Param(imgIdParam))
 		if err != nil {
@@ -75,7 +75,7 @@ func getImageH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteImageH(a itf.Api) gin.HandlerFunc {
+func deleteImageH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		if err := a.RemoveImage(gc.Request.Context(), gc.Param(imgIdParam)); err != nil {
 			_ = gc.Error(err)

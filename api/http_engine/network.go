@@ -17,15 +17,15 @@
 package http_engine
 
 import (
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 const netIdParam = "n"
 
-func getNetworksH(a itf.Api) gin.HandlerFunc {
+func getNetworksH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		networks, err := a.GetNetworks(gc.Request.Context())
 		if err != nil {
@@ -36,7 +36,7 @@ func getNetworksH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func postNetworkH(a itf.Api) gin.HandlerFunc {
+func postNetworkH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		network := model.Network{}
 		if err := gc.ShouldBindJSON(&network); err != nil {
@@ -52,7 +52,7 @@ func postNetworkH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func getNetworkH(a itf.Api) gin.HandlerFunc {
+func getNetworkH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		network, err := a.GetNetwork(gc.Request.Context(), gc.Param(netIdParam))
 		if err != nil {
@@ -63,7 +63,7 @@ func getNetworkH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteNetworkH(a itf.Api) gin.HandlerFunc {
+func deleteNetworkH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		if err := a.RemoveNetwork(gc.Request.Context(), gc.Param(netIdParam)); err != nil {
 			_ = gc.Error(err)

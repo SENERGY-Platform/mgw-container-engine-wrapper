@@ -17,8 +17,8 @@
 package http_engine
 
 import (
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -29,7 +29,7 @@ type volumesQuery struct {
 	Label []string `form:"label"`
 }
 
-func getVolumesH(a itf.Api) gin.HandlerFunc {
+func getVolumesH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := volumesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
@@ -46,7 +46,7 @@ func getVolumesH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func postVolumeH(a itf.Api) gin.HandlerFunc {
+func postVolumeH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		volume := model.Volume{}
 		if err := gc.ShouldBindJSON(&volume); err != nil {
@@ -62,7 +62,7 @@ func postVolumeH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func getVolumeH(a itf.Api) gin.HandlerFunc {
+func getVolumeH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		volume, err := a.GetVolume(gc.Request.Context(), gc.Param(volIdParam))
 		if err != nil {
@@ -73,7 +73,7 @@ func getVolumeH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteVolumeH(a itf.Api) gin.HandlerFunc {
+func deleteVolumeH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		if err := a.RemoveVolume(gc.Request.Context(), gc.Param(volIdParam)); err != nil {
 			_ = gc.Error(err)

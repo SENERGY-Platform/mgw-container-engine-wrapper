@@ -18,8 +18,8 @@ package http_engine
 
 import (
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -40,7 +40,7 @@ type containerLogQuery struct {
 	Until    int64 `form:"until"`
 }
 
-func getContainersH(a itf.Api) gin.HandlerFunc {
+func getContainersH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := containersQuery{}
 		if err := c.ShouldBindQuery(&query); err != nil {
@@ -68,7 +68,7 @@ func getContainersH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func postContainerH(a itf.Api) gin.HandlerFunc {
+func postContainerH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		container := model.Container{}
 		if err := c.ShouldBindJSON(&container); err != nil {
@@ -85,7 +85,7 @@ func postContainerH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteContainerH(a itf.Api) gin.HandlerFunc {
+func deleteContainerH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := a.RemoveContainer(c.Request.Context(), c.Param(ctrIdParam)); err != nil {
 			_ = c.Error(err)
@@ -95,7 +95,7 @@ func deleteContainerH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func getContainerH(a itf.Api) gin.HandlerFunc {
+func getContainerH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		container, err := a.GetContainer(c.Request.Context(), c.Param(ctrIdParam))
 		if err != nil {
@@ -106,7 +106,7 @@ func getContainerH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func getContainerLogH(a itf.Api) gin.HandlerFunc {
+func getContainerLogH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := containerLogQuery{}
 		if err := c.ShouldBindQuery(&query); err != nil {
@@ -161,7 +161,7 @@ func getContainerLogH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func postContainerCtrlH(a itf.Api) gin.HandlerFunc {
+func postContainerCtrlH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		var ctrlReq model.ContainerCtrlRequest
 		if err := gc.ShouldBindJSON(&ctrlReq); err != nil {

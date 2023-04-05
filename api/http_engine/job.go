@@ -18,8 +18,8 @@ package http_engine
 
 import (
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -34,7 +34,7 @@ type jobsQuery struct {
 	Until    int64  `form:"until"`
 }
 
-func getJobsH(a itf.Api) gin.HandlerFunc {
+func getJobsH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := jobsQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
@@ -63,7 +63,7 @@ func getJobsH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func getJobH(a itf.Api) gin.HandlerFunc {
+func getJobH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		job, err := a.GetJob(gc.Request.Context(), gc.Param(jobIdParam))
 		if err != nil {
@@ -74,7 +74,7 @@ func getJobH(a itf.Api) gin.HandlerFunc {
 	}
 }
 
-func postJobCancelH(a itf.Api) gin.HandlerFunc {
+func postJobCancelH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		err := a.CancelJob(gc.Request.Context(), gc.Param(jobIdParam))
 		if err != nil {

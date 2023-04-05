@@ -18,7 +18,7 @@ package client
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
 func (c *Client) GetNetworks(ctx context.Context) ([]model.Network, error) {

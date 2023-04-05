@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package itf
+package handler
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 )
 
@@ -50,30 +50,4 @@ type JobHandler interface {
 	Get(id string) (model.Job, error)
 	Create(desc string, tFunc func(context.Context, context.CancelFunc) error) (string, error)
 	Cancel(id string) error
-}
-
-type Api interface {
-	GetContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error)
-	GetContainer(ctx context.Context, id string) (model.Container, error)
-	CreateContainer(ctx context.Context, container model.Container) (id string, err error)
-	StartContainer(ctx context.Context, id string) error
-	StopContainer(ctx context.Context, id string) (jobId string, err error)
-	RestartContainer(ctx context.Context, id string) (jobId string, err error)
-	RemoveContainer(ctx context.Context, id string) error
-	GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error)
-	GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
-	GetImage(ctx context.Context, id string) (model.Image, error)
-	AddImage(ctx context.Context, img string) (jobId string, err error)
-	RemoveImage(ctx context.Context, id string) error
-	GetNetworks(ctx context.Context) ([]model.Network, error)
-	GetNetwork(ctx context.Context, id string) (model.Network, error)
-	CreateNetwork(ctx context.Context, net model.Network) error
-	RemoveNetwork(ctx context.Context, id string) error
-	GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
-	GetVolume(ctx context.Context, id string) (model.Volume, error)
-	CreateVolume(ctx context.Context, vol model.Volume) error
-	RemoveVolume(ctx context.Context, id string) error
-	GetJobs(ctx context.Context, filter model.JobFilter) []model.Job
-	GetJob(ctx context.Context, id string) (model.Job, error)
-	CancelJob(ctx context.Context, id string) error
 }

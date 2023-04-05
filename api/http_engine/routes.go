@@ -17,11 +17,11 @@
 package http_engine
 
 import (
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/gin-gonic/gin"
 )
 
-func SetRoutes(e *gin.Engine, a itf.Api) {
+func SetRoutes(e *gin.Engine, a lib.Api) {
 	e.GET("/containers", getContainersH(a))
 	e.POST("/containers", postContainerH(a))
 	e.DELETE("/containers/:"+ctrIdParam, deleteContainerH(a))

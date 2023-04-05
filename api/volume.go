@@ -18,7 +18,7 @@ package api
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
 func (a *Api) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {

@@ -17,15 +17,15 @@
 package api
 
 import (
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/itf"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler"
 )
 
 type Api struct {
-	ceHandler  itf.ContainerEngineHandler
-	jobHandler itf.JobHandler
+	ceHandler  handler.ContainerEngineHandler
+	jobHandler handler.JobHandler
 }
 
-func New(ceHandler itf.ContainerEngineHandler, jobHandler itf.JobHandler) *Api {
+func New(ceHandler handler.ContainerEngineHandler, jobHandler handler.JobHandler) *Api {
 	return &Api{
 		ceHandler:  ceHandler,
 		jobHandler: jobHandler,
