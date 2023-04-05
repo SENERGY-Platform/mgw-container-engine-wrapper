@@ -36,3 +36,20 @@ func (c *Client) AddImage(ctx context.Context, img string) (jobId string, err er
 func (c *Client) RemoveImage(ctx context.Context, id string) error {
 	panic("not implemented")
 }
+
+func genImagesQuery(filter model.ImageFilter) string {
+	var q []string
+	if len(filter.Labels) > 0 {
+		for k, v := range filter.Labels {
+			if v != "" {
+				q = append(q, "label="+k+"="+v)
+			} else {
+				q = append(q, "label="+k)
+			}
+		}
+	}
+	if len(q) > 0 {
+		return "?" + strings.Join(q, "&")
+	}
+	return ""
+}
