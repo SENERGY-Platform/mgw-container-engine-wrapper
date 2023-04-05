@@ -19,6 +19,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 	"net/http"
 )
@@ -50,7 +51,11 @@ func execRequest(httpClient HttpClient, req *http.Request) ([]byte, error) {
 		return nil, err
 	}
 	if resp.StatusCode >= 400 {
-		return body, errors.New(resp.Status)
+		msg := resp.Status
+		if len(body) > 0 {
+			msg = string(body)
+		}
+		return nil, getError(resp.StatusCode, msg)
 	}
 	return body, nil
 }
@@ -65,4 +70,17 @@ func execRequestJSONResp(httpClient HttpClient, req *http.Request, v any) error 
 		return err
 	}
 	return nil
+}
+
+func getError(sc int, msg string) error {
+	err := errors.New(msg)
+	switch sc {
+	case http.StatusInternalServerError:
+		return model.NewInternalError(err)
+	case http.StatusNotFound:
+		return model.NewNotFoundError(err)
+	case http.StatusBadRequest:
+		return model.NewInvalidInputError(err)
+	}
+	return newResponseError(sc, err)
 }
