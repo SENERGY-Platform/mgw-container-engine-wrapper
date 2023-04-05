@@ -28,7 +28,7 @@ type ContainerEngineHandler interface {
 	ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
 	ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
 	NetworkInfo(ctx context.Context, id string) (model.Network, error)
-	NetworkCreate(ctx context.Context, net model.Network) error
+	NetworkCreate(ctx context.Context, net model.Network) (string, error)
 	NetworkRemove(ctx context.Context, id string) error
 	ContainerInfo(ctx context.Context, id string) (model.Container, error)
 	ContainerCreate(ctx context.Context, container model.Container) (id string, err error)
