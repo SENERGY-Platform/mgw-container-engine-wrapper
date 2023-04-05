@@ -41,7 +41,20 @@ func (c *Client) GetNetworks(ctx context.Context) ([]model.Network, error) {
 }
 
 func (c *Client) GetNetwork(ctx context.Context, id string) (model.Network, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.NetworksPath, id)
+	if err != nil {
+		return model.Network{}, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return model.Network{}, err
+	}
+	var network model.Network
+	err = execRequestJSONResp(c.httpClient, req, &network)
+	if err != nil {
+		return model.Network{}, err
+	}
+	return network, nil
 }
 
 func (c *Client) CreateNetwork(ctx context.Context, net model.Network) error {
