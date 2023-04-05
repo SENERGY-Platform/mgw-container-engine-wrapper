@@ -19,10 +19,28 @@ package client
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
 )
 
 func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.Job, error) {
-	panic("not implemented")
+	u, err := url.JoinPath(c.baseUrl, model.JobsPath)
+	if err != nil {
+		return nil, err
+	}
+	u += genJobsFilter(filter)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	var jobs []model.Job
+	err = execRequestJSONResp(c.httpClient, req, &jobs)
+	if err != nil {
+		return nil, err
+	}
+	return jobs, nil
 }
 
 func (c *Client) GetJob(ctx context.Context, id string) (model.Job, error) {
@@ -31,4 +49,24 @@ func (c *Client) GetJob(ctx context.Context, id string) (model.Job, error) {
 
 func (c *Client) CancelJob(ctx context.Context, id string) error {
 	panic("not implemented")
+}
+
+func genJobsFilter(filter model.JobFilter) string {
+	var q []string
+	if filter.SortDesc {
+		q = append(q, "sort_desc=true")
+	}
+	if filter.Status != "" {
+		q = append(q, "status="+filter.Status)
+	}
+	if !filter.Since.IsZero() {
+		q = append(q, "since="+filter.Since.Format(time.RFC3339Nano))
+	}
+	if !filter.Until.IsZero() {
+		q = append(q, "until="+filter.Until.Format(time.RFC3339Nano))
+	}
+	if len(q) > 0 {
+		return "?" + strings.Join(q, "&")
+	}
+	return ""
 }
