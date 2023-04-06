@@ -14,34 +14,15 @@
  * limitations under the License.
  */
 
-package middleware
+package http_engine
 
 import (
 	"errors"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
 
-func ErrorHandler(gc *gin.Context) {
-	gc.Next()
-	if !gc.IsAborted() && len(gc.Errors) > 0 {
-		var errs []string
-		for _, e := range gc.Errors {
-			if sc := getStatusCode(e); sc != 0 {
-				gc.Status(sc)
-			}
-			errs = append(errs, e.Error())
-		}
-		if gc.Writer.Status() < 400 {
-			gc.Status(http.StatusInternalServerError)
-		}
-		gc.String(-1, strings.Join(errs, ", "))
-	}
-}
-
-func getStatusCode(err error) int {
+func GetStatusCode(err error) int {
 	var nfe *model.NotFoundError
 	if errors.As(err, &nfe) {
 		return http.StatusNotFound

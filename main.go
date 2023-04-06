@@ -26,7 +26,6 @@ import (
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api/http_engine"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api/http_engine/middleware"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/job"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
@@ -107,7 +106,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
-	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), middleware.ErrorHandler, gin.Recovery())
+	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler(http_engine.GetStatusCode, ", "), gin.Recovery())
 	apiEngine.UseRawPath = true
 	cewApi := api.New(dockerHandler, jobHandler)
 
