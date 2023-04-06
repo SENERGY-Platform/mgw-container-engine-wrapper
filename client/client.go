@@ -19,10 +19,13 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 	"net/http"
 )
+
+type CewClient = lib.Api
 
 type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
