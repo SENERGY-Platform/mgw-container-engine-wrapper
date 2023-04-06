@@ -16,22 +16,46 @@
 
 package client
 
+type cError struct {
+	err error
+}
+
 type ResponseError struct {
-	err  error
+	cError
 	Code int
+}
+
+type ClientError struct {
+	cError
+}
+
+type ServerError struct {
+	cError
+}
+
+func newClientError(err error) *ClientError {
+	return &ClientError{
+		cError: cError{err: err},
+	}
+}
+
+func newServerError(err error) *ServerError {
+	return &ServerError{
+		cError: cError{err: err},
+	}
 }
 
 func newResponseError(c int, err error) *ResponseError {
 	return &ResponseError{
-		err:  err,
-		Code: c,
+		cError: cError{err: err},
+		Code:   c,
 	}
 }
 
-func (e *ResponseError) Error() string {
+func (e *cError) Error() string {
 	return e.err.Error()
 }
 
-func (e *ResponseError) Unwrap() error {
+func (e *cError) Unwrap() error {
 	return e.err
 }

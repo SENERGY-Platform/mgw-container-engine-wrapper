@@ -73,14 +73,21 @@ func execRequestJSONResp(httpClient HttpClient, req *http.Request, v any) error 
 }
 
 func getError(sc int, msg string) error {
-	err := errors.New(msg)
+	var err error
+	err = newResponseError(sc, errors.New(msg))
+	if sc < 500 {
+		err = newClientError(err)
+	}
+	if sc >= 500 {
+		err = newServerError(err)
+	}
 	switch sc {
 	case http.StatusInternalServerError:
-		return model.NewInternalError(err)
+		err = model.NewInternalError(err)
 	case http.StatusNotFound:
-		return model.NewNotFoundError(err)
+		err = model.NewNotFoundError(err)
 	case http.StatusBadRequest:
-		return model.NewInvalidInputError(err)
+		err = model.NewInvalidInputError(err)
 	}
-	return newResponseError(sc, err)
+	return err
 }
