@@ -61,7 +61,7 @@ func (c *Client) GetJob(ctx context.Context, id string) (model.Job, error) {
 }
 
 func (c *Client) CancelJob(ctx context.Context, id string) error {
-	u, err := url.JoinPath(c.baseUrl, model.JobsPath, id)
+	u, err := url.JoinPath(c.baseUrl, model.JobsPath, id, model.JobsCancelPath)
 	if err != nil {
 		return err
 	}
