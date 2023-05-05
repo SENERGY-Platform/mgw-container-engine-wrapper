@@ -31,6 +31,7 @@ import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -107,7 +108,9 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
-	apiEngine.Use(gin_mw.LoggerHandler(srv_base.Logger), gin_mw.ErrorHandler(http_engine.GetStatusCode, ", "), gin.Recovery())
+	apiEngine.Use(gin_mw.StaticHeaderHandler(http_engine.GetStaticHeader(version, model.ServiceName)), requestid.New(), gin_mw.LoggerHandler(srv_base.Logger, func(gc *gin.Context) string {
+		return requestid.Get(gc)
+	}), gin_mw.ErrorHandler(http_engine.GetStatusCode, ", "), gin.Recovery())
 	apiEngine.UseRawPath = true
 	cewApi := api.New(dockerHandler, jobHandler)
 
