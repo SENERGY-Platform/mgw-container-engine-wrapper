@@ -16,6 +16,8 @@
 
 package model
 
+const ServiceName = "mgw-container-engine-wrapper"
+
 const (
 	TcpPort  PortType = "tcp"
 	UdpPort  PortType = "udp"

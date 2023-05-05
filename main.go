@@ -28,6 +28,7 @@ import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api/http_engine"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/job"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
@@ -39,7 +40,7 @@ import (
 var version string
 
 func main() {
-	srv_base.PrintInfo("mgw-container-engine-wrapper", version)
+	srv_base.PrintInfo(model.ServiceName, version)
 
 	flags := util.NewFlags()
 
