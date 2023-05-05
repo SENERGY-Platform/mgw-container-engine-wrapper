@@ -9,6 +9,7 @@ require (
 	github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.0.0-00010101000000-000000000000
 	github.com/docker/docker v23.0.3+incompatible
 	github.com/docker/go-connections v0.4.0
+	github.com/gin-contrib/requestid v0.0.6
 	github.com/gin-gonic/gin v1.9.0
 	github.com/google/uuid v1.3.0
 	github.com/y-du/go-log-level v0.2.2
