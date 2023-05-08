@@ -43,33 +43,75 @@ func New(httpClient HttpClient, baseUrl string) *Client {
 	}
 }
 
-func execRequest(httpClient HttpClient, req *http.Request) ([]byte, error) {
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+func (c *Client) execRequest(req *http.Request) (io.ReadCloser, error) {
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	if resp.StatusCode >= 400 {
-		msg := resp.Status
-		if len(body) > 0 {
-			msg = string(body)
+		defer resp.Body.Close()
+		errMsg, err := readString(resp.Body)
+		if err != nil || errMsg == "" {
+			errMsg = resp.Status
 		}
-		return nil, getError(resp.StatusCode, msg)
+		return nil, getError(resp.StatusCode, errMsg)
 	}
-	return body, nil
+	return resp.Body, nil
 }
 
-func execRequestJSONResp(httpClient HttpClient, req *http.Request, v any) error {
-	body, err := execRequest(httpClient, req)
+func (c *Client) execRequestJSON(req *http.Request, v any) error {
+	body, err := c.execRequest(req)
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(body, v)
+	defer body.Close()
+	err = readJSON(body, v)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) execRequestString(req *http.Request) (string, error) {
+	body, err := c.execRequest(req)
+	if err != nil {
+		return "", err
+	}
+	defer body.Close()
+	return readString(body)
+}
+
+func (c *Client) execRequestVoid(req *http.Request) error {
+	body, err := c.execRequest(req)
+	if err != nil {
+		return err
+	}
+	defer body.Close()
+	_ = readVoid(body)
+	return nil
+}
+
+func readVoid(rc io.ReadCloser) error {
+	_, err := io.ReadAll(rc)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func readString(rc io.ReadCloser) (string, error) {
+	b, err := io.ReadAll(rc)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func readJSON(rc io.ReadCloser, v any) error {
+	jd := json.NewDecoder(rc)
+	err := jd.Decode(v)
+	if err != nil {
+		_ = readVoid(rc)
 		return err
 	}
 	return nil

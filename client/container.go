@@ -38,7 +38,7 @@ func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter
 		return nil, err
 	}
 	var containers []model.Container
-	err = execRequestJSONResp(c.httpClient, req, &containers)
+	err = c.execRequestJSON(req, &containers)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *Client) GetContainer(ctx context.Context, id string) (model.Container, 
 		return model.Container{}, err
 	}
 	var container model.Container
-	err = execRequestJSONResp(c.httpClient, req, &container)
+	err = c.execRequestJSON(req, &container)
 	if err != nil {
 		return model.Container{}, err
 	}
@@ -76,11 +76,7 @@ func (c *Client) CreateContainer(ctx context.Context, container model.Container)
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	body, err = execRequest(c.httpClient, req)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
+	return c.execRequestString(req)
 }
 
 func (c *Client) StartContainer(ctx context.Context, id string) error {
@@ -105,11 +101,7 @@ func (c *Client) RemoveContainer(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = execRequest(c.httpClient, req)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.execRequestVoid(req)
 }
 
 func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {
@@ -130,11 +122,7 @@ func (c *Client) postContainerCtrl(ctx context.Context, id string, state model.C
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	body, err = execRequest(c.httpClient, req)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
+	return c.execRequestString(req)
 }
 
 func genGetContainersQuery(filter model.ContainerFilter) string {
