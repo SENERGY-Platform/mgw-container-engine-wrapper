@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package http_engine
+package http_hdl
 
-const (
-	apiVerKey  = "X-Api-Version"
-	srvNameKey = "X-Service"
+import (
+	"errors"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"net/http"
 )
 
-func GetStaticHeader(ver string, name string) map[string]string {
-	return map[string]string{
-		apiVerKey:  ver,
-		srvNameKey: name,
+func GetStatusCode(err error) int {
+	var nfe *model.NotFoundError
+	if errors.As(err, &nfe) {
+		return http.StatusNotFound
 	}
+	var iie *model.InvalidInputError
+	if errors.As(err, &iie) {
+		return http.StatusBadRequest
+	}
+	var ie *model.InternalError
+	if errors.As(err, &ie) {
+		return http.StatusInternalServerError
+	}
+	return 0
 }

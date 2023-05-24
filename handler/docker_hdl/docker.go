@@ -14,23 +14,30 @@
  * limitations under the License.
  */
 
-package http_engine
+package docker_hdl
 
 import (
-	"strings"
+	"context"
+	"github.com/docker/docker/client"
 )
 
-func GenLabels(sl []string) (l map[string]string) {
-	if sl != nil && len(sl) > 0 {
-		l = make(map[string]string)
-		for _, s := range sl {
-			p := strings.Split(s, "=")
-			if len(p) > 1 {
-				l[p[0]] = p[1]
-			} else {
-				l[p[0]] = ""
-			}
-		}
+type Docker struct {
+	client *client.Client
+}
+
+func New(c *client.Client) *Docker {
+	return &Docker{client: c}
+}
+
+func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
+	info := map[string]string{}
+	srvVer, err := d.client.ServerVersion(ctx)
+	if err != nil {
+		return info, err
 	}
-	return
+	for i := 0; i < len(srvVer.Components); i++ {
+		info[srvVer.Components[i].Name] = srvVer.Components[i].Version
+	}
+	info["api"] = d.client.ClientVersion()
+	return info, nil
 }

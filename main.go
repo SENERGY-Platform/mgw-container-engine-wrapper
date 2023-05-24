@@ -25,9 +25,9 @@ import (
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
 	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api/http_engine"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/job"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api/http_hdl"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/job_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
@@ -72,7 +72,7 @@ func main() {
 	}
 	defer dockerClient.Close()
 
-	dockerHandler := docker.New(dockerClient)
+	dockerHandler := docker_hdl.New(dockerClient)
 
 	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
@@ -84,7 +84,7 @@ func main() {
 	ccHandler := ccjh.New(config.Jobs.BufferSize)
 
 	jobCtx, cFunc := context.WithCancel(context.Background())
-	jobHandler := job.New(jobCtx, ccHandler)
+	jobHandler := job_hdl.New(jobCtx, ccHandler)
 
 	defer func() {
 		ccHandler.Stop()
@@ -108,13 +108,13 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
-	apiEngine.Use(gin_mw.StaticHeaderHandler(http_engine.GetStaticHeader(version, model.ServiceName)), requestid.New(), gin_mw.LoggerHandler(srv_base.Logger, func(gc *gin.Context) string {
+	apiEngine.Use(gin_mw.StaticHeaderHandler(http_hdl.GetStaticHeader(version, model.ServiceName)), requestid.New(), gin_mw.LoggerHandler(srv_base.Logger, func(gc *gin.Context) string {
 		return requestid.Get(gc)
-	}), gin_mw.ErrorHandler(http_engine.GetStatusCode, ", "), gin.Recovery())
+	}), gin_mw.ErrorHandler(http_hdl.GetStatusCode, ", "), gin.Recovery())
 	apiEngine.UseRawPath = true
 	cewApi := api.New(dockerHandler, jobHandler)
 
-	http_engine.SetRoutes(apiEngine, cewApi)
+	http_hdl.SetRoutes(apiEngine, cewApi)
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {

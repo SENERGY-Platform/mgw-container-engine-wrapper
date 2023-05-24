@@ -14,30 +14,16 @@
  * limitations under the License.
  */
 
-package docker
+package http_hdl
 
-import (
-	"context"
-	"github.com/docker/docker/client"
+const (
+	apiVerKey  = "X-Api-Version"
+	srvNameKey = "X-Service"
 )
 
-type Docker struct {
-	client *client.Client
-}
-
-func New(c *client.Client) *Docker {
-	return &Docker{client: c}
-}
-
-func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
-	info := map[string]string{}
-	srvVer, err := d.client.ServerVersion(ctx)
-	if err != nil {
-		return info, err
+func GetStaticHeader(ver string, name string) map[string]string {
+	return map[string]string{
+		apiVerKey:  ver,
+		srvNameKey: name,
 	}
-	for i := 0; i < len(srvVer.Components); i++ {
-		info[srvVer.Components[i].Name] = srvVer.Components[i].Version
-	}
-	info["api"] = d.client.ClientVersion()
-	return info, nil
 }

@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package http_engine
+package http_hdl
 
 import (
-	"errors"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
-	"net/http"
+	"strings"
 )
 
-func GetStatusCode(err error) int {
-	var nfe *model.NotFoundError
-	if errors.As(err, &nfe) {
-		return http.StatusNotFound
+func GenLabels(sl []string) (l map[string]string) {
+	if sl != nil && len(sl) > 0 {
+		l = make(map[string]string)
+		for _, s := range sl {
+			p := strings.Split(s, "=")
+			if len(p) > 1 {
+				l[p[0]] = p[1]
+			} else {
+				l[p[0]] = ""
+			}
+		}
 	}
-	var iie *model.InvalidInputError
-	if errors.As(err, &iie) {
-		return http.StatusBadRequest
-	}
-	var ie *model.InternalError
-	if errors.As(err, &ie) {
-		return http.StatusInternalServerError
-	}
-	return 0
+	return
 }

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package docker
+package docker_hdl
 
 import (
 	"context"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker/util"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
