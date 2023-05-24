@@ -108,7 +108,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	apiEngine := gin.New()
-	apiEngine.Use(gin_mw.StaticHeaderHandler(http_hdl.GetStaticHeader(version, model.ServiceName)), requestid.New(), gin_mw.LoggerHandler(srv_base.Logger, func(gc *gin.Context) string {
+	apiEngine.Use(gin_mw.StaticHeaderHandler(http_hdl.GetStaticHeader(version, model.ServiceName)), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(srv_base.Logger, func(gc *gin.Context) string {
 		return requestid.Get(gc)
 	}), gin_mw.ErrorHandler(http_hdl.GetStatusCode, ", "), gin.Recovery())
 	apiEngine.UseRawPath = true
