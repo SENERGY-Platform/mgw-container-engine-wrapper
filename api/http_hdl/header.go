@@ -16,14 +16,11 @@
 
 package http_hdl
 
-const (
-	apiVerKey  = "X-Api-Version"
-	srvNameKey = "X-Service"
-)
+import "github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 
 func GetStaticHeader(ver string, name string) map[string]string {
 	return map[string]string{
-		apiVerKey:  ver,
-		srvNameKey: name,
+		model.HeaderApiVer:  ver,
+		model.HeaderSrvName: name,
 	}
 }
