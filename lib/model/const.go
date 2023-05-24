@@ -19,6 +19,12 @@ package model
 const ServiceName = "mgw-container-engine-wrapper"
 
 const (
+	HeaderRequestID = "X-Request-ID"
+	HeaderApiVer    = "X-Api-Version"
+	HeaderSrvName   = "X-Service"
+)
+
+const (
 	TcpPort  PortType = "tcp"
 	UdpPort  PortType = "udp"
 	SctpPort PortType = "sctp"
