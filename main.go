@@ -119,6 +119,7 @@ func main() {
 	cewApi := api.New(dockerHandler, jobHandler)
 
 	http_hdl.SetRoutes(apiEngine, cewApi)
+	srv_base.Logger.Debugf("routes: %s", srv_base.ToJsonStr(http_hdl.GetRoutes(apiEngine)))
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {
