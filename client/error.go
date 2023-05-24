@@ -22,7 +22,8 @@ type cError struct {
 
 type ResponseError struct {
 	cError
-	Code int
+	Code      int
+	RequestID string
 }
 
 type ClientError struct {
@@ -45,10 +46,11 @@ func newServerError(err error) *ServerError {
 	}
 }
 
-func newResponseError(c int, err error) *ResponseError {
+func newResponseError(c int, rID string, err error) *ResponseError {
 	return &ResponseError{
-		cError: cError{err: err},
-		Code:   c,
+		cError:    cError{err: err},
+		Code:      c,
+		RequestID: rID,
 	}
 }
 

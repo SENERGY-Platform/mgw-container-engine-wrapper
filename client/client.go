@@ -54,7 +54,7 @@ func (c *Client) execRequest(req *http.Request) (io.ReadCloser, error) {
 		if err != nil || errMsg == "" {
 			errMsg = resp.Status
 		}
-		return nil, getError(resp.StatusCode, errMsg)
+		return nil, getError(resp.StatusCode, resp.Header.Get(model.HeaderRequestID), errMsg)
 	}
 	return resp.Body, nil
 }
@@ -117,9 +117,9 @@ func readJSON(rc io.ReadCloser, v any) error {
 	return nil
 }
 
-func getError(sc int, msg string) error {
+func getError(sc int, rID, msg string) error {
 	var err error
-	err = newResponseError(sc, errors.New(msg))
+	err = newResponseError(sc, rID, errors.New(msg))
 	if sc < 500 {
 		err = newClientError(err)
 	}
