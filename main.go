@@ -51,7 +51,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	logFile, err := srv_base.InitLogger(config.Logger)
+	logFile, err := util.InitLogger(config.Logger)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		var logFileError *srv_base.LogFileError
@@ -63,11 +63,11 @@ func main() {
 		defer logFile.Close()
 	}
 
-	srv_base.Logger.Debugf("config: %s", srv_base.ToJsonStr(config))
+	util.Logger.Debugf("config: %s", srv_base.ToJsonStr(config))
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		srv_base.Logger.Error(err)
+		util.Logger.Error(err)
 		return
 	}
 	defer dockerClient.Close()
@@ -76,10 +76,10 @@ func main() {
 
 	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
-		srv_base.Logger.Error(err)
+		util.Logger.Error(err)
 		return
 	}
-	srv_base.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
+	util.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
 
 	ccHandler := ccjh.New(config.Jobs.BufferSize)
 
@@ -90,19 +90,19 @@ func main() {
 		ccHandler.Stop()
 		cFunc()
 		if ccHandler.Active() > 0 {
-			srv_base.Logger.Info("waiting for active jobs to cancel ...")
+			util.Logger.Info("waiting for active jobs to cancel ...")
 			ctx, cf := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cf()
 			for ccHandler.Active() != 0 {
 				select {
 				case <-ctx.Done():
-					srv_base.Logger.Error("canceling jobs took too long")
+					util.Logger.Error("canceling jobs took too long")
 					return
 				default:
 					time.Sleep(50 * time.Millisecond)
 				}
 			}
-			srv_base.Logger.Info("jobs canceled")
+			util.Logger.Info("jobs canceled")
 		}
 	}()
 
@@ -112,26 +112,26 @@ func main() {
 		model.HeaderApiVer:  version,
 		model.HeaderSrvName: model.ServiceName,
 	}
-	apiEngine.Use(gin_mw.StaticHeaderHandler(staticHeader), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(srv_base.Logger, func(gc *gin.Context) string {
+	apiEngine.Use(gin_mw.StaticHeaderHandler(staticHeader), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(util.Logger, func(gc *gin.Context) string {
 		return requestid.Get(gc)
 	}), gin_mw.ErrorHandler(http_hdl.GetStatusCode, ", "), gin.Recovery())
 	apiEngine.UseRawPath = true
 	cewApi := api.New(dockerHandler, jobHandler)
 
 	http_hdl.SetRoutes(apiEngine, cewApi)
-	srv_base.Logger.Debugf("routes: %s", srv_base.ToJsonStr(http_hdl.GetRoutes(apiEngine)))
+	util.Logger.Debugf("routes: %s", srv_base.ToJsonStr(http_hdl.GetRoutes(apiEngine)))
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {
-		srv_base.Logger.Error(err)
+		util.Logger.Error(err)
 		return
 	}
 
 	err = ccHandler.RunAsync(config.Jobs.MaxNumber, time.Duration(config.Jobs.JHInterval*1000))
 	if err != nil {
-		srv_base.Logger.Error(err)
+		util.Logger.Error(err)
 		return
 	}
 
-	srv_base.StartServer(&http.Server{Handler: apiEngine}, listener, srv_base_types.DefaultShutdownSignals)
+	srv_base.StartServer(&http.Server{Handler: apiEngine}, listener, srv_base_types.DefaultShutdownSignals, util.Logger)
 }

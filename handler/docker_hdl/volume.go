@@ -18,16 +18,16 @@ package docker_hdl
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
+	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 )
 
 func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
 	var vols []model.Volume
-	vls, err := d.client.VolumeList(ctx, util.GenVolumeFilterArgs(filter))
+	vls, err := d.client.VolumeList(ctx, hdl_util.GenVolumeFilterArgs(filter))
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
@@ -36,8 +36,8 @@ func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]
 			Name:   vl.Name,
 			Labels: vl.Labels,
 		}
-		if ti, err := util.ParseTimestamp(vl.CreatedAt); err != nil {
-			srv_base.Logger.Errorf("parsing created timestamp for volume '%s' failed: %s", vl.Name, err)
+		if ti, err := hdl_util.ParseTimestamp(vl.CreatedAt); err != nil {
+			util.Logger.Errorf("parsing created timestamp for volume '%s' failed: %s", vl.Name, err)
 		} else {
 			vol.Created = ti
 		}
@@ -57,8 +57,8 @@ func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error
 	}
 	vol.Name = vl.Name
 	vol.Labels = vl.Labels
-	if ti, err := util.ParseTimestamp(vl.CreatedAt); err != nil {
-		srv_base.Logger.Errorf("parsing created timestamp for volume '%s' failed: %s", vl.Name, err)
+	if ti, err := hdl_util.ParseTimestamp(vl.CreatedAt); err != nil {
+		util.Logger.Errorf("parsing created timestamp for volume '%s' failed: %s", vl.Name, err)
 	} else {
 		vol.Created = ti
 	}

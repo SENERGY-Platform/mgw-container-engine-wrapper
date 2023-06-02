@@ -18,9 +18,9 @@ package docker_hdl
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
+	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -32,52 +32,52 @@ import (
 
 func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
 	var csl []model.Container
-	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: util.GenContainerFilterArgs(filter)})
+	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: hdl_util.GenContainerFilterArgs(filter)})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
 	for _, c := range cl {
 		ctr := model.Container{
 			ID:       c.ID,
-			State:    util.GetConst(c.State, util.StateMap),
+			State:    hdl_util.GetConst(c.State, hdl_util.StateMap),
 			ImageID:  c.ImageID,
 			Labels:   c.Labels,
-			Mounts:   util.ParseMountPoints(c.Mounts),
-			Networks: util.ParseEndpointSettings(c.NetworkSettings.Networks),
+			Mounts:   hdl_util.ParseMountPoints(c.Mounts),
+			Networks: hdl_util.ParseEndpointSettings(c.NetworkSettings.Networks),
 		}
 		if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
-			srv_base.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
+			util.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
 		} else {
-			ctr.Name = util.ParseContainerName(ci.Name)
-			if tc, err := util.ParseTimestamp(ci.Created); err != nil {
-				srv_base.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
+			ctr.Name = hdl_util.ParseContainerName(ci.Name)
+			if tc, err := hdl_util.ParseTimestamp(ci.Created); err != nil {
+				util.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 			} else {
 				ctr.Created = tc
 			}
 			if c.State == "running" {
-				if ts, err := util.ParseTimestamp(ci.State.StartedAt); err != nil {
-					srv_base.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
+				if ts, err := hdl_util.ParseTimestamp(ci.State.StartedAt); err != nil {
+					util.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
 				} else {
 					ctr.Started = &ts
 				}
 			}
 			ctr.Image = ci.Config.Image
-			ctr.EnvVars = util.ParseEnv(ci.Config.Env)
-			if ports, err := util.ParsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports); err != nil {
-				srv_base.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
+			ctr.EnvVars = hdl_util.ParseEnv(ci.Config.Env)
+			if ports, err := hdl_util.ParsePortSetAndMap(ci.Config.ExposedPorts, ci.NetworkSettings.Ports); err != nil {
+				util.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
 			} else {
 				ctr.Ports = ports
 			}
 			if len(ci.HostConfig.Mounts) > 0 {
-				ctr.Mounts = util.ParseMounts(ci.HostConfig.Mounts)
+				ctr.Mounts = hdl_util.ParseMounts(ci.HostConfig.Mounts)
 			}
-			ctr.Networks = util.ParseEndpointSettings(ci.NetworkSettings.Networks)
-			strategy, retries := util.ParseRestartPolicy(ci.HostConfig.RestartPolicy)
+			ctr.Networks = hdl_util.ParseEndpointSettings(ci.NetworkSettings.Networks)
+			strategy, retries := hdl_util.ParseRestartPolicy(ci.HostConfig.RestartPolicy)
 			ctr.RunConfig = model.RunConfig{
 				RestartStrategy: strategy,
 				Retries:         retries,
 				RemoveAfterRun:  ci.HostConfig.AutoRemove,
-				StopTimeout:     util.ParseStopTimeout(ci.Config.StopTimeout),
+				StopTimeout:     hdl_util.ParseStopTimeout(ci.Config.StopTimeout),
 			}
 			if ci.Config.StopSignal != "" {
 				ctr.RunConfig.StopSignal = &ci.Config.StopSignal
@@ -99,42 +99,42 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container,
 	}
 	var mts []model.Mount
 	if len(c.HostConfig.Mounts) > 0 {
-		mts = util.ParseMounts(c.HostConfig.Mounts)
+		mts = hdl_util.ParseMounts(c.HostConfig.Mounts)
 	} else {
-		mts = util.ParseMountPoints(c.Mounts)
+		mts = hdl_util.ParseMountPoints(c.Mounts)
 	}
 	ctr.ID = c.ID
-	ctr.Name = util.ParseContainerName(c.Name)
-	ctr.State = util.GetConst(c.State.Status, util.StateMap)
+	ctr.Name = hdl_util.ParseContainerName(c.Name)
+	ctr.State = hdl_util.GetConst(c.State.Status, hdl_util.StateMap)
 	ctr.Image = c.Config.Image
 	ctr.ImageID = c.Image
-	ctr.EnvVars = util.ParseEnv(c.Config.Env)
+	ctr.EnvVars = hdl_util.ParseEnv(c.Config.Env)
 	ctr.Labels = c.Config.Labels
 	ctr.Mounts = mts
-	if ports, err := util.ParsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports); err != nil {
-		srv_base.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
+	if ports, err := hdl_util.ParsePortSetAndMap(c.Config.ExposedPorts, c.NetworkSettings.Ports); err != nil {
+		util.Logger.Errorf("parsing ports for container '%s' failed: %s", c.ID, err)
 	} else {
 		ctr.Ports = ports
 	}
-	ctr.Networks = util.ParseEndpointSettings(c.NetworkSettings.Networks)
-	strategy, retries := util.ParseRestartPolicy(c.HostConfig.RestartPolicy)
+	ctr.Networks = hdl_util.ParseEndpointSettings(c.NetworkSettings.Networks)
+	strategy, retries := hdl_util.ParseRestartPolicy(c.HostConfig.RestartPolicy)
 	ctr.RunConfig = model.RunConfig{
 		RestartStrategy: strategy,
 		Retries:         retries,
 		RemoveAfterRun:  c.HostConfig.AutoRemove,
-		StopTimeout:     util.ParseStopTimeout(c.Config.StopTimeout),
+		StopTimeout:     hdl_util.ParseStopTimeout(c.Config.StopTimeout),
 	}
 	if c.Config.StopSignal != "" {
 		ctr.RunConfig.StopSignal = &c.Config.StopSignal
 	}
-	if tc, err := util.ParseTimestamp(c.Created); err != nil {
-		srv_base.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
+	if tc, err := hdl_util.ParseTimestamp(c.Created); err != nil {
+		util.Logger.Errorf("parsing created timestamp for container '%s' failed: %s", c.ID, err)
 	} else {
 		ctr.Created = tc
 	}
 	if c.State.Status == "running" {
-		if ts, err := util.ParseTimestamp(c.State.StartedAt); err != nil {
-			srv_base.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
+		if ts, err := hdl_util.ParseTimestamp(c.State.StartedAt); err != nil {
+			util.Logger.Errorf("parsing started timestamp for container '%s' failed: %s", c.ID, err)
 		} else {
 			ctr.Started = &ts
 		}
@@ -147,23 +147,23 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 		AttachStdout: true,
 		AttachStderr: true,
 		Tty:          ctrConf.RunConfig.PseudoTTY,
-		Env:          util.GenEnv(ctrConf.EnvVars),
+		Env:          hdl_util.GenEnv(ctrConf.EnvVars),
 		Image:        ctrConf.Image,
 		Labels:       ctrConf.Labels,
-		StopTimeout:  util.GenStopTimeout(ctrConf.RunConfig.StopTimeout),
+		StopTimeout:  hdl_util.GenStopTimeout(ctrConf.RunConfig.StopTimeout),
 	}
 	if ctrConf.RunConfig.StopSignal != nil {
 		cConfig.StopSignal = *ctrConf.RunConfig.StopSignal
 	}
-	bindings, err := util.GenPortMap(ctrConf.Ports)
+	bindings, err := hdl_util.GenPortMap(ctrConf.Ports)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
 	}
-	mts, err := util.GenMounts(ctrConf.Mounts)
+	mts, err := hdl_util.GenMounts(ctrConf.Mounts)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
 	}
-	rp, err := util.GenRestartPolicy(ctrConf.RunConfig.RestartStrategy, ctrConf.RunConfig.Retries)
+	rp, err := hdl_util.GenRestartPolicy(ctrConf.RunConfig.RestartStrategy, ctrConf.RunConfig.Retries)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
 	}
@@ -173,7 +173,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 		AutoRemove:    ctrConf.RunConfig.RemoveAfterRun,
 		Mounts:        mts,
 	}
-	err = util.CheckNetworks(ctrConf.Networks)
+	err = hdl_util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
 	}
@@ -197,14 +197,14 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 			if err != nil {
 				err2 := d.ContainerRemove(ctx, res.ID)
 				if err2 != nil {
-					srv_base.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
+					util.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
 				return "", model.NewInternalError(err)
 			}
 		}
 	}
 	if res.Warnings != nil && len(res.Warnings) > 0 {
-		srv_base.Logger.Warningf("encountered warnings during creation of container '%s': %s", ctrConf.Name, res.Warnings)
+		util.Logger.Warningf("encountered warnings during creation of container '%s': %s", ctrConf.Name, res.Warnings)
 	}
 	return res.ID, nil
 }
@@ -270,5 +270,5 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 		}
 		return nil, model.NewInternalError(err)
 	}
-	return util.NewLogReader(rc), nil
+	return hdl_util.NewLogReader(rc), nil
 }

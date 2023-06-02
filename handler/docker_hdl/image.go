@@ -20,9 +20,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
+	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -31,7 +31,7 @@ import (
 
 func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	var images []model.Image
-	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: util.GenImageFilterArgs(filter)})
+	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: hdl_util.GenImageFilterArgs(filter)})
 	if err != nil {
 		return images, model.NewInternalError(err)
 	}
@@ -45,10 +45,10 @@ func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]mo
 			Labels:  is.Labels,
 		}
 		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
-			srv_base.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
+			util.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
 		} else {
-			if ti, err := util.ParseTimestamp(i.Created); err != nil {
-				srv_base.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
+			if ti, err := hdl_util.ParseTimestamp(i.Created); err != nil {
+				util.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", is.ID, err)
 			} else {
 				img.Created = ti.UTC()
 			}
@@ -74,8 +74,8 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) 
 	img.Tags = i.RepoTags
 	img.Digests = i.RepoDigests
 	img.Labels = i.Config.Labels
-	if ti, err := util.ParseTimestamp(i.Created); err != nil {
-		srv_base.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
+	if ti, err := hdl_util.ParseTimestamp(i.Created); err != nil {
+		util.Logger.Errorf("parsing created timestamp for image '%s' failed: %s", i.ID, err)
 	} else {
 		img.Created = ti.UTC()
 	}
@@ -92,7 +92,7 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 	}
 	defer rc.Close()
 	jd := json.NewDecoder(rc)
-	var msg util.ImgPullResp
+	var msg hdl_util.ImgPullResp
 	for {
 		if err := jd.Decode(&msg); err != nil {
 			if err == io.EOF {
@@ -101,7 +101,7 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 				return model.NewInternalError(err)
 			}
 		}
-		srv_base.Logger.Debugf("pulling image '%s': %s", id, msg)
+		util.Logger.Debugf("pulling image '%s': %s", id, msg)
 	}
 	if msg.Message != "" {
 		return model.NewInternalError(errors.New(msg.Message))

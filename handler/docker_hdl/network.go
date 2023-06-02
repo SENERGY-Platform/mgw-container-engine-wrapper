@@ -19,9 +19,9 @@ package docker_hdl
 import (
 	"context"
 	"fmt"
-	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
+	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
@@ -34,8 +34,8 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
 		return nil, model.NewInternalError(err)
 	}
 	for _, r := range nr {
-		if nType, ok := util.NetTypeMap[r.Driver]; ok {
-			s, gw := util.ParseNetIPAMConfig(r.IPAM.Config)
+		if nType, ok := hdl_util.NetTypeMap[r.Driver]; ok {
+			s, gw := hdl_util.ParseNetIPAMConfig(r.IPAM.Config)
 			n = append(n, model.Network{
 				ID:      r.ID,
 				Name:    r.Name,
@@ -57,10 +57,10 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 		}
 		return model.Network{}, model.NewInternalError(err)
 	}
-	s, gw := util.ParseNetIPAMConfig(nr.IPAM.Config)
+	s, gw := hdl_util.ParseNetIPAMConfig(nr.IPAM.Config)
 	n.ID = nr.ID
 	n.Name = nr.Name
-	n.Type = util.GetConst(nr.Driver, util.NetTypeMap)
+	n.Type = hdl_util.GetConst(nr.Driver, hdl_util.NetTypeMap)
 	n.Subnet = s
 	n.Gateway = gw
 	return n, nil
@@ -72,17 +72,17 @@ func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, 
 	}
 	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
 		CheckDuplicate: true,
-		Driver:         util.NetTypeRMap[net.Type],
+		Driver:         hdl_util.NetTypeRMap[net.Type],
 		Attachable:     true,
 		IPAM: &network.IPAM{
-			Config: util.GenNetIPAMConfig(net),
+			Config: hdl_util.GenNetIPAMConfig(net),
 		},
 	})
 	if err != nil {
 		return "", model.NewInternalError(err)
 	}
 	if res.Warning != "" {
-		srv_base.Logger.Warningf("encountered warnings during creation of network '%s': %s", net.Name, res.Warning)
+		util.Logger.Warningf("encountered warnings during creation of network '%s': %s", net.Name, res.Warning)
 	}
 	return res.ID, nil
 }
