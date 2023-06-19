@@ -49,7 +49,7 @@ type Config struct {
 	Header HeaderConfig          `json:"header" env_var:"HEADER_CONFIG"`
 }
 
-func NewConfig(path *string) (*Config, error) {
+func NewConfig(path string) (*Config, error) {
 	cfg := Config{
 		Logger: srv_base.LoggerConfig{
 			Level:        level.Warning,
