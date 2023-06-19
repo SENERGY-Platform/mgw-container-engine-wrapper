@@ -27,7 +27,7 @@ import (
 
 func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
 	var vols []model.Volume
-	vls, err := d.client.VolumeList(ctx, hdl_util.GenVolumeFilterArgs(filter))
+	vls, err := d.client.VolumeList(ctx, volume.ListOptions{Filters: hdl_util.GenVolumeFilterArgs(filter)})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
