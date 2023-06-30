@@ -163,6 +163,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
 	}
+	dvs, err := hdl_util.GenDevices(ctrConf.Devices)
 	rp, err := hdl_util.GenRestartPolicy(ctrConf.RunConfig.RestartStrategy, ctrConf.RunConfig.Retries)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
@@ -172,6 +173,9 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 		RestartPolicy: rp,
 		AutoRemove:    ctrConf.RunConfig.RemoveAfterRun,
 		Mounts:        mts,
+		Resources: container.Resources{
+			Devices: dvs,
+		},
 	}
 	err = hdl_util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
