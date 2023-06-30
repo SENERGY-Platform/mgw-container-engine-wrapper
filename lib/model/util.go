@@ -30,6 +30,10 @@ func (m *Mount) KeyStr() string {
 	return fmt.Sprintf("%s:%s", m.Source, m.Target)
 }
 
+func (d *Device) KeyStr() string {
+	return fmt.Sprintf("%s:%s", d.Source, d.Target)
+}
+
 func (s *Subnet) KeyStr() string {
 	return fmt.Sprintf("%s/%d", net.IP(s.Prefix).String(), s.Bits)
 }

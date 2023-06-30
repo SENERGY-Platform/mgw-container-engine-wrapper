@@ -88,6 +88,11 @@ type Mount struct {
 	Mode     fs.FileMode       `json:"mode,omitempty"`
 }
 
+type Device struct {
+	Source string `json:"source"`
+	Target string `json:"target"`
+}
+
 type RestartStrategy = string
 
 type RunConfig struct {
@@ -112,6 +117,7 @@ type Container struct {
 	EnvVars   map[string]string `json:"env_vars"`
 	Labels    map[string]string `json:"labels"`
 	Mounts    []Mount           `json:"mounts"`
+	Devices   []Device          `json:"devices"`
 	Ports     []Port            `json:"ports"`
 	Networks  []ContainerNet    `json:"networks"`
 	RunConfig RunConfig         `json:"run_config"`
