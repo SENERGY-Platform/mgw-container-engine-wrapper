@@ -105,6 +105,23 @@ func GenMounts(mounts []model.Mount) ([]mount.Mount, error) {
 	return msl, nil
 }
 
+func GenDevices(devices []model.Device) ([]container.DeviceMapping, error) {
+	var dms []container.DeviceMapping
+	set := make(map[string]struct{})
+	for _, d := range devices {
+		key := d.KeyStr()
+		if _, ok := set[key]; ok {
+			return nil, fmt.Errorf("device duplicate '%s'", key)
+		}
+		set[key] = struct{}{}
+		dms = append(dms, container.DeviceMapping{
+			PathOnHost:      d.Source,
+			PathInContainer: d.Target,
+		})
+	}
+	return dms, nil
+}
+
 func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
 	if fLabels != nil && len(fLabels) > 0 {
 		for k, v := range fLabels {
