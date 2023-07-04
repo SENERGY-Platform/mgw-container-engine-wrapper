@@ -89,8 +89,9 @@ type Mount struct {
 }
 
 type Device struct {
-	Source string `json:"source"`
-	Target string `json:"target"`
+	Source   string `json:"source"`
+	Target   string `json:"target"`
+	ReadOnly bool   `json:"read_only"`
 }
 
 type RestartStrategy = string
