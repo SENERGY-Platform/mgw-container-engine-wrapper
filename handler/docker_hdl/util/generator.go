@@ -115,11 +115,19 @@ func GenDevices(devices []model.Device) ([]container.DeviceMapping, error) {
 		}
 		set[key] = struct{}{}
 		dms = append(dms, container.DeviceMapping{
-			PathOnHost:      d.Source,
-			PathInContainer: d.Target,
+			PathOnHost:        d.Source,
+			PathInContainer:   d.Target,
+			CgroupPermissions: getCgroupPermissions(d.ReadOnly),
 		})
 	}
 	return dms, nil
+}
+
+func getCgroupPermissions(readOnly bool) string {
+	if readOnly {
+		return "rm"
+	}
+	return "rwm"
 }
 
 func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
