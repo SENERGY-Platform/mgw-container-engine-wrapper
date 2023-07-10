@@ -107,10 +107,13 @@ type RunConfig struct {
 
 type ContainerState = string
 
+type ContainerHealth = string
+
 type Container struct {
 	ID        string            `json:"id"`
 	Name      string            `json:"name"`
 	State     ContainerState    `json:"state"`
+	Health    *ContainerHealth  `json:"health"`
 	Created   time.Time         `json:"created"`
 	Started   *time.Time        `json:"started"`
 	Image     string            `json:"image"`

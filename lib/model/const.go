@@ -95,6 +95,12 @@ var ContainerStateMap = map[ContainerState]struct{}{
 }
 
 const (
+	HealthyState    ContainerHealth = "healthy"
+	UnhealthyState  ContainerHealth = "unhealthy"
+	TransitionState ContainerHealth = "transitioning"
+)
+
+const (
 	JobPending   JobStatus = "pending"
 	JobRunning   JobStatus = "running"
 	JobCanceled  JobStatus = "canceled"
