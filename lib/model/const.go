@@ -81,7 +81,7 @@ const (
 	RestartingState ContainerState = "restarting"
 	RemovingState   ContainerState = "removing"
 	StoppedState    ContainerState = "stopped"
-	UnhealthyState  ContainerState = "unhealthy"
+	DeadState       ContainerState = "dead"
 )
 
 var ContainerStateMap = map[ContainerState]struct{}{
@@ -91,7 +91,7 @@ var ContainerStateMap = map[ContainerState]struct{}{
 	RestartingState: {},
 	RemovingState:   {},
 	StoppedState:    {},
-	UnhealthyState:  {},
+	DeadState:       {},
 }
 
 const (

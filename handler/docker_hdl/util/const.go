@@ -28,7 +28,7 @@ var StateMap = map[string]model.ContainerState{
 	"restarting": model.RestartingState,
 	"removing":   model.RemovingState,
 	"exited":     model.StoppedState,
-	"dead":       model.UnhealthyState,
+	"dead":       model.DeadState,
 }
 
 var StateRMap = func() map[model.ContainerState]string {
