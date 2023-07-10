@@ -39,6 +39,12 @@ var StateRMap = func() map[model.ContainerState]string {
 	return m
 }()
 
+var HealthMap = map[string]model.ContainerHealth{
+	"starting":  model.TransitionState,
+	"healthy":   model.HealthyState,
+	"unhealthy": model.UnhealthyState,
+}
+
 var RestartPolicyMap = map[string]model.RestartStrategy{
 	"no":             model.RestartNever,
 	"on-failure":     model.RestartOnFail,

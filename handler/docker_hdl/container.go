@@ -82,6 +82,10 @@ func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilte
 			if ci.Config.StopSignal != "" {
 				ctr.RunConfig.StopSignal = &ci.Config.StopSignal
 			}
+			if ci.State.Health != nil {
+				hs := hdl_util.GetConst(ci.State.Health.Status, hdl_util.HealthMap)
+				ctr.Health = &hs
+			}
 		}
 		csl = append(csl, ctr)
 	}
@@ -138,6 +142,10 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container,
 		} else {
 			ctr.Started = &ts
 		}
+	}
+	if c.State.Health != nil {
+		hs := hdl_util.GetConst(c.State.Health.Status, hdl_util.HealthMap)
+		ctr.Health = &hs
 	}
 	return ctr, nil
 }
