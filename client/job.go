@@ -65,7 +65,7 @@ func (c *Client) CancelJob(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u, nil)
 	if err != nil {
 		return err
 	}
