@@ -44,7 +44,7 @@ func SetRoutes(e *gin.Engine, a lib.Api) {
 	e.DELETE("/"+model.VolumesPath+"/:"+volIdParam, deleteVolumeH(a))
 	e.GET("/"+model.JobsPath, getJobsH(a))
 	e.GET("/"+model.JobsPath+"/:"+jobIdParam, getJobH(a))
-	e.POST("/"+model.JobsPath+"/:"+jobIdParam+"/"+model.JobsCancelPath, postJobCancelH(a))
+	e.PATCH("/"+model.JobsPath+"/:"+jobIdParam+"/"+model.JobsCancelPath, patchJobCancelH(a))
 }
 
 func GetRoutes(e *gin.Engine) [][2]string {
