@@ -136,10 +136,6 @@ type ContainerNet struct {
 	MacAddress  string   `json:"mac_address"`
 }
 
-type ContainerCtrlRequest struct {
-	State ContainerState `json:"state"`
-}
-
 type ContainerFilter struct {
 	Name   string
 	State  ContainerState
