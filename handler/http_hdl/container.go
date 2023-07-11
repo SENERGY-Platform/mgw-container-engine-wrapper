@@ -164,38 +164,35 @@ func getContainerLogH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func postContainerCtrlH(a lib.Api) gin.HandlerFunc {
+func patchContainerStartH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		var ctrlReq model.ContainerCtrlRequest
-		if err := gc.ShouldBindJSON(&ctrlReq); err != nil {
-			_ = gc.Error(model.NewInvalidInputError(err))
+		err := a.StartContainer(gc.Request.Context(), gc.Param(ctrIdParam))
+		if err != nil {
+			_ = gc.Error(err)
 			return
 		}
-		switch ctrlReq.State {
-		case model.RunningState:
-			err := a.StartContainer(gc.Request.Context(), gc.Param(ctrIdParam))
-			if err != nil {
-				_ = gc.Error(err)
-				return
-			}
-			gc.Status(http.StatusOK)
-		case model.StoppedState:
-			id, err := a.StopContainer(gc.Request.Context(), gc.Param(ctrIdParam))
-			if err != nil {
-				_ = gc.Error(err)
-				return
-			}
-			gc.String(http.StatusOK, id)
-		case model.RestartingState:
-			id, err := a.RestartContainer(gc.Request.Context(), gc.Param(ctrIdParam))
-			if err != nil {
-				_ = gc.Error(err)
-				return
-			}
-			gc.String(http.StatusOK, id)
-		default:
-			_ = gc.Error(model.NewInvalidInputError(fmt.Errorf("unknown container state '%s'", ctrlReq.State)))
+		gc.Status(http.StatusOK)
+	}
+}
+
+func patchContainerStopH(a lib.Api) gin.HandlerFunc {
+	return func(gc *gin.Context) {
+		jID, err := a.StopContainer(gc.Request.Context(), gc.Param(ctrIdParam))
+		if err != nil {
+			_ = gc.Error(err)
 			return
 		}
+		gc.String(http.StatusOK, jID)
+	}
+}
+
+func patchContainerRestartH(a lib.Api) gin.HandlerFunc {
+	return func(gc *gin.Context) {
+		jID, err := a.RestartContainer(gc.Request.Context(), gc.Param(ctrIdParam))
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.String(http.StatusOK, jID)
 	}
 }
