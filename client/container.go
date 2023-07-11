@@ -80,16 +80,39 @@ func (c *Client) CreateContainer(ctx context.Context, container model.Container)
 }
 
 func (c *Client) StartContainer(ctx context.Context, id string) error {
-	_, err := c.postContainerCtrl(ctx, id, model.RunningState)
-	return err
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id, model.ContainerStartPath)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u, nil)
+	if err != nil {
+		return err
+	}
+	return c.execRequestVoid(req)
 }
 
 func (c *Client) StopContainer(ctx context.Context, id string) (jobId string, err error) {
-	return c.postContainerCtrl(ctx, id, model.StoppedState)
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id, model.ContainerStopPath)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u, nil)
+	if err != nil {
+		return "", err
+	}
+	return c.execRequestString(req)
 }
 
 func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string, err error) {
-	return c.postContainerCtrl(ctx, id, model.RestartingState)
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id, model.ContainerRestartPath)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u, nil)
+	if err != nil {
+		return "", err
+	}
+	return c.execRequestString(req)
 }
 
 func (c *Client) RemoveContainer(ctx context.Context, id string) error {
@@ -106,23 +129,6 @@ func (c *Client) RemoveContainer(ctx context.Context, id string) error {
 
 func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {
 	panic("not implemented")
-}
-
-func (c *Client) postContainerCtrl(ctx context.Context, id string, state model.ContainerState) (string, error) {
-	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id, model.ContainerCtrlPath)
-	if err != nil {
-		return "", err
-	}
-	body, err := json.Marshal(model.ContainerCtrlRequest{State: state})
-	if err != nil {
-		return "", err
-	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewBuffer(body))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	return c.execRequestString(req)
 }
 
 func genGetContainersQuery(filter model.ContainerFilter) string {
