@@ -67,8 +67,7 @@ func main() {
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		util.Logger.Error(err)
-		return
+		util.Logger.Fatal(err)
 	}
 	defer dockerClient.Close()
 
@@ -76,8 +75,7 @@ func main() {
 
 	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
 	if err != nil {
-		util.Logger.Error(err)
-		return
+		util.Logger.Fatal(err)
 	}
 	util.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
 
@@ -123,14 +121,12 @@ func main() {
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {
-		util.Logger.Error(err)
-		return
+		util.Logger.Fatal(err)
 	}
 
 	err = ccHandler.RunAsync(config.Jobs.MaxNumber, time.Duration(config.Jobs.JHInterval*1000))
 	if err != nil {
-		util.Logger.Error(err)
-		return
+		util.Logger.Fatal(err)
 	}
 
 	srv_base.StartServer(&http.Server{Handler: apiEngine}, listener, srv_base_types.DefaultShutdownSignals, util.Logger)
