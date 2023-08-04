@@ -23,7 +23,6 @@ import (
 	"github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
 	"github.com/SENERGY-Platform/go-service-base/srv-base"
-	"github.com/SENERGY-Platform/go-service-base/srv-base/types"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl"
@@ -35,6 +34,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -72,6 +72,8 @@ func main() {
 
 	util.Logger.Debugf("config: %s", srv_base.ToJsonStr(config))
 
+	watchdog := srv_base.NewWatchdog(util.Logger, syscall.SIGINT, syscall.SIGTERM)
+
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		util.Logger.Error(err)
@@ -92,12 +94,12 @@ func main() {
 
 	ccHandler := ccjh.New(config.Jobs.BufferSize)
 
-	jobCtx, cFunc := context.WithCancel(context.Background())
+	jobCtx, jobCF := context.WithCancel(context.Background())
 	jobHandler := job_hdl.New(jobCtx, ccHandler)
 
-	defer func() {
+	watchdog.RegisterStopFunc(func() error {
 		ccHandler.Stop()
-		cFunc()
+		jobCF()
 		if ccHandler.Active() > 0 {
 			util.Logger.Info("waiting for active jobs to cancel ...")
 			ctx, cf := context.WithTimeout(context.Background(), 5*time.Second)
@@ -105,30 +107,30 @@ func main() {
 			for ccHandler.Active() != 0 {
 				select {
 				case <-ctx.Done():
-					util.Logger.Error("canceling jobs took too long")
-					return
+					return fmt.Errorf("canceling jobs took too long")
 				default:
 					time.Sleep(50 * time.Millisecond)
 				}
 			}
 			util.Logger.Info("jobs canceled")
 		}
-	}()
+		return nil
+	})
 
 	gin.SetMode(gin.ReleaseMode)
-	apiEngine := gin.New()
+	httpHandler := gin.New()
 	staticHeader := map[string]string{
 		model.HeaderApiVer:  version,
 		model.HeaderSrvName: model.ServiceName,
 	}
-	apiEngine.Use(gin_mw.StaticHeaderHandler(staticHeader), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(util.Logger, func(gc *gin.Context) string {
+	httpHandler.Use(gin_mw.StaticHeaderHandler(staticHeader), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(util.Logger, func(gc *gin.Context) string {
 		return requestid.Get(gc)
 	}), gin_mw.ErrorHandler(http_hdl.GetStatusCode, ", "), gin.Recovery())
-	apiEngine.UseRawPath = true
+	httpHandler.UseRawPath = true
 	cewApi := api.New(dockerHandler, jobHandler)
 
-	http_hdl.SetRoutes(apiEngine, cewApi)
-	util.Logger.Debugf("routes: %s", srv_base.ToJsonStr(http_hdl.GetRoutes(apiEngine)))
+	http_hdl.SetRoutes(httpHandler, cewApi)
+	util.Logger.Debugf("routes: %s", srv_base.ToJsonStr(http_hdl.GetRoutes(httpHandler)))
 
 	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {
@@ -136,6 +138,28 @@ func main() {
 		ec = 1
 		return
 	}
+	server := &http.Server{Handler: httpHandler}
+	srvCtx, srvCF := context.WithCancel(context.Background())
+	watchdog.RegisterStopFunc(func() error {
+		if srvCtx.Err() == nil {
+			ctxWt, cf := context.WithTimeout(context.Background(), time.Second*5)
+			defer cf()
+			if err := server.Shutdown(ctxWt); err != nil {
+				return err
+			}
+			util.Logger.Info("http server shutdown complete")
+		}
+		return nil
+	})
+	watchdog.RegisterHealthFunc(func() bool {
+		if srvCtx.Err() == nil {
+			return true
+		}
+		util.Logger.Error("http server closed unexpectedly")
+		return false
+	})
+
+	watchdog.Start()
 
 	err = ccHandler.RunAsync(config.Jobs.MaxNumber, time.Duration(config.Jobs.JHInterval*1000))
 	if err != nil {
@@ -144,5 +168,15 @@ func main() {
 		return
 	}
 
-	srv_base.StartServer(&http.Server{Handler: apiEngine}, listener, srv_base_types.DefaultShutdownSignals, util.Logger)
+	go func() {
+		defer srvCF()
+		util.Logger.Info("starting http server ...")
+		if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
+			util.Logger.Error(err)
+			ec = 1
+			return
+		}
+	}()
+
+	ec = watchdog.Join()
 }
