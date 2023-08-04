@@ -18,7 +18,9 @@ package docker_hdl
 
 import (
 	"context"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
+	"time"
 )
 
 type Docker struct {
@@ -29,7 +31,11 @@ func New(c *client.Client) *Docker {
 	return &Docker{client: c}
 }
 
-func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
+func (d *Docker) ServerInfo(ctx context.Context, delay time.Duration) (map[string]string, error) {
+	err := d.waitForServer(ctx, delay)
+	if err != nil {
+		return nil, err
+	}
 	info := map[string]string{}
 	srvVer, err := d.client.ServerVersion(ctx)
 	if err != nil {
@@ -40,4 +46,36 @@ func (d *Docker) ServerInfo(ctx context.Context) (map[string]string, error) {
 	}
 	info["api"] = d.client.ClientVersion()
 	return info, nil
+}
+
+func (d *Docker) waitForServer(ctx context.Context, delay time.Duration) error {
+	_, err := d.client.Ping(ctx)
+	if err == nil {
+		return nil
+	} else {
+		if !client.IsErrConnectionFailed(err) {
+			return err
+		} else {
+			util.Logger.Error(err)
+		}
+	}
+	ticker := time.NewTicker(delay)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			_, err = d.client.Ping(ctx)
+			if err == nil {
+				return nil
+			} else {
+				if !client.IsErrConnectionFailed(err) {
+					return err
+				} else {
+					util.Logger.Error(err)
+				}
+			}
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 }
