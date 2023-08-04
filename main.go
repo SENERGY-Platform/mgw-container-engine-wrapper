@@ -84,14 +84,6 @@ func main() {
 
 	dockerHandler := docker_hdl.New(dockerClient)
 
-	dockerInfo, err := dockerHandler.ServerInfo(context.Background())
-	if err != nil {
-		util.Logger.Error(err)
-		ec = 1
-		return
-	}
-	util.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
-
 	ccHandler := ccjh.New(config.Jobs.BufferSize)
 
 	jobCtx, jobCF := context.WithCancel(context.Background())
@@ -167,6 +159,23 @@ func main() {
 		ec = 1
 		return
 	}
+
+	dCtx, dCF := context.WithCancel(context.Background())
+	watchdog.RegisterStopFunc(func() error {
+		dCF()
+		return nil
+	})
+
+	go func() {
+		defer dCF()
+		dockerInfo, err := dockerHandler.ServerInfo(dCtx, time.Millisecond*100)
+		if err != nil {
+			util.Logger.Error(err)
+			ec = 1
+			return
+		}
+		util.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
+	}()
 
 	go func() {
 		defer srvCF()
