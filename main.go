@@ -172,6 +172,7 @@ func main() {
 		if err != nil {
 			util.Logger.Error(err)
 			ec = 1
+			watchdog.Trigger()
 			return
 		}
 		util.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
