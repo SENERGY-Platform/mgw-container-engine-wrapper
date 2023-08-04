@@ -5,8 +5,8 @@ github.com/SENERGY-Platform/gin-middleware v0.4.0 h1:ImtPLpzAOu0M1sLXBCC9jJSq5JK
 github.com/SENERGY-Platform/gin-middleware v0.4.0/go.mod h1:BVE9k1GsvsXXnnLOBa5vfwklFXGCQTJE0CGDBAwy0TY=
 github.com/SENERGY-Platform/go-cc-job-handler v0.1.0 h1:JD8FNOo239AUCpiGKF1/E96XrBResRn3k1+c963UTJU=
 github.com/SENERGY-Platform/go-cc-job-handler v0.1.0/go.mod h1:9n2ZEgD4qhPJUIFJPzEDxmkoEY8d5U5oUVHOSnDUglc=
-github.com/SENERGY-Platform/go-service-base v0.10.0 h1:K3YUrJJfbT9PiujRNQ5bRDJCLxJayZTWlK0I1/E0XEA=
-github.com/SENERGY-Platform/go-service-base v0.10.0/go.mod h1:3ZD/Bo3uqhb3KzR70teqLEHyRCEXBJay9v9vzUpXqmI=
+github.com/SENERGY-Platform/go-service-base v0.11.1 h1:WoLQI/u8u8SHBwd8Y7DZybsWZ0NbdoOY5u4+vccX/qE=
+github.com/SENERGY-Platform/go-service-base v0.11.1/go.mod h1:3ZD/Bo3uqhb3KzR70teqLEHyRCEXBJay9v9vzUpXqmI=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.9.1 h1:6iJ6NqdoxCDr6mbY8h18oSO+cShGSMRGCEo7F2h0x8s=
 github.com/bytedance/sonic v1.9.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
