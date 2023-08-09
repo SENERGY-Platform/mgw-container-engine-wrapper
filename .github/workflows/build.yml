@@ -19,11 +19,13 @@ jobs:
       - name: Make Linux build dir
         run: mkdir -p linux_build/amd64 linux_build/arm64
       - name: Build Linux amd64
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux_build/amd64/wrapper -ldflags="-X 'main.version=${{ github.ref_name }}'" main.go
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux_build/amd64/bin -ldflags="-X 'main.version=${{ github.ref_name }}'" main.go
+      - name: Build Linux arm
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -o linux_build/arm/bin -ldflags="-X 'main.version=${{ github.ref_name }}'" main.go
       - name: Build Linux arm64
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o linux_build/arm64/wrapper -ldflags="-X 'main.version=${{ github.ref_name }}'" main.go
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o linux_build/arm64/bin -ldflags="-X 'main.version=${{ github.ref_name }}'" main.go
       - name: Archive Linux
-        run: tar -czvf mgw_ce_wrapper_${{ github.ref_name }}_linux.tar.gz LICENSE README.md -C linux_build amd64 arm64
+        run: tar -czvf mgw_ce_wrapper_${{ github.ref_name }}_linux.tar.gz LICENSE README.md -C linux_build amd64 arm arm64
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
