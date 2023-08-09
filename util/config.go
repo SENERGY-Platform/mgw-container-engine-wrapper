@@ -54,7 +54,7 @@ func NewConfig(path string) (*Config, error) {
 		Logger: srv_base.LoggerConfig{
 			Level:        level.Warning,
 			Utc:          true,
-			Path:         "/var/log/",
+			Path:         "./",
 			FileName:     "mgw_ce_wrapper",
 			Microseconds: true,
 		},
