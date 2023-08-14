@@ -46,8 +46,6 @@ func main() {
 		os.Exit(ec)
 	}()
 
-	srv_base.PrintInfo(model.ServiceName, version)
-
 	util.ParseFlags()
 
 	config, err := util.NewConfig(util.Flags.ConfPath)
@@ -69,6 +67,8 @@ func main() {
 	if logFile != nil {
 		defer logFile.Close()
 	}
+
+	util.Logger.Printf("%s %s", model.ServiceName, version)
 
 	util.Logger.Debugf("config: %s", srv_base.ToJsonStr(config))
 
