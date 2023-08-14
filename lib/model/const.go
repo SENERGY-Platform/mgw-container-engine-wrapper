@@ -16,7 +16,7 @@
 
 package model
 
-const ServiceName = "mgw-container-engine-wrapper"
+const ServiceName = "ce-wrapper"
 
 const (
 	HeaderRequestID = "X-Request-ID"
