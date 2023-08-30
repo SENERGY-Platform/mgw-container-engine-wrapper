@@ -282,5 +282,5 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 		}
 		return nil, model.NewInternalError(err)
 	}
-	return hdl_util.NewLogReader(rc), nil
+	return &hdl_util.RCWrapper{ReadCloser: rc}, nil
 }
