@@ -18,12 +18,9 @@ package client
 
 import (
 	"github.com/SENERGY-Platform/go-base-http-client"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 )
-
-type CewClient = lib.Api
 
 type Client struct {
 	baseClient *base_client.Client
