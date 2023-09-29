@@ -37,7 +37,7 @@ func (c *Client) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]m
 		return nil, err
 	}
 	var volumes []model.Volume
-	err = c.execRequestJSON(req, &volumes)
+	err = c.baseClient.ExecRequestJSON(req, &volumes)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Client) GetVolume(ctx context.Context, id string) (model.Volume, error)
 		return model.Volume{}, err
 	}
 	var volume model.Volume
-	err = c.execRequestJSON(req, &volume)
+	err = c.baseClient.ExecRequestJSON(req, &volume)
 	if err != nil {
 		return model.Volume{}, err
 	}
@@ -75,7 +75,7 @@ func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, er
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	return c.execRequestString(req)
+	return c.baseClient.ExecRequestString(req)
 }
 
 func (c *Client) RemoveVolume(ctx context.Context, id string) error {
@@ -87,7 +87,7 @@ func (c *Client) RemoveVolume(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return c.execRequestVoid(req)
+	return c.baseClient.ExecRequestVoid(req)
 }
 
 func genVolumesQuery(filter model.VolumeFilter) string {

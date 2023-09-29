@@ -35,7 +35,7 @@ func (c *Client) GetNetworks(ctx context.Context) ([]model.Network, error) {
 		return nil, err
 	}
 	var networks []model.Network
-	err = c.execRequestJSON(req, &networks)
+	err = c.baseClient.ExecRequestJSON(req, &networks)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Client) GetNetwork(ctx context.Context, id string) (model.Network, erro
 		return model.Network{}, err
 	}
 	var network model.Network
-	err = c.execRequestJSON(req, &network)
+	err = c.baseClient.ExecRequestJSON(req, &network)
 	if err != nil {
 		return model.Network{}, err
 	}
@@ -73,7 +73,7 @@ func (c *Client) CreateNetwork(ctx context.Context, net model.Network) (string, 
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	return c.execRequestString(req)
+	return c.baseClient.ExecRequestString(req)
 }
 
 func (c *Client) RemoveNetwork(ctx context.Context, id string) error {
@@ -85,5 +85,5 @@ func (c *Client) RemoveNetwork(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return c.execRequestVoid(req)
+	return c.baseClient.ExecRequestVoid(req)
 }

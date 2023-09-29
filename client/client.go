@@ -17,116 +17,28 @@
 package client
 
 import (
-	"encoding/json"
-	"errors"
+	"github.com/SENERGY-Platform/go-base-http-client"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
-	"io"
 	"net/http"
 )
 
 type CewClient = lib.Api
 
-type HttpClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
-
 type Client struct {
-	httpClient HttpClient
+	baseClient *base_client.Client
 	baseUrl    string
 }
 
-func New(httpClient HttpClient, baseUrl string) *Client {
+func New(httpClient base_client.HTTPClient, baseUrl string) *Client {
 	return &Client{
-		httpClient: httpClient,
+		baseClient: base_client.New(httpClient, customError, model.HeaderRequestID),
 		baseUrl:    baseUrl,
 	}
 }
 
-func (c *Client) execRequest(req *http.Request) (io.ReadCloser, error) {
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode >= 400 {
-		defer resp.Body.Close()
-		errMsg, err := readString(resp.Body)
-		if err != nil || errMsg == "" {
-			errMsg = resp.Status
-		}
-		return nil, getError(resp.StatusCode, resp.Header.Get(model.HeaderRequestID), errMsg)
-	}
-	return resp.Body, nil
-}
-
-func (c *Client) execRequestJSON(req *http.Request, v any) error {
-	body, err := c.execRequest(req)
-	if err != nil {
-		return err
-	}
-	defer body.Close()
-	err = readJSON(body, v)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Client) execRequestString(req *http.Request) (string, error) {
-	body, err := c.execRequest(req)
-	if err != nil {
-		return "", err
-	}
-	defer body.Close()
-	return readString(body)
-}
-
-func (c *Client) execRequestVoid(req *http.Request) error {
-	body, err := c.execRequest(req)
-	if err != nil {
-		return err
-	}
-	defer body.Close()
-	_ = readVoid(body)
-	return nil
-}
-
-func readVoid(rc io.ReadCloser) error {
-	_, err := io.ReadAll(rc)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func readString(rc io.ReadCloser) (string, error) {
-	b, err := io.ReadAll(rc)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
-}
-
-func readJSON(rc io.ReadCloser, v any) error {
-	jd := json.NewDecoder(rc)
-	err := jd.Decode(v)
-	if err != nil {
-		_ = readVoid(rc)
-		return err
-	}
-	return nil
-}
-
-func getError(sc int, rID, msg string) error {
-	var err error
-	err = newResponseError(sc, rID, errors.New(msg))
-	if sc < 500 {
-		err = newClientError(err)
-	}
-	if sc >= 500 {
-		err = newServerError(err)
-	}
-	switch sc {
+func customError(code int, err error) error {
+	switch code {
 	case http.StatusInternalServerError:
 		err = model.NewInternalError(err)
 	case http.StatusNotFound:

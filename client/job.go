@@ -36,7 +36,7 @@ func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.J
 		return nil, err
 	}
 	var jobs []model.Job
-	err = c.execRequestJSON(req, &jobs)
+	err = c.baseClient.ExecRequestJSON(req, &jobs)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Client) GetJob(ctx context.Context, id string) (model.Job, error) {
 		return model.Job{}, err
 	}
 	var job model.Job
-	err = c.execRequestJSON(req, &job)
+	err = c.baseClient.ExecRequestJSON(req, &job)
 	if err != nil {
 		return model.Job{}, err
 	}
@@ -69,7 +69,7 @@ func (c *Client) CancelJob(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return c.execRequestVoid(req)
+	return c.baseClient.ExecRequestVoid(req)
 }
 
 func genJobsFilter(filter model.JobFilter) string {

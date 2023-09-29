@@ -38,7 +38,7 @@ func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter
 		return nil, err
 	}
 	var containers []model.Container
-	err = c.execRequestJSON(req, &containers)
+	err = c.baseClient.ExecRequestJSON(req, &containers)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *Client) GetContainer(ctx context.Context, id string) (model.Container, 
 		return model.Container{}, err
 	}
 	var container model.Container
-	err = c.execRequestJSON(req, &container)
+	err = c.baseClient.ExecRequestJSON(req, &container)
 	if err != nil {
 		return model.Container{}, err
 	}
@@ -76,7 +76,7 @@ func (c *Client) CreateContainer(ctx context.Context, container model.Container)
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	return c.execRequestString(req)
+	return c.baseClient.ExecRequestString(req)
 }
 
 func (c *Client) StartContainer(ctx context.Context, id string) error {
@@ -88,7 +88,7 @@ func (c *Client) StartContainer(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return c.execRequestVoid(req)
+	return c.baseClient.ExecRequestVoid(req)
 }
 
 func (c *Client) StopContainer(ctx context.Context, id string) (jobId string, err error) {
@@ -100,7 +100,7 @@ func (c *Client) StopContainer(ctx context.Context, id string) (jobId string, er
 	if err != nil {
 		return "", err
 	}
-	return c.execRequestString(req)
+	return c.baseClient.ExecRequestString(req)
 }
 
 func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string, err error) {
@@ -112,7 +112,7 @@ func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string,
 	if err != nil {
 		return "", err
 	}
-	return c.execRequestString(req)
+	return c.baseClient.ExecRequestString(req)
 }
 
 func (c *Client) RemoveContainer(ctx context.Context, id string) error {
@@ -124,7 +124,7 @@ func (c *Client) RemoveContainer(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return c.execRequestVoid(req)
+	return c.baseClient.ExecRequestVoid(req)
 }
 
 func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {

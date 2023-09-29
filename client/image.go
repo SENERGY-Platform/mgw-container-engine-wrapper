@@ -37,7 +37,7 @@ func (c *Client) GetImages(ctx context.Context, filter model.ImageFilter) ([]mod
 		return nil, err
 	}
 	var images []model.Image
-	err = c.execRequestJSON(req, &images)
+	err = c.baseClient.ExecRequestJSON(req, &images)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Client) GetImage(ctx context.Context, id string) (model.Image, error) {
 		return model.Image{}, err
 	}
 	var image model.Image
-	err = c.execRequestJSON(req, &image)
+	err = c.baseClient.ExecRequestJSON(req, &image)
 	if err != nil {
 		return model.Image{}, err
 	}
@@ -76,7 +76,7 @@ func (c *Client) AddImage(ctx context.Context, img string) (jobId string, err er
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	return c.execRequestString(req)
+	return c.baseClient.ExecRequestString(req)
 }
 
 func (c *Client) RemoveImage(ctx context.Context, id string) error {
@@ -88,7 +88,7 @@ func (c *Client) RemoveImage(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return c.execRequestVoid(req)
+	return c.baseClient.ExecRequestVoid(req)
 }
 
 func genImagesQuery(filter model.ImageFilter) string {
