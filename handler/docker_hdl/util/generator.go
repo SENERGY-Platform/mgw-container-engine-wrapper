@@ -49,19 +49,18 @@ func GenStopTimeout(d *time.Duration) *int {
 func GenPortMap(ports []model.Port) (nat.PortMap, nat.PortSet, error) {
 	pm := make(nat.PortMap)
 	ps := make(nat.PortSet)
-	set := make(map[string]struct{})
 	for _, p := range ports {
 		if _, ok := model.PortTypeMap[p.Protocol]; !ok {
 			return nil, nil, fmt.Errorf("invalid port type '%s'", p.Protocol)
 		}
-		if _, ok := set[p.KeyStr()]; ok {
-			return nil, nil, fmt.Errorf("port duplicate '%s'", p.KeyStr())
-		}
-		set[p.KeyStr()] = struct{}{}
 		port, err := nat.NewPort(PortTypeRMap[p.Protocol], strconv.FormatInt(int64(p.Number), 10))
 		if err != nil {
 			return nil, nil, err
 		}
+		if _, ok := ps[port]; ok {
+			return nil, nil, fmt.Errorf("port duplicate '%s'", p.KeyStr())
+		}
+		ps[port] = struct{}{}
 		var bindings []nat.PortBinding
 		for _, binding := range p.Bindings {
 			hostIP := net.IP(binding.Interface)
@@ -75,7 +74,6 @@ func GenPortMap(ports []model.Port) (nat.PortMap, nat.PortSet, error) {
 			})
 		}
 		pm[port] = bindings
-		ps[port] = struct{}{}
 	}
 	return pm, ps, nil
 }
