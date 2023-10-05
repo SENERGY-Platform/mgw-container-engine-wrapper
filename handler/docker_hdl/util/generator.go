@@ -46,31 +46,38 @@ func GenStopTimeout(d *time.Duration) *int {
 	return nil
 }
 
-func GenPortMap(ports []model.Port) (nat.PortMap, error) {
+func GenPortMap(ports []model.Port) (nat.PortMap, nat.PortSet, error) {
 	pm := make(nat.PortMap)
+	ps := make(nat.PortSet)
 	set := make(map[string]struct{})
 	for _, p := range ports {
 		if _, ok := model.PortTypeMap[p.Protocol]; !ok {
-			return pm, fmt.Errorf("invalid port type '%s'", p.Protocol)
+			return nil, nil, fmt.Errorf("invalid port type '%s'", p.Protocol)
 		}
 		if _, ok := set[p.KeyStr()]; ok {
-			return pm, fmt.Errorf("port duplicate '%s'", p.KeyStr())
+			return nil, nil, fmt.Errorf("port duplicate '%s'", p.KeyStr())
 		}
 		set[p.KeyStr()] = struct{}{}
 		port, err := nat.NewPort(PortTypeRMap[p.Protocol], strconv.FormatInt(int64(p.Number), 10))
 		if err != nil {
-			return pm, err
+			return nil, nil, err
 		}
 		var bindings []nat.PortBinding
 		for _, binding := range p.Bindings {
+			hostIP := net.IP(binding.Interface)
+			hostIPStr := ""
+			if len(hostIP) > 0 {
+				hostIPStr = hostIP.String()
+			}
 			bindings = append(bindings, nat.PortBinding{
-				HostIP:   net.IP(binding.Interface).String(),
+				HostIP:   hostIPStr,
 				HostPort: strconv.FormatInt(int64(binding.Number), 10),
 			})
 		}
 		pm[port] = bindings
+		ps[port] = struct{}{}
 	}
-	return pm, nil
+	return pm, ps, nil
 }
 
 func GenMounts(mounts []model.Mount) ([]mount.Mount, error) {

@@ -151,9 +151,14 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container,
 }
 
 func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (string, error) {
+	portMap, portSet, err := hdl_util.GenPortMap(ctrConf.Ports)
+	if err != nil {
+		return "", model.NewInvalidInputError(err)
+	}
 	cConfig := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
+		ExposedPorts: portSet,
 		Tty:          ctrConf.RunConfig.PseudoTTY,
 		Env:          hdl_util.GenEnv(ctrConf.EnvVars),
 		Image:        ctrConf.Image,
@@ -162,10 +167,6 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	}
 	if ctrConf.RunConfig.StopSignal != nil {
 		cConfig.StopSignal = *ctrConf.RunConfig.StopSignal
-	}
-	bindings, err := hdl_util.GenPortMap(ctrConf.Ports)
-	if err != nil {
-		return "", model.NewInvalidInputError(err)
 	}
 	mts, err := hdl_util.GenMounts(ctrConf.Mounts)
 	if err != nil {
@@ -177,7 +178,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 		return "", model.NewInvalidInputError(err)
 	}
 	hConfig := &container.HostConfig{
-		PortBindings:  bindings,
+		PortBindings:  portMap,
 		RestartPolicy: rp,
 		AutoRemove:    ctrConf.RunConfig.RemoveAfterRun,
 		Mounts:        mts,
