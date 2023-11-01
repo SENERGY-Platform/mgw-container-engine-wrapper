@@ -18,6 +18,7 @@ package lib
 
 import (
 	"context"
+	job_hdl_lib "github.com/SENERGY-Platform/go-service-base/job-hdl/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 )
@@ -43,7 +44,5 @@ type Api interface {
 	GetVolume(ctx context.Context, id string) (model.Volume, error)
 	CreateVolume(ctx context.Context, vol model.Volume) (string, error)
 	RemoveVolume(ctx context.Context, id string) error
-	GetJobs(ctx context.Context, filter model.JobFilter) ([]model.Job, error)
-	GetJob(ctx context.Context, id string) (model.Job, error)
-	CancelJob(ctx context.Context, id string) error
+	job_hdl_lib.Api
 }
