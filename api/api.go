@@ -17,15 +17,16 @@
 package api
 
 import (
+	"github.com/SENERGY-Platform/go-service-base/job-hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler"
 )
 
 type Api struct {
 	ceHandler  handler.ContainerEngineHandler
-	jobHandler handler.JobHandler
+	jobHandler job_hdl.JobHandler
 }
 
-func New(ceHandler handler.ContainerEngineHandler, jobHandler handler.JobHandler) *Api {
+func New(ceHandler handler.ContainerEngineHandler, jobHandler job_hdl.JobHandler) *Api {
 	return &Api{
 		ceHandler:  ceHandler,
 		jobHandler: jobHandler,

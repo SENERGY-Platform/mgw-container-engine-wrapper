@@ -39,8 +39,8 @@ func (a *Api) StartContainer(ctx context.Context, id string) error {
 	return a.ceHandler.ContainerStart(ctx, id)
 }
 
-func (a *Api) StopContainer(_ context.Context, id string) (string, error) {
-	return a.jobHandler.Create(fmt.Sprintf("stop container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
+func (a *Api) StopContainer(ctx context.Context, id string) (string, error) {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("stop container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
 		defer cf()
 		err := a.ceHandler.ContainerStop(ctx, id)
 		if err == nil {
@@ -50,8 +50,8 @@ func (a *Api) StopContainer(_ context.Context, id string) (string, error) {
 	})
 }
 
-func (a *Api) RestartContainer(_ context.Context, id string) (string, error) {
-	return a.jobHandler.Create(fmt.Sprintf("restart container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
+func (a *Api) RestartContainer(ctx context.Context, id string) (string, error) {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("restart container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
 		defer cf()
 		err := a.ceHandler.ContainerRestart(ctx, id)
 		if err == nil {

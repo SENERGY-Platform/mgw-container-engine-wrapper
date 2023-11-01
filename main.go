@@ -22,12 +22,12 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
+	job_hdl "github.com/SENERGY-Platform/go-service-base/job-hdl"
 	sb_util "github.com/SENERGY-Platform/go-service-base/util"
 	"github.com/SENERGY-Platform/go-service-base/watchdog"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/job_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
@@ -88,6 +88,11 @@ func main() {
 
 	ccHandler := ccjh.New(config.Jobs.BufferSize)
 
+	job_hdl.Logger = util.Logger
+	job_hdl.ErrCodeMapper = util.GetErrCode
+	job_hdl.NewNotFoundErr = model.NewNotFoundError
+	job_hdl.NewInvalidInputError = model.NewInvalidInputError
+	job_hdl.NewInternalErr = model.NewInternalError
 	jobCtx, jobCF := context.WithCancel(context.Background())
 	jobHandler := job_hdl.New(jobCtx, ccHandler)
 

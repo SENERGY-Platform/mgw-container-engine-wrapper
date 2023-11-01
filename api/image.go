@@ -30,8 +30,8 @@ func (a *Api) GetImage(ctx context.Context, id string) (model.Image, error) {
 	return a.ceHandler.ImageInfo(ctx, id)
 }
 
-func (a *Api) AddImage(_ context.Context, img string) (string, error) {
-	return a.jobHandler.Create(fmt.Sprintf("add image '%s'", img), func(ctx context.Context, cf context.CancelFunc) error {
+func (a *Api) AddImage(ctx context.Context, img string) (string, error) {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("add image '%s'", img), func(ctx context.Context, cf context.CancelFunc) error {
 		defer cf()
 		err := a.ceHandler.ImagePull(ctx, img)
 		if err == nil {
