@@ -119,7 +119,7 @@ func main() {
 	}
 	httpHandler.Use(gin_mw.StaticHeaderHandler(staticHeader), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(util.Logger, nil, func(gc *gin.Context) string {
 		return requestid.Get(gc)
-	}), gin_mw.ErrorHandler(http_hdl.GetStatusCode, ", "), gin.Recovery())
+	}), gin_mw.ErrorHandler(util.GetStatusCode, ", "), gin.Recovery())
 	httpHandler.UseRawPath = true
 	cewApi := api.New(dockerHandler, jobHandler)
 
