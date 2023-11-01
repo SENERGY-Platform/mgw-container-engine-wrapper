@@ -160,27 +160,6 @@ type VolumeFilter struct {
 	Labels map[string]string
 }
 
-// Job -----------------------------------------------------------------------------------------
-
-type Job struct {
-	ID          string     `json:"id"`
-	Error       any        `json:"error"`
-	Created     time.Time  `json:"created"`
-	Started     *time.Time `json:"started"`
-	Completed   *time.Time `json:"completed"`
-	Canceled    *time.Time `json:"canceled"`
-	Description string     `json:"description"`
-}
-
-type JobStatus = string
-
-type JobFilter struct {
-	Status   JobStatus
-	SortDesc bool
-	Since    time.Time
-	Until    time.Time
-}
-
 // Error -----------------------------------------------------------------------------------------
 
 type cError struct {
