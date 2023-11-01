@@ -44,10 +44,3 @@ type ContainerEngineHandler interface {
 	VolumeCreate(ctx context.Context, vol model.Volume) (string, error)
 	VolumeRemove(ctx context.Context, id string) error
 }
-
-type JobHandler interface {
-	List(filter model.JobFilter) []model.Job
-	Get(id string) (model.Job, error)
-	Create(desc string, tFunc func(context.Context, context.CancelFunc) error) (string, error)
-	Cancel(id string) error
-}
