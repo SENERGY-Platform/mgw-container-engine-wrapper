@@ -18,6 +18,7 @@ package client
 
 import (
 	"context"
+	job_hdl_lib "github.com/SENERGY-Platform/go-service-base/job-hdl/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 	"net/url"
@@ -25,7 +26,7 @@ import (
 	"time"
 )
 
-func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.Job, error) {
+func (c *Client) GetJobs(ctx context.Context, filter job_hdl_lib.JobFilter) ([]job_hdl_lib.Job, error) {
 	u, err := url.JoinPath(c.baseUrl, model.JobsPath)
 	if err != nil {
 		return nil, err
@@ -35,7 +36,7 @@ func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.J
 	if err != nil {
 		return nil, err
 	}
-	var jobs []model.Job
+	var jobs []job_hdl_lib.Job
 	err = c.baseClient.ExecRequestJSON(req, &jobs)
 	if err != nil {
 		return nil, err
@@ -43,19 +44,19 @@ func (c *Client) GetJobs(ctx context.Context, filter model.JobFilter) ([]model.J
 	return jobs, nil
 }
 
-func (c *Client) GetJob(ctx context.Context, id string) (model.Job, error) {
+func (c *Client) GetJob(ctx context.Context, id string) (job_hdl_lib.Job, error) {
 	u, err := url.JoinPath(c.baseUrl, model.JobsPath, id)
 	if err != nil {
-		return model.Job{}, err
+		return job_hdl_lib.Job{}, err
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
-		return model.Job{}, err
+		return job_hdl_lib.Job{}, err
 	}
-	var job model.Job
+	var job job_hdl_lib.Job
 	err = c.baseClient.ExecRequestJSON(req, &job)
 	if err != nil {
-		return model.Job{}, err
+		return job_hdl_lib.Job{}, err
 	}
 	return job, nil
 }
@@ -72,7 +73,7 @@ func (c *Client) CancelJob(ctx context.Context, id string) error {
 	return c.baseClient.ExecRequestVoid(req)
 }
 
-func genJobsFilter(filter model.JobFilter) string {
+func genJobsFilter(filter job_hdl_lib.JobFilter) string {
 	var q []string
 	if filter.SortDesc {
 		q = append(q, "sort_desc=true")
