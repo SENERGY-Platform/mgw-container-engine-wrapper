@@ -17,7 +17,7 @@
 package util
 
 import (
-	"github.com/SENERGY-Platform/go-service-base/srv-base"
+	sb_util "github.com/SENERGY-Platform/go-service-base/util"
 	"github.com/y-du/go-log-level/level"
 	"io/fs"
 	"os"
@@ -43,15 +43,15 @@ type SocketConfig struct {
 }
 
 type Config struct {
-	Logger srv_base.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
-	Socket SocketConfig          `json:"socket" env_var:"SOCKET_CONFIG"`
-	Jobs   JobsConfig            `json:"jobs" env_var:"JOBS_CONFIG"`
-	Header HeaderConfig          `json:"header" env_var:"HEADER_CONFIG"`
+	Logger sb_util.LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	Socket SocketConfig         `json:"socket" env_var:"SOCKET_CONFIG"`
+	Jobs   JobsConfig           `json:"jobs" env_var:"JOBS_CONFIG"`
+	Header HeaderConfig         `json:"header" env_var:"HEADER_CONFIG"`
 }
 
 func NewConfig(path string) (*Config, error) {
 	cfg := Config{
-		Logger: srv_base.LoggerConfig{
+		Logger: sb_util.LoggerConfig{
 			Level:        level.Warning,
 			Utc:          true,
 			Path:         "./",
@@ -75,6 +75,6 @@ func NewConfig(path string) (*Config, error) {
 			Uri:        "X-Uri",
 		},
 	}
-	err := srv_base.LoadConfig(path, &cfg, nil, nil, nil)
+	err := sb_util.LoadConfig(path, &cfg, nil, nil, nil)
 	return &cfg, err
 }

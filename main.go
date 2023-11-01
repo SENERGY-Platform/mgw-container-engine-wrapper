@@ -22,7 +22,8 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
-	"github.com/SENERGY-Platform/go-service-base/srv-base"
+	sb_util "github.com/SENERGY-Platform/go-service-base/util"
+	"github.com/SENERGY-Platform/go-service-base/watchdog"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl"
@@ -58,7 +59,7 @@ func main() {
 	logFile, err := util.InitLogger(config.Logger)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
-		var logFileError *srv_base.LogFileError
+		var logFileError *sb_util.LogFileError
 		if errors.As(err, &logFileError) {
 			ec = 1
 			return
@@ -70,9 +71,10 @@ func main() {
 
 	util.Logger.Printf("%s %s", model.ServiceName, version)
 
-	util.Logger.Debugf("config: %s", srv_base.ToJsonStr(config))
+	util.Logger.Debugf("config: %s", sb_util.ToJsonStr(config))
 
-	watchdog := srv_base.NewWatchdog(util.Logger, syscall.SIGINT, syscall.SIGTERM)
+	watchdog.Logger = util.Logger
+	wtchdg := watchdog.New(syscall.SIGINT, syscall.SIGTERM)
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -89,7 +91,7 @@ func main() {
 	jobCtx, jobCF := context.WithCancel(context.Background())
 	jobHandler := job_hdl.New(jobCtx, ccHandler)
 
-	watchdog.RegisterStopFunc(func() error {
+	wtchdg.RegisterStopFunc(func() error {
 		ccHandler.Stop()
 		jobCF()
 		if ccHandler.Active() > 0 {
@@ -122,9 +124,9 @@ func main() {
 	cewApi := api.New(dockerHandler, jobHandler)
 
 	http_hdl.SetRoutes(httpHandler, cewApi)
-	util.Logger.Debugf("routes: %s", srv_base.ToJsonStr(http_hdl.GetRoutes(httpHandler)))
+	util.Logger.Debugf("routes: %s", sb_util.ToJsonStr(http_hdl.GetRoutes(httpHandler)))
 
-	listener, err := srv_base.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
+	listener, err := sb_util.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
 	if err != nil {
 		util.Logger.Error(err)
 		ec = 1
@@ -132,7 +134,7 @@ func main() {
 	}
 	server := &http.Server{Handler: httpHandler}
 	srvCtx, srvCF := context.WithCancel(context.Background())
-	watchdog.RegisterStopFunc(func() error {
+	wtchdg.RegisterStopFunc(func() error {
 		if srvCtx.Err() == nil {
 			ctxWt, cf := context.WithTimeout(context.Background(), time.Second*5)
 			defer cf()
@@ -143,7 +145,7 @@ func main() {
 		}
 		return nil
 	})
-	watchdog.RegisterHealthFunc(func() bool {
+	wtchdg.RegisterHealthFunc(func() bool {
 		if srvCtx.Err() == nil {
 			return true
 		}
@@ -151,7 +153,7 @@ func main() {
 		return false
 	})
 
-	watchdog.Start()
+	wtchdg.Start()
 
 	err = ccHandler.RunAsync(config.Jobs.MaxNumber, time.Duration(config.Jobs.JHInterval*1000))
 	if err != nil {
@@ -161,7 +163,7 @@ func main() {
 	}
 
 	dCtx, dCF := context.WithCancel(context.Background())
-	watchdog.RegisterStopFunc(func() error {
+	wtchdg.RegisterStopFunc(func() error {
 		dCF()
 		return nil
 	})
@@ -172,10 +174,10 @@ func main() {
 		if err != nil {
 			util.Logger.Error(err)
 			ec = 1
-			watchdog.Trigger()
+			wtchdg.Trigger()
 			return
 		}
-		util.Logger.Debugf("docker: %s", srv_base.ToJsonStr(dockerInfo))
+		util.Logger.Debugf("docker: %s", sb_util.ToJsonStr(dockerInfo))
 	}()
 
 	go func() {
@@ -188,5 +190,5 @@ func main() {
 		}
 	}()
 
-	ec = watchdog.Join()
+	ec = wtchdg.Join()
 }

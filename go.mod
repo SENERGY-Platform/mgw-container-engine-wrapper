@@ -5,7 +5,8 @@ go 1.21
 require (
 	github.com/SENERGY-Platform/gin-middleware v0.4.2
 	github.com/SENERGY-Platform/go-cc-job-handler v0.1.1
-	github.com/SENERGY-Platform/go-service-base v0.13.0
+	github.com/SENERGY-Platform/go-service-base/util v0.14.0
+	github.com/SENERGY-Platform/go-service-base/watchdog v0.4.0
 	github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.0.0-00010101000000-000000000000
 	github.com/docker/docker v24.0.6+incompatible
 	github.com/docker/go-connections v0.4.0
