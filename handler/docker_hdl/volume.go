@@ -73,8 +73,8 @@ func (d *Docker) VolumeCreate(ctx context.Context, vol model.Volume) (string, er
 	return res.Name, nil
 }
 
-func (d *Docker) VolumeRemove(ctx context.Context, id string) error {
-	if err := d.client.VolumeRemove(ctx, id, false); err != nil {
+func (d *Docker) VolumeRemove(ctx context.Context, id string, force bool) error {
+	if err := d.client.VolumeRemove(ctx, id, force); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}

@@ -42,5 +42,5 @@ type ContainerEngineHandler interface {
 	ImageRemove(ctx context.Context, id string) error
 	VolumeInfo(ctx context.Context, id string) (model.Volume, error)
 	VolumeCreate(ctx context.Context, vol model.Volume) (string, error)
-	VolumeRemove(ctx context.Context, id string) error
+	VolumeRemove(ctx context.Context, id string, force bool) error
 }

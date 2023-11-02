@@ -43,6 +43,6 @@ type Api interface {
 	GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error)
 	GetVolume(ctx context.Context, id string) (model.Volume, error)
 	CreateVolume(ctx context.Context, vol model.Volume) (string, error)
-	RemoveVolume(ctx context.Context, id string) error
+	RemoveVolume(ctx context.Context, id string, force bool) error
 	job_hdl_lib.Api
 }

@@ -33,6 +33,6 @@ func (a *Api) GetVolume(ctx context.Context, id string) (model.Volume, error) {
 	return a.ceHandler.VolumeInfo(ctx, id)
 }
 
-func (a *Api) RemoveVolume(ctx context.Context, id string) error {
-	return a.ceHandler.VolumeRemove(ctx, id)
+func (a *Api) RemoveVolume(ctx context.Context, id string, force bool) error {
+	return a.ceHandler.VolumeRemove(ctx, id, force)
 }
