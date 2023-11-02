@@ -29,6 +29,10 @@ type volumesQuery struct {
 	Label []string `form:"label"`
 }
 
+type deleteVolumeQuery struct {
+	Force bool `form:"force"`
+}
+
 func getVolumesH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
 		query := volumesQuery{}
@@ -74,7 +78,12 @@ func getVolumeH(a lib.Api) gin.HandlerFunc {
 
 func deleteVolumeH(a lib.Api) gin.HandlerFunc {
 	return func(gc *gin.Context) {
-		if err := a.RemoveVolume(gc.Request.Context(), gc.Param(volIdParam)); err != nil {
+		query := deleteVolumeQuery{}
+		if err := gc.ShouldBindQuery(&query); err != nil {
+			_ = gc.Error(model.NewInvalidInputError(err))
+			return
+		}
+		if err := a.RemoveVolume(gc.Request.Context(), gc.Param(volIdParam), query.Force); err != nil {
 			_ = gc.Error(err)
 			return
 		}
