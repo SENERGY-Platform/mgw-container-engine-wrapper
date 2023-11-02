@@ -61,8 +61,8 @@ func (a *Api) RestartContainer(ctx context.Context, id string) (string, error) {
 	})
 }
 
-func (a *Api) RemoveContainer(ctx context.Context, id string) error {
-	return a.ceHandler.ContainerRemove(ctx, id)
+func (a *Api) RemoveContainer(ctx context.Context, id string, force bool) error {
+	return a.ceHandler.ContainerRemove(ctx, id, force)
 }
 
 func (a *Api) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {

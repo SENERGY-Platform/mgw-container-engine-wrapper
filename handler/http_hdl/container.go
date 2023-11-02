@@ -40,6 +40,10 @@ type containerLogQuery struct {
 	Until    string `form:"until"`
 }
 
+type deleteContainerQuery struct {
+	Force bool `form:"force"`
+}
+
 func getContainersH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := containersQuery{}
@@ -84,7 +88,12 @@ func postContainerH(a lib.Api) gin.HandlerFunc {
 
 func deleteContainerH(a lib.Api) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if err := a.RemoveContainer(c.Request.Context(), c.Param(ctrIdParam)); err != nil {
+		query := deleteContainerQuery{}
+		if err := c.ShouldBindQuery(&query); err != nil {
+			_ = c.Error(model.NewInvalidInputError(err))
+			return
+		}
+		if err := a.RemoveContainer(c.Request.Context(), c.Param(ctrIdParam), query.Force); err != nil {
 			_ = c.Error(err)
 			return
 		}
