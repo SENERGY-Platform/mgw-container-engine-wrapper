@@ -78,10 +78,13 @@ func (c *Client) CreateVolume(ctx context.Context, vol model.Volume) (string, er
 	return c.baseClient.ExecRequestString(req)
 }
 
-func (c *Client) RemoveVolume(ctx context.Context, id string) error {
+func (c *Client) RemoveVolume(ctx context.Context, id string, force bool) error {
 	u, err := url.JoinPath(c.baseUrl, model.VolumesPath, id)
 	if err != nil {
 		return err
+	}
+	if force {
+		u += "?force=true"
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
 	if err != nil {
