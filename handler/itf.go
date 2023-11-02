@@ -32,7 +32,7 @@ type ContainerEngineHandler interface {
 	NetworkRemove(ctx context.Context, id string) error
 	ContainerInfo(ctx context.Context, id string) (model.Container, error)
 	ContainerCreate(ctx context.Context, container model.Container) (id string, err error)
-	ContainerRemove(ctx context.Context, id string) error
+	ContainerRemove(ctx context.Context, id string, force bool) error
 	ContainerStart(ctx context.Context, id string) error
 	ContainerStop(ctx context.Context, id string) error
 	ContainerRestart(ctx context.Context, id string) error

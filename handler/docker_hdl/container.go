@@ -208,7 +208,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 				Aliases: ctrConf.Networks[i].DomainNames,
 			})
 			if err != nil {
-				err2 := d.ContainerRemove(ctx, res.ID)
+				err2 := d.ContainerRemove(ctx, res.ID, true)
 				if err2 != nil {
 					util.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
@@ -222,8 +222,8 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	return res.ID, nil
 }
 
-func (d *Docker) ContainerRemove(ctx context.Context, id string) error {
-	if err := d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{RemoveVolumes: true}); err != nil {
+func (d *Docker) ContainerRemove(ctx context.Context, id string, force bool) error {
+	if err := d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{Force: force}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
