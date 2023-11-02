@@ -115,10 +115,13 @@ func (c *Client) RestartContainer(ctx context.Context, id string) (jobId string,
 	return c.baseClient.ExecRequestString(req)
 }
 
-func (c *Client) RemoveContainer(ctx context.Context, id string) error {
+func (c *Client) RemoveContainer(ctx context.Context, id string, force bool) error {
 	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id)
 	if err != nil {
 		return err
+	}
+	if force {
+		u += "?force=true"
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
 	if err != nil {
