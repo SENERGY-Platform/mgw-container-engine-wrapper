@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
-	job_hdl "github.com/SENERGY-Platform/go-service-base/job-hdl"
+	"github.com/SENERGY-Platform/go-service-base/job-hdl"
 	sb_util "github.com/SENERGY-Platform/go-service-base/util"
 	"github.com/SENERGY-Platform/go-service-base/watchdog"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
