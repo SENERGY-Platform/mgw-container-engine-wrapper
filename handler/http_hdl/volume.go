@@ -26,7 +26,7 @@ import (
 const volIdParam = "v"
 
 type volumesQuery struct {
-	Label []string `form:"label"`
+	Labels string `form:"labels"`
 }
 
 type deleteVolumeQuery struct {
@@ -40,7 +40,7 @@ func getVolumesH(a lib.Api) gin.HandlerFunc {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: genLabels(query.Label)})
+		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: genLabels(parseStringSlice(query.Labels, ","))})
 		if err != nil {
 			_ = gc.Error(err)
 			return

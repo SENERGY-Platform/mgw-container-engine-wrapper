@@ -26,7 +26,7 @@ import (
 const imgIdParam = "i"
 
 type imagesQuery struct {
-	Label []string `form:"label"`
+	Labels string `form:"labels"`
 }
 
 func getImagesH(a lib.Api) gin.HandlerFunc {
@@ -36,7 +36,7 @@ func getImagesH(a lib.Api) gin.HandlerFunc {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		filter := model.ImageFilter{Labels: genLabels(query.Label)}
+		filter := model.ImageFilter{Labels: genLabels(parseStringSlice(query.Labels, ","))}
 		images, err := a.GetImages(gc.Request.Context(), filter)
 		if err != nil {
 			_ = gc.Error(err)

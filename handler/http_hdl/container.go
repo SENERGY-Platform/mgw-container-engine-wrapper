@@ -29,9 +29,9 @@ import (
 const ctrIdParam = "c"
 
 type containersQuery struct {
-	Name  string   `form:"name"`
-	State string   `form:"state"`
-	Label []string `form:"label"`
+	Name   string `form:"name"`
+	State  string `form:"state"`
+	Labels string `form:"labels"`
 }
 
 type containerLogQuery struct {
@@ -60,7 +60,7 @@ func getContainersH(a lib.Api) gin.HandlerFunc {
 			}
 			filter.State = query.State
 		}
-		filter.Labels = genLabels(query.Label)
+		filter.Labels = genLabels(parseStringSlice(query.Labels, ","))
 		containers, err := a.GetContainers(c.Request.Context(), filter)
 		if err != nil {
 			_ = c.Error(err)
