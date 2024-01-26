@@ -96,9 +96,9 @@ func genImagesQuery(filter model.ImageFilter) string {
 	if len(filter.Labels) > 0 {
 		for k, v := range filter.Labels {
 			if v != "" {
-				q = append(q, "label="+k+"="+v)
+				q = append(q, "labels="+k+"="+v)
 			} else {
-				q = append(q, "label="+k)
+				q = append(q, "labels="+k)
 			}
 		}
 	}
