@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-func GenLabels(sl []string) (l map[string]string) {
+func genLabels(sl []string) (l map[string]string) {
 	if sl != nil && len(sl) > 0 {
 		l = make(map[string]string)
 		for _, s := range sl {

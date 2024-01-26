@@ -40,7 +40,7 @@ func getVolumesH(a lib.Api) gin.HandlerFunc {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: GenLabels(query.Label)})
+		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: genLabels(query.Label)})
 		if err != nil {
 			_ = gc.Error(err)
 			return

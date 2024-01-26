@@ -36,7 +36,7 @@ func getImagesH(a lib.Api) gin.HandlerFunc {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		filter := model.ImageFilter{Labels: GenLabels(query.Label)}
+		filter := model.ImageFilter{Labels: genLabels(query.Label)}
 		images, err := a.GetImages(gc.Request.Context(), filter)
 		if err != nil {
 			_ = gc.Error(err)

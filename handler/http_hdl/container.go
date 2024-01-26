@@ -60,7 +60,7 @@ func getContainersH(a lib.Api) gin.HandlerFunc {
 			}
 			filter.State = query.State
 		}
-		filter.Labels = GenLabels(query.Label)
+		filter.Labels = genLabels(query.Label)
 		containers, err := a.GetContainers(c.Request.Context(), filter)
 		if err != nil {
 			_ = c.Error(err)
