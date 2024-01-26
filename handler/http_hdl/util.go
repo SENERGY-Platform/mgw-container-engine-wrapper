@@ -34,3 +34,10 @@ func genLabels(sl []string) (l map[string]string) {
 	}
 	return
 }
+
+func parseStringSlice(s, sep string) []string {
+	if s != "" {
+		return strings.Split(s, sep)
+	}
+	return nil
+}
