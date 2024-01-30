@@ -68,3 +68,14 @@ func (a *Api) RemoveContainer(ctx context.Context, id string, force bool) error 
 func (a *Api) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {
 	return a.ceHandler.ContainerLog(ctx, id, logOptions)
 }
+
+func (a *Api) ContainerExec(ctx context.Context, id string, exeConf model.ExecConfig) (string, error) {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("container execute '%+v'", exeConf), func(ctx context.Context, cf context.CancelFunc) error {
+		defer cf()
+		err := a.ceHandler.ContainerExec(ctx, id, exeConf)
+		if err == nil {
+			err = ctx.Err()
+		}
+		return err
+	})
+}
