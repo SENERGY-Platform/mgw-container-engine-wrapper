@@ -205,3 +205,19 @@ func patchContainerRestartH(a lib.Api) gin.HandlerFunc {
 		gc.String(http.StatusOK, jID)
 	}
 }
+
+func patchContainerExecH(a lib.Api) gin.HandlerFunc {
+	return func(gc *gin.Context) {
+		eConf := model.ExecConfig{}
+		if err := gc.ShouldBindJSON(&eConf); err != nil {
+			_ = gc.Error(model.NewInvalidInputError(err))
+			return
+		}
+		jID, err := a.ContainerExec(gc.Request.Context(), gc.Param(ctrIdParam), eConf)
+		if err != nil {
+			_ = gc.Error(err)
+			return
+		}
+		gc.String(http.StatusOK, jID)
+	}
+}
