@@ -148,6 +148,13 @@ type LogFilter struct {
 	Until    time.Time
 }
 
+type ExecConfig struct {
+	Tty     bool
+	EnvVars map[string]string
+	WorkDir string
+	Cmd     []string
+}
+
 // Volume --------------------------------------------------------------------------------------
 
 type Volume struct {
