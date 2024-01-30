@@ -32,6 +32,7 @@ type Api interface {
 	RestartContainer(ctx context.Context, id string) (jobId string, err error)
 	RemoveContainer(ctx context.Context, id string, force bool) error
 	GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error)
+	ContainerExec(ctx context.Context, id string, exeConf model.ExecConfig) (string, error)
 	GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error)
 	GetImage(ctx context.Context, id string) (model.Image, error)
 	AddImage(ctx context.Context, img string) (jobId string, err error)
