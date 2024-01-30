@@ -106,6 +106,7 @@ const (
 	ContainerStopPath    = "stop"
 	ContainerRestartPath = "restart"
 	ContainerLogsPath    = "logs"
+	ContainerExecPath    = "exec"
 	ImagesPath           = "images"
 	NetworksPath         = "networks"
 	VolumesPath          = "volumes"
