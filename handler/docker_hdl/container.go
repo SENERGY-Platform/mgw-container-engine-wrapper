@@ -18,6 +18,7 @@ package docker_hdl
 
 import (
 	"context"
+	"errors"
 	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
@@ -284,4 +285,54 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 		return nil, model.NewInternalError(err)
 	}
 	return &hdl_util.RCWrapper{ReadCloser: rc}, nil
+}
+
+func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.ExecConfig) error {
+	eConf, err := d.client.ContainerExecCreate(ctx, id, types.ExecConfig{
+		Tty:          execOpt.Tty,
+		AttachStderr: true,
+		AttachStdout: true,
+		Env:          hdl_util.GenEnv(execOpt.EnvVars),
+		WorkingDir:   execOpt.WorkDir,
+		Cmd:          execOpt.Cmd,
+	})
+	if err != nil {
+		return model.NewInternalError(err)
+	}
+	eAttach, err := d.client.ContainerExecAttach(ctx, eConf.ID, types.ExecStartCheck{Tty: execOpt.Tty})
+	if err != nil {
+		return model.NewInternalError(err)
+	}
+	defer eAttach.Close()
+	eRes, err := d.awaitContainerExec(ctx, eConf.ID, time.Millisecond*250)
+	if err != nil {
+		return model.NewInternalError(err)
+	}
+	if eRes.ExitCode > 0 {
+		bytes, err := io.ReadAll(eAttach.Reader)
+		if err != nil {
+			return model.NewInternalError(err)
+		}
+		return model.NewInternalError(errors.New(string(bytes)))
+	}
+	return nil
+}
+
+func (d *Docker) awaitContainerExec(ctx context.Context, execID string, delay time.Duration) (types.ContainerExecInspect, error) {
+	ticker := time.NewTicker(delay)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return types.ContainerExecInspect{}, ctx.Err()
+		case <-ticker.C:
+			eRes, err := d.client.ContainerExecInspect(ctx, execID)
+			if err != nil {
+				return types.ContainerExecInspect{}, err
+			}
+			if !eRes.Running {
+				return eRes, nil
+			}
+		}
+	}
 }
