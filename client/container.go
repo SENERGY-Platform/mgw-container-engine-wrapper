@@ -134,6 +134,23 @@ func (c *Client) GetContainerLog(ctx context.Context, id string, logOptions mode
 	panic("not implemented")
 }
 
+func (c *Client) ContainerExec(ctx context.Context, id string, exeConf model.ExecConfig) (jobId string, err error) {
+	u, err := url.JoinPath(c.baseUrl, model.ContainersPath, id, model.ContainerExecPath)
+	if err != nil {
+		return "", err
+	}
+	body, err := json.Marshal(exeConf)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u, bytes.NewBuffer(body))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	return c.baseClient.ExecRequestString(req)
+}
+
 func genGetContainersQuery(filter model.ContainerFilter) string {
 	var q []string
 	if filter.Name != "" {
