@@ -31,6 +31,7 @@ func SetRoutes(e *gin.Engine, a lib.Api) {
 	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerStartPath, patchContainerStartH(a))
 	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerStopPath, patchContainerStopH(a))
 	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerRestartPath, patchContainerRestartH(a))
+	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerExecPath, patchContainerExecH(a))
 	e.GET("/"+model.ContainerLogsPath+"/:"+ctrIdParam, getContainerLogH(a))
 	e.GET("/"+model.ImagesPath, getImagesH(a))
 	e.POST("/"+model.ImagesPath, postImageH(a))
