@@ -17,7 +17,7 @@ jobs:
 #      - name: Test
 #        run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
       - name: Make Linux build dir
-        run: mkdir -p linux_build/amd64 linux_build/arm64
+        run: mkdir -p linux_build/amd64 linux_build/arm64 linux_build/arm
       - name: Build Linux amd64
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux_build/amd64/bin -ldflags="-X 'main.version=${{ github.ref_name }}'" main.go
       - name: Build Linux arm
