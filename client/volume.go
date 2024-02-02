@@ -96,13 +96,7 @@ func (c *Client) RemoveVolume(ctx context.Context, id string, force bool) error 
 func genVolumesQuery(filter model.VolumeFilter) string {
 	var q []string
 	if len(filter.Labels) > 0 {
-		for k, v := range filter.Labels {
-			if v != "" {
-				q = append(q, "labels="+k+"="+v)
-			} else {
-				q = append(q, "labels="+k)
-			}
-		}
+		q = append(q, "labels="+genLabels(filter.Labels, "=", ","))
 	}
 	if len(q) > 0 {
 		return "?" + strings.Join(q, "&")
