@@ -61,19 +61,21 @@ func GenPortMap(ports []model.Port) (nat.PortMap, nat.PortSet, error) {
 			return nil, nil, fmt.Errorf("port duplicate '%s'", p.KeyStr())
 		}
 		ps[port] = struct{}{}
-		var bindings []nat.PortBinding
-		for _, binding := range p.Bindings {
-			hostIP := net.IP(binding.Interface)
-			hostIPStr := ""
-			if len(hostIP) > 0 {
-				hostIPStr = hostIP.String()
+		if len(p.Bindings) > 0 {
+			var bindings []nat.PortBinding
+			for _, binding := range p.Bindings {
+				hostIP := net.IP(binding.Interface)
+				hostIPStr := ""
+				if len(hostIP) > 0 {
+					hostIPStr = hostIP.String()
+				}
+				bindings = append(bindings, nat.PortBinding{
+					HostIP:   hostIPStr,
+					HostPort: strconv.FormatInt(int64(binding.Number), 10),
+				})
 			}
-			bindings = append(bindings, nat.PortBinding{
-				HostIP:   hostIPStr,
-				HostPort: strconv.FormatInt(int64(binding.Number), 10),
-			})
+			pm[port] = bindings
 		}
-		pm[port] = bindings
 	}
 	return pm, ps, nil
 }
