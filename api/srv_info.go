@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 InfAI (CC SES)
+ * Copyright 2024 InfAI (CC SES)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,10 @@
 package api
 
 import (
-	"github.com/SENERGY-Platform/go-service-base/job-hdl"
-	"github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler"
+	"context"
+	srv_info_lib "github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib"
 )
 
-type Api struct {
-	ceHandler  handler.ContainerEngineHandler
-	jobHandler job_hdl.JobHandler
-	srvInfoHdl srv_info_hdl.SrvInfoHandler
-}
-
-func New(ceHandler handler.ContainerEngineHandler, jobHandler job_hdl.JobHandler, srvInfoHandler srv_info_hdl.SrvInfoHandler) *Api {
-	return &Api{
-		ceHandler:  ceHandler,
-		jobHandler: jobHandler,
-		srvInfoHdl: srvInfoHandler,
-	}
+func (a *Api) GetSrvInfo(_ context.Context) srv_info_lib.SrvInfo {
+	return a.srvInfoHdl.GetInfo()
 }
