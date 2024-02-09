@@ -24,30 +24,14 @@ import (
 )
 
 func SetRoutes(e *gin.Engine, a lib.Api) {
-	e.GET("/"+model.ContainersPath, getContainersH(a))
-	e.POST("/"+model.ContainersPath, postContainerH(a))
-	e.DELETE("/"+model.ContainersPath+"/:"+ctrIdParam, deleteContainerH(a))
-	e.GET("/"+model.ContainersPath+"/:"+ctrIdParam, getContainerH(a))
-	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerStartPath, patchContainerStartH(a))
-	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerStopPath, patchContainerStopH(a))
-	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerRestartPath, patchContainerRestartH(a))
-	e.PATCH("/"+model.ContainersPath+"/:"+ctrIdParam+"/"+model.ContainerExecPath, patchContainerExecH(a))
-	e.GET("/"+model.ContainerLogsPath+"/:"+ctrIdParam, getContainerLogH(a))
-	e.GET("/"+model.ImagesPath, getImagesH(a))
-	e.POST("/"+model.ImagesPath, postImageH(a))
-	e.GET("/"+model.ImagesPath+"/:"+imgIdParam, getImageH(a))
-	e.DELETE("/"+model.ImagesPath+"/:"+imgIdParam, deleteImageH(a))
-	e.GET("/"+model.NetworksPath, getNetworksH(a))
-	e.POST("/"+model.NetworksPath, postNetworkH(a))
-	e.GET("/"+model.NetworksPath+"/:"+netIdParam, getNetworkH(a))
-	e.DELETE("/"+model.NetworksPath+"/:"+netIdParam, deleteNetworkH(a))
-	e.GET("/"+model.VolumesPath, getVolumesH(a))
-	e.POST("/"+model.VolumesPath, postVolumeH(a))
-	e.GET("/"+model.VolumesPath+"/:"+volIdParam, getVolumeH(a))
-	e.DELETE("/"+model.VolumesPath+"/:"+volIdParam, deleteVolumeH(a))
-	e.GET("/"+model.JobsPath, getJobsH(a))
-	e.GET("/"+model.JobsPath+"/:"+jobIdParam, getJobH(a))
-	e.PATCH("/"+model.JobsPath+"/:"+jobIdParam+"/"+model.JobsCancelPath, patchJobCancelH(a))
+	standardGrp := e.Group("")
+	restrictedGrp := e.Group(model.RestrictedPath)
+	setSharedRoutes(a, standardGrp, restrictedGrp)
+	setContainersRoutes(a, standardGrp.Group(model.ContainersPath))
+	setImagesRoutes(a, standardGrp.Group(model.ImagesPath))
+	setNetworksRoutes(a, standardGrp.Group(model.NetworksPath))
+	setVolumesRoutes(a, standardGrp.Group(model.VolumesPath))
+	setJobsRoutes(a, standardGrp.Group(model.JobsPath))
 }
 
 func GetRoutes(e *gin.Engine) [][2]string {
@@ -60,4 +44,49 @@ func GetRoutes(e *gin.Engine) [][2]string {
 		rInfo = append(rInfo, [2]string{info.Method, info.Path})
 	}
 	return rInfo
+}
+
+func setSharedRoutes(a lib.Api, rGroups ...*gin.RouterGroup) {
+	for _, rg := range rGroups {
+		rg.GET(model.SrvInfoPath, getSrvInfoH(a))
+		rg.GET(model.ContainerLogsPath+"/:"+ctrIdParam, getContainerLogH(a))
+	}
+}
+
+func setContainersRoutes(a lib.Api, rg *gin.RouterGroup) {
+	rg.GET("", getContainersH(a))
+	rg.POST("", postContainerH(a))
+	rg.DELETE(":"+ctrIdParam, deleteContainerH(a))
+	rg.GET(":"+ctrIdParam, getContainerH(a))
+	rg.PATCH(":"+ctrIdParam+"/"+model.ContainerStartPath, patchContainerStartH(a))
+	rg.PATCH(":"+ctrIdParam+"/"+model.ContainerStopPath, patchContainerStopH(a))
+	rg.PATCH(":"+ctrIdParam+"/"+model.ContainerRestartPath, patchContainerRestartH(a))
+	rg.PATCH(":"+ctrIdParam+"/"+model.ContainerExecPath, patchContainerExecH(a))
+}
+
+func setImagesRoutes(a lib.Api, rg *gin.RouterGroup) {
+	rg.GET("", getImagesH(a))
+	rg.POST("", postImageH(a))
+	rg.GET(":"+imgIdParam, getImageH(a))
+	rg.DELETE(":"+imgIdParam, deleteImageH(a))
+}
+
+func setNetworksRoutes(a lib.Api, rg *gin.RouterGroup) {
+	rg.GET("", getNetworksH(a))
+	rg.POST("", postNetworkH(a))
+	rg.GET(":"+netIdParam, getNetworkH(a))
+	rg.DELETE(":"+netIdParam, deleteNetworkH(a))
+}
+
+func setVolumesRoutes(a lib.Api, rg *gin.RouterGroup) {
+	rg.GET("", getVolumesH(a))
+	rg.POST("", postVolumeH(a))
+	rg.GET(":"+volIdParam, getVolumeH(a))
+	rg.DELETE(":"+volIdParam, deleteVolumeH(a))
+}
+
+func setJobsRoutes(a lib.Api, rg *gin.RouterGroup) {
+	rg.GET("", getJobsH(a))
+	rg.GET(":"+jobIdParam, getJobH(a))
+	rg.PATCH(":"+jobIdParam+"/"+model.JobsCancelPath, patchJobCancelH(a))
 }
