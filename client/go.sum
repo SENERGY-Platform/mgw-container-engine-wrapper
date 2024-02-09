@@ -1,8 +1,8 @@
-github.com/SENERGY-Platform/go-base-http-client v0.0.1 h1:ofyTL9spbA4+hp8Mm+j2uNL4oWVWIKX5vNGtZpHvjsc=
-github.com/SENERGY-Platform/go-base-http-client v0.0.1/go.mod h1:zkUjrJTz4btwM0CMfgEmPfR0knxPIZgd1hvG8pu4fBE=
-github.com/SENERGY-Platform/go-service-base/job-hdl/lib v0.0.3 h1:7zh7sN0YoQiu1uzniXFoiT04dkmKYf4lus9hZmXm5j4=
-github.com/SENERGY-Platform/go-service-base/job-hdl/lib v0.0.3/go.mod h1:jz80K3k0w45V8o2+jE4Flzxg2zydOkD9Dz40A8bgMvI=
-github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.1 h1:8AlutD/LCcqOSDant4q3HP+vCv/CoI61Bg4JrUtOGmY=
-github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.1/go.mod h1:7Bz91pdp3VvLNqcQa94V4MleNJSu1h4452i5843gyYM=
-github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.14.1 h1:oUEm+TfLnzhLeyA1b8dts7iabYGsIClppzm3M9Ma1cM=
-github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.14.1/go.mod h1:IGxdtI4i08LvcWAAVWv+aybAFp6G8lXGpKYWmh8sJ0Q=
+github.com/SENERGY-Platform/go-base-http-client v0.0.2 h1:sF4QDRkNjhnKQh6d8ujfxQRpeWzSTiBeYIK/aNWWOls=
+github.com/SENERGY-Platform/go-base-http-client v0.0.2/go.mod h1:NfKW/relIVTkMXhz4OqZlzJXYPQUYEKxwqou8D0B/Kw=
+github.com/SENERGY-Platform/go-service-base/job-hdl/lib v0.0.4 h1:H/rwzaD6r+ApWCms2X51pQrFszJI1/Rs5rOyOMcn6DA=
+github.com/SENERGY-Platform/go-service-base/job-hdl/lib v0.0.4/go.mod h1:+j0dc3Ey4IR+DeC26gIA6MoBTjf4TBH1DXQpnJPjx04=
+github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.2 h1:Bcdxt7i3DGGvlwS6U3NY9eGJjiPuv3ZpbMwebEUV+nE=
+github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.2/go.mod h1:vcvyLaSoZsScGQ8K/OuJxlANTs5FPozsLvPzFUZgiVM=
+github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.14.2 h1:eZB9VCbtEHP7v9uzwkrHJr/gRbB+vH7g9c0rq7kLcSs=
+github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.14.2/go.mod h1:CyGI/kSn/C9vKKdFp6ldSOs/Xl0K+5gK/NjdOr2vf0Q=
