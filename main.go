@@ -23,6 +23,7 @@ import (
 	"github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/go-cc-job-handler/ccjh"
 	"github.com/SENERGY-Platform/go-service-base/job-hdl"
+	"github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 	sb_util "github.com/SENERGY-Platform/go-service-base/util"
 	"github.com/SENERGY-Platform/go-service-base/watchdog"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
@@ -42,6 +43,8 @@ import (
 var version string
 
 func main() {
+	srvInfoHdl := srv_info_hdl.New("ce-wrapper", version)
+
 	ec := 0
 	defer func() {
 		os.Exit(ec)
@@ -69,7 +72,7 @@ func main() {
 		defer logFile.Close()
 	}
 
-	util.Logger.Printf("%s %s", model.ServiceName, version)
+	util.Logger.Printf("%s %s", srvInfoHdl.GetName(), srvInfoHdl.GetVersion())
 
 	util.Logger.Debugf("config: %s", sb_util.ToJsonStr(config))
 
@@ -119,8 +122,8 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	httpHandler := gin.New()
 	staticHeader := map[string]string{
-		model.HeaderApiVer:  version,
-		model.HeaderSrvName: model.ServiceName,
+		model.HeaderApiVer:  srvInfoHdl.GetVersion(),
+		model.HeaderSrvName: srvInfoHdl.GetName(),
 	}
 	httpHandler.Use(gin_mw.StaticHeaderHandler(staticHeader), requestid.New(requestid.WithCustomHeaderStrKey(model.HeaderRequestID)), gin_mw.LoggerHandler(util.Logger, nil, func(gc *gin.Context) string {
 		return requestid.Get(gc)
