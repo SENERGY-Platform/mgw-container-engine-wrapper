@@ -19,6 +19,7 @@ package lib
 import (
 	"context"
 	job_hdl_lib "github.com/SENERGY-Platform/go-service-base/job-hdl/lib"
+	srv_info_lib "github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 )
@@ -46,4 +47,5 @@ type Api interface {
 	CreateVolume(ctx context.Context, vol model.Volume) (string, error)
 	RemoveVolume(ctx context.Context, id string, force bool) error
 	job_hdl_lib.Api
+	srv_info_lib.Api
 }
