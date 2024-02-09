@@ -110,4 +110,6 @@ const (
 	VolumesPath          = "volumes"
 	JobsPath             = "jobs"
 	JobsCancelPath       = "cancel"
+	SrvInfoPath          = "info"
+	RestrictedPath       = "restricted"
 )
