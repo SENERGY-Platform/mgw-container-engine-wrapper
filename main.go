@@ -129,7 +129,7 @@ func main() {
 		return requestid.Get(gc)
 	}), gin_mw.ErrorHandler(util.GetStatusCode, ", "), gin.Recovery())
 	httpHandler.UseRawPath = true
-	cewApi := api.New(dockerHandler, jobHandler)
+	cewApi := api.New(dockerHandler, jobHandler, srvInfoHdl)
 
 	http_hdl.SetRoutes(httpHandler, cewApi)
 	util.Logger.Debugf("routes: %s", sb_util.ToJsonStr(http_hdl.GetRoutes(httpHandler)))
