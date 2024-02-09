@@ -16,8 +16,6 @@
 
 package model
 
-const ServiceName = "ce-wrapper"
-
 const (
 	HeaderRequestID = "X-Request-ID"
 	HeaderApiVer    = "X-Api-Version"
