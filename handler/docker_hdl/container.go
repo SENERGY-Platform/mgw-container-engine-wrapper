@@ -162,13 +162,15 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 		ExposedPorts: portSet,
 		Tty:          ctrConf.RunConfig.PseudoTTY,
 		Env:          hdl_util.GenEnv(ctrConf.EnvVars),
-		Cmd:          ctrConf.RunConfig.Command,
 		Image:        ctrConf.Image,
 		Labels:       ctrConf.Labels,
 		StopTimeout:  hdl_util.GenStopTimeout(ctrConf.RunConfig.StopTimeout),
 	}
 	if ctrConf.RunConfig.StopSignal != nil {
 		cConfig.StopSignal = *ctrConf.RunConfig.StopSignal
+	}
+	if len(ctrConf.RunConfig.Command) > 0 {
+		cConfig.Cmd = ctrConf.RunConfig.Command
 	}
 	mts, err := hdl_util.GenMounts(ctrConf.Mounts)
 	if err != nil {
