@@ -4,5 +4,5 @@ github.com/SENERGY-Platform/go-service-base/job-hdl/lib v0.0.4 h1:H/rwzaD6r+ApWC
 github.com/SENERGY-Platform/go-service-base/job-hdl/lib v0.0.4/go.mod h1:+j0dc3Ey4IR+DeC26gIA6MoBTjf4TBH1DXQpnJPjx04=
 github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.2 h1:Bcdxt7i3DGGvlwS6U3NY9eGJjiPuv3ZpbMwebEUV+nE=
 github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib v0.0.2/go.mod h1:vcvyLaSoZsScGQ8K/OuJxlANTs5FPozsLvPzFUZgiVM=
-github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.14.2 h1:eZB9VCbtEHP7v9uzwkrHJr/gRbB+vH7g9c0rq7kLcSs=
-github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.14.2/go.mod h1:CyGI/kSn/C9vKKdFp6ldSOs/Xl0K+5gK/NjdOr2vf0Q=
+github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.15.0 h1:NOmcPT93GCv9/cFcf15eONCwvCGu5TCCnKNbtwS0mR8=
+github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib v0.15.0/go.mod h1:CyGI/kSn/C9vKKdFp6ldSOs/Xl0K+5gK/NjdOr2vf0Q=
