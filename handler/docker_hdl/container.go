@@ -162,6 +162,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 		ExposedPorts: portSet,
 		Tty:          ctrConf.RunConfig.PseudoTTY,
 		Env:          hdl_util.GenEnv(ctrConf.EnvVars),
+		Cmd:          ctrConf.RunConfig.Command,
 		Image:        ctrConf.Image,
 		Labels:       ctrConf.Labels,
 		StopTimeout:  hdl_util.GenStopTimeout(ctrConf.RunConfig.StopTimeout),
