@@ -23,15 +23,15 @@ import (
 	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"io"
 )
 
 func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	var images []model.Image
-	il, err := d.client.ImageList(ctx, types.ImageListOptions{Filters: hdl_util.GenImageFilterArgs(filter)})
+	il, err := d.client.ImageList(ctx, image.ListOptions{Filters: hdl_util.GenImageFilterArgs(filter)})
 	if err != nil {
 		return images, model.NewInternalError(err)
 	}
@@ -83,7 +83,7 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) 
 }
 
 func (d *Docker) ImagePull(ctx context.Context, id string) error {
-	rc, err := d.client.ImagePull(ctx, id, types.ImagePullOptions{})
+	rc, err := d.client.ImagePull(ctx, id, image.PullOptions{})
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
@@ -110,7 +110,7 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 }
 
 func (d *Docker) ImageRemove(ctx context.Context, id string) error {
-	if _, err := d.client.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
+	if _, err := d.client.ImageRemove(ctx, id, image.RemoveOptions{}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
