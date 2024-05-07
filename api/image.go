@@ -31,13 +31,13 @@ func (a *Api) GetImage(ctx context.Context, id string) (model.Image, error) {
 }
 
 func (a *Api) AddImage(ctx context.Context, img string) (string, error) {
-	return a.jobHandler.Create(ctx, fmt.Sprintf("add image '%s'", img), func(ctx context.Context, cf context.CancelFunc) error {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("add image '%s'", img), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ImagePull(ctx, img)
 		if err == nil {
 			err = ctx.Err()
 		}
-		return err
+		return nil, err
 	})
 }
 

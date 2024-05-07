@@ -40,24 +40,24 @@ func (a *Api) StartContainer(ctx context.Context, id string) error {
 }
 
 func (a *Api) StopContainer(ctx context.Context, id string) (string, error) {
-	return a.jobHandler.Create(ctx, fmt.Sprintf("stop container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("stop container '%s'", id), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ContainerStop(ctx, id)
 		if err == nil {
 			err = ctx.Err()
 		}
-		return err
+		return nil, err
 	})
 }
 
 func (a *Api) RestartContainer(ctx context.Context, id string) (string, error) {
-	return a.jobHandler.Create(ctx, fmt.Sprintf("restart container '%s'", id), func(ctx context.Context, cf context.CancelFunc) error {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("restart container '%s'", id), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ContainerRestart(ctx, id)
 		if err == nil {
 			err = ctx.Err()
 		}
-		return err
+		return nil, err
 	})
 }
 
@@ -70,12 +70,12 @@ func (a *Api) GetContainerLog(ctx context.Context, id string, logOptions model.L
 }
 
 func (a *Api) ContainerExec(ctx context.Context, id string, exeConf model.ExecConfig) (string, error) {
-	return a.jobHandler.Create(ctx, fmt.Sprintf("container execute '%+v'", exeConf), func(ctx context.Context, cf context.CancelFunc) error {
+	return a.jobHandler.Create(ctx, fmt.Sprintf("container execute '%+v'", exeConf), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ContainerExec(ctx, id, exeConf)
 		if err == nil {
 			err = ctx.Err()
 		}
-		return err
+		return nil, err
 	})
 }
