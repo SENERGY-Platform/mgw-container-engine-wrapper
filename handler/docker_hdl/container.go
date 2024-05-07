@@ -33,7 +33,7 @@ import (
 
 func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
 	var csl []model.Container
-	cl, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true, Filters: hdl_util.GenContainerFilterArgs(filter)})
+	cl, err := d.client.ContainerList(ctx, container.ListOptions{All: true, Filters: hdl_util.GenContainerFilterArgs(filter)})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
@@ -227,7 +227,7 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 }
 
 func (d *Docker) ContainerRemove(ctx context.Context, id string, force bool) error {
-	if err := d.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{Force: force}); err != nil {
+	if err := d.client.ContainerRemove(ctx, id, container.RemoveOptions{Force: force}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -237,7 +237,7 @@ func (d *Docker) ContainerRemove(ctx context.Context, id string, force bool) err
 }
 
 func (d *Docker) ContainerStart(ctx context.Context, id string) error {
-	if err := d.client.ContainerStart(ctx, id, types.ContainerStartOptions{}); err != nil {
+	if err := d.client.ContainerStart(ctx, id, container.StartOptions{}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -267,7 +267,7 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 }
 
 func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFilter) (io.ReadCloser, error) {
-	clo := types.ContainerLogsOptions{
+	clo := container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 	}

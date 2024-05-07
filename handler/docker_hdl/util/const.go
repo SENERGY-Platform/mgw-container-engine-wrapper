@@ -18,6 +18,7 @@ package util
 
 import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 )
 
@@ -45,15 +46,15 @@ var HealthMap = map[string]model.ContainerHealth{
 	"unhealthy": model.UnhealthyState,
 }
 
-var RestartPolicyMap = map[string]model.RestartStrategy{
-	"no":             model.RestartNever,
-	"on-failure":     model.RestartOnFail,
-	"always":         model.RestartAlways,
-	"unless-stopped": model.RestartNotStopped,
+var RestartPolicyMap = map[container.RestartPolicyMode]model.RestartStrategy{
+	container.RestartPolicyDisabled:      model.RestartNever,
+	container.RestartPolicyOnFailure:     model.RestartOnFail,
+	container.RestartPolicyAlways:        model.RestartAlways,
+	container.RestartPolicyUnlessStopped: model.RestartNotStopped,
 }
 
-var RestartPolicyRMap = func() map[model.RestartStrategy]string {
-	m := make(map[model.RestartStrategy]string)
+var RestartPolicyRMap = func() map[model.RestartStrategy]container.RestartPolicyMode {
+	m := make(map[model.RestartStrategy]container.RestartPolicyMode)
 	for k, v := range RestartPolicyMap {
 		m[v] = k
 	}

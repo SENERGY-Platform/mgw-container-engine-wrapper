@@ -164,7 +164,11 @@ func ParseRestartPolicy(rp container.RestartPolicy) (strategy model.RestartStrat
 	if rp.Name == "" {
 		strategy = model.RestartNever
 	} else {
-		strategy = GetConst(rp.Name, RestartPolicyMap)
+		if rs, ok := RestartPolicyMap[rp.Name]; ok {
+			strategy = rs
+		} else {
+			strategy = "unknown"
+		}
 	}
 	if strategy == model.RestartOnFail {
 		retires = &rp.MaximumRetryCount
