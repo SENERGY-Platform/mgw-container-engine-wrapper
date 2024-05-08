@@ -35,6 +35,8 @@ type Image struct {
 }
 
 type ImageFilter struct {
+	Name   string
+	Tag    string
 	Labels map[string]string
 }
 
