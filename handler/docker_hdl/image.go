@@ -27,6 +27,7 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"io"
+	"strings"
 )
 
 func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
@@ -36,6 +37,9 @@ func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]mo
 		return images, model.NewInternalError(err)
 	}
 	for _, is := range il {
+		if filter.Name != "" && !inTags(is.RepoTags, filter.Name, filter.Tag) {
+			continue
+		}
 		img := model.Image{
 			ID: is.ID,
 			//Created: is.Created,
@@ -122,4 +126,22 @@ func (d *Docker) ImageRemove(ctx context.Context, id string) error {
 func (d *Docker) PruneImages(ctx context.Context) error {
 	_, err := d.client.ImagesPrune(ctx, filters.Args{})
 	return err
+}
+
+func inTags(list []string, name, tag string) bool {
+	if tag != "" {
+		name += ":" + tag
+		for _, item := range list {
+			if item == name {
+				return true
+			}
+		}
+	} else {
+		for _, item := range list {
+			if strings.HasPrefix(item, name) {
+				return true
+			}
+		}
+	}
+	return false
 }
