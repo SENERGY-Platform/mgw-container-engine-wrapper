@@ -96,6 +96,12 @@ func genImagesQuery(filter model.ImageFilter) string {
 	if len(filter.Labels) > 0 {
 		q = append(q, "labels="+genLabels(filter.Labels, "=", ","))
 	}
+	if filter.Name != "" {
+		q = append(q, "name="+filter.Name)
+	}
+	if filter.Tag != "" {
+		q = append(q, "tag="+filter.Tag)
+	}
 	if len(q) > 0 {
 		return "?" + strings.Join(q, "&")
 	}
