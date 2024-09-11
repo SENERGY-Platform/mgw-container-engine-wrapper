@@ -52,9 +52,10 @@ type LoggerConfig struct {
 }
 
 type Config struct {
-	Logger LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
-	Socket SocketConfig `json:"socket" env_var:"SOCKET_CONFIG"`
-	Jobs   JobsConfig   `json:"jobs" env_var:"JOBS_CONFIG"`
+	Logger     LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	Socket     SocketConfig `json:"socket" env_var:"SOCKET_CONFIG"`
+	Jobs       JobsConfig   `json:"jobs" env_var:"JOBS_CONFIG"`
+	DockerHost string       `json:"docker_host" env_var:"DOCKER_HOST"`
 }
 
 func NewConfig(path string) (*Config, error) {
@@ -79,6 +80,7 @@ func NewConfig(path string) (*Config, error) {
 			PJHInterval: 300000000000,
 			MaxAge:      172800000000000,
 		},
+		DockerHost: "unix:///var/run/docker.sock",
 	}
 	err := config_hdl.Load(&cfg, nil, map[reflect.Type]envldr.Parser{reflect.TypeOf(level.Off): sb_logger.LevelParser}, nil, path)
 	return &cfg, err

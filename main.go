@@ -80,7 +80,7 @@ func main() {
 	watchdog.Logger = util.Logger
 	wtchdg := watchdog.New(syscall.SIGINT, syscall.SIGTERM)
 
-	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	dockerClient, err := client.NewClientWithOpts(client.WithTLSClientConfigFromEnv(), client.WithHost(config.DockerHost), client.WithVersionFromEnv(), client.WithAPIVersionNegotiation())
 	if err != nil {
 		util.Logger.Error(err)
 		ec = 1
