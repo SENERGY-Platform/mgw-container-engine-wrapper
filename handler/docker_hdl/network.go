@@ -22,14 +22,13 @@ import (
 	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 )
 
 func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
 	var n []model.Network
-	nr, err := d.client.NetworkList(ctx, types.NetworkListOptions{})
+	nr, err := d.client.NetworkList(ctx, network.ListOptions{})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
@@ -50,7 +49,7 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
 
 func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, error) {
 	n := model.Network{}
-	nr, err := d.client.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
+	nr, err := d.client.NetworkInspect(ctx, id, network.InspectOptions{})
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.Network{}, model.NewNotFoundError(err)
@@ -70,10 +69,9 @@ func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, 
 	if _, ok := model.NetworkTypeMap[net.Type]; !ok {
 		return "", model.NewInvalidInputError(fmt.Errorf("invalid network type '%s'", net.Type))
 	}
-	res, err := d.client.NetworkCreate(ctx, net.Name, types.NetworkCreate{
-		CheckDuplicate: true,
-		Driver:         hdl_util.NetTypeRMap[net.Type],
-		Attachable:     true,
+	res, err := d.client.NetworkCreate(ctx, net.Name, network.CreateOptions{
+		Driver:     hdl_util.NetTypeRMap[net.Type],
+		Attachable: true,
 		IPAM: &network.IPAM{
 			Config: hdl_util.GenNetIPAMConfig(net),
 		},

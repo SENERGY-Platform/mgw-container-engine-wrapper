@@ -22,7 +22,6 @@ import (
 	hdl_util "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
@@ -291,7 +290,7 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 }
 
 func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.ExecConfig) error {
-	eConf, err := d.client.ContainerExecCreate(ctx, id, types.ExecConfig{
+	eConf, err := d.client.ContainerExecCreate(ctx, id, container.ExecOptions{
 		Tty:          execOpt.Tty,
 		AttachStderr: true,
 		AttachStdout: true,
@@ -302,7 +301,7 @@ func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.Exe
 	if err != nil {
 		return model.NewInternalError(err)
 	}
-	eAttach, err := d.client.ContainerExecAttach(ctx, eConf.ID, types.ExecStartCheck{Tty: execOpt.Tty})
+	eAttach, err := d.client.ContainerExecAttach(ctx, eConf.ID, container.ExecAttachOptions{Tty: execOpt.Tty})
 	if err != nil {
 		return model.NewInternalError(err)
 	}
@@ -321,17 +320,17 @@ func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.Exe
 	return nil
 }
 
-func (d *Docker) awaitContainerExec(ctx context.Context, execID string, delay time.Duration) (types.ContainerExecInspect, error) {
+func (d *Docker) awaitContainerExec(ctx context.Context, execID string, delay time.Duration) (container.ExecInspect, error) {
 	ticker := time.NewTicker(delay)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ctx.Done():
-			return types.ContainerExecInspect{}, ctx.Err()
+			return container.ExecInspect{}, ctx.Err()
 		case <-ticker.C:
 			eRes, err := d.client.ContainerExecInspect(ctx, execID)
 			if err != nil {
-				return types.ContainerExecInspect{}, err
+				return container.ExecInspect{}, err
 			}
 			if !eRes.Running {
 				return eRes, nil
