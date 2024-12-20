@@ -80,7 +80,7 @@ func main() {
 	watchdog.Logger = util.Logger
 	wtchdg := watchdog.New(syscall.SIGINT, syscall.SIGTERM)
 
-	dockerClient, err := client.NewClientWithOpts(client.WithTLSClientConfigFromEnv(), client.WithHost(config.DockerHost), client.WithVersionFromEnv(), client.WithAPIVersionNegotiation())
+	dockerClient, err := client.NewClientWithOpts(client.WithTLSClientConfigFromEnv(), client.WithHost(config.Docker.Host), client.WithVersionFromEnv(), client.WithAPIVersionNegotiation())
 	if err != nil {
 		util.Logger.Error(err)
 		ec = 1
@@ -88,7 +88,16 @@ func main() {
 	}
 	defer dockerClient.Close()
 
-	dockerHandler := docker_hdl.New(dockerClient)
+	dockerHandler, err := docker_hdl.New(dockerClient, docker_hdl.ContainerLogConf{
+		Driver:  config.Docker.CtrLogDriver,
+		MaxSize: config.Docker.CtrLogMaxSize,
+		MaxFile: config.Docker.CtrLogMaxFile,
+	})
+	if err != nil {
+		util.Logger.Error(err)
+		ec = 1
+		return
+	}
 
 	ccHandler := ccjh.New(config.Jobs.BufferSize)
 

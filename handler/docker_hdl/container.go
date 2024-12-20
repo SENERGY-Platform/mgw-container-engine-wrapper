@@ -189,6 +189,22 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 			Devices: dvs,
 		},
 	}
+	if d.ctrLogConf.Driver != "" {
+		var cMap map[string]string
+		if d.ctrLogConf.MaxSize != "" || d.ctrLogConf.MaxFile > 0 {
+			cMap = make(map[string]string)
+			if d.ctrLogConf.MaxSize != "" {
+				cMap["max-size"] = d.ctrLogConf.MaxSize
+			}
+			if d.ctrLogConf.MaxFile > 0 {
+				cMap["max-file"] = strconv.FormatInt(int64(d.ctrLogConf.MaxFile), 10)
+			}
+		}
+		hConfig.LogConfig = container.LogConfig{
+			Type:   d.ctrLogConf.Driver,
+			Config: cMap,
+		}
+	}
 	err = hdl_util.CheckNetworks(ctrConf.Networks)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)

@@ -51,11 +51,18 @@ type LoggerConfig struct {
 	Prefix       string      `json:"prefix" env_var:"LOGGER_PREFIX"`
 }
 
+type DockerConfig struct {
+	Host          string `json:"host" env_var:"DOCKER_HOST"`
+	CtrLogDriver  string `json:"ctr_log_driver" env_var:"DOCKER_CTR_LOG_DRIVER"`
+	CtrLogMaxSize string `json:"ctr_log_max_size" env_var:"DOCKER_CTR_LOG_MAX_SIZE"`
+	CtrLogMaxFile int    `json:"ctr_log_max_file" env_var:"DOCKER_CTR_LOG_MAX_FILE"`
+}
+
 type Config struct {
-	Logger     LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
-	Socket     SocketConfig `json:"socket" env_var:"SOCKET_CONFIG"`
-	Jobs       JobsConfig   `json:"jobs" env_var:"JOBS_CONFIG"`
-	DockerHost string       `json:"docker_host" env_var:"DOCKER_HOST"`
+	Logger LoggerConfig `json:"logger" env_var:"LOGGER_CONFIG"`
+	Socket SocketConfig `json:"socket" env_var:"SOCKET_CONFIG"`
+	Jobs   JobsConfig   `json:"jobs" env_var:"JOBS_CONFIG"`
+	Docker DockerConfig `json:"docker" env_var:"DOCKER_CONFIG"`
 }
 
 func NewConfig(path string) (*Config, error) {
@@ -80,7 +87,9 @@ func NewConfig(path string) (*Config, error) {
 			PJHInterval: 300000000000,
 			MaxAge:      172800000000000,
 		},
-		DockerHost: "unix:///var/run/docker.sock",
+		Docker: DockerConfig{
+			Host: "unix:///var/run/docker.sock",
+		},
 	}
 	err := config_hdl.Load(&cfg, nil, map[reflect.Type]envldr.Parser{reflect.TypeOf(level.Off): sb_logger.LevelParser}, nil, path)
 	return &cfg, err

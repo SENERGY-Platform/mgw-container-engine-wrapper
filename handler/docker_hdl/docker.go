@@ -18,17 +18,31 @@ package docker_hdl
 
 import (
 	"context"
+	"errors"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/docker/docker/client"
 	"time"
 )
 
-type Docker struct {
-	client *client.Client
+type ContainerLogConf struct {
+	Driver  string
+	MaxSize string
+	MaxFile int
 }
 
-func New(c *client.Client) *Docker {
-	return &Docker{client: c}
+type Docker struct {
+	client     *client.Client
+	ctrLogConf ContainerLogConf
+}
+
+func New(c *client.Client, ctrLogConf ContainerLogConf) (*Docker, error) {
+	if ctrLogConf.Driver != "" && !isValidLoggingDriver(ctrLogConf.Driver) {
+		return nil, errors.New("invalid logging driver: " + ctrLogConf.Driver)
+	}
+	return &Docker{
+		client:     c,
+		ctrLogConf: ctrLogConf,
+	}, nil
 }
 
 func (d *Docker) ServerInfo(ctx context.Context, delay time.Duration) (map[string]string, error) {
@@ -78,4 +92,14 @@ func (d *Docker) waitForServer(ctx context.Context, delay time.Duration) error {
 			return ctx.Err()
 		}
 	}
+}
+
+var loggingDrivers = map[string]struct{}{
+	"local":     {},
+	"json-file": {},
+}
+
+func isValidLoggingDriver(s string) bool {
+	_, ok := loggingDrivers[s]
+	return ok
 }
