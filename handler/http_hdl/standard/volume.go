@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 InfAI (CC SES)
+ * Copyright 2025 InfAI (CC SES)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package http_hdl
+package standard
 
 import (
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path"
 )
-
-const volIdParam = "v"
 
 type volumesQuery struct {
 	Labels string `form:"labels"`
@@ -33,14 +33,14 @@ type deleteVolumeQuery struct {
 	Force bool `form:"force"`
 }
 
-func getVolumesH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func getVolumesH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, model.VolumesPath, func(gc *gin.Context) {
 		query := volumesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: genLabels(parseStringSlice(query.Labels, ","))})
+		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: util.GenLabels(util.ParseStringSlice(query.Labels, ","))})
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -49,8 +49,8 @@ func getVolumesH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func postVolumeH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func postVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodPost, model.VolumesPath, func(gc *gin.Context) {
 		volume := model.Volume{}
 		if err := gc.ShouldBindJSON(&volume); err != nil {
 			_ = gc.Error(model.NewInvalidInputError(err))
@@ -65,9 +65,9 @@ func postVolumeH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func getVolumeH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
-		volume, err := a.GetVolume(gc.Request.Context(), gc.Param(volIdParam))
+func getVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, path.Join(model.VolumesPath, ":id"), func(gc *gin.Context) {
+		volume, err := a.GetVolume(gc.Request.Context(), gc.Param("id"))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -76,14 +76,14 @@ func getVolumeH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteVolumeH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func deleteVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodDelete, path.Join(model.VolumesPath, ":id"), func(gc *gin.Context) {
 		query := deleteVolumeQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		if err := a.RemoveVolume(gc.Request.Context(), gc.Param(volIdParam), query.Force); err != nil {
+		if err := a.RemoveVolume(gc.Request.Context(), gc.Param("id"), query.Force); err != nil {
 			_ = gc.Error(err)
 			return
 		}

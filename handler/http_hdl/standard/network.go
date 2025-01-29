@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 InfAI (CC SES)
+ * Copyright 2025 InfAI (CC SES)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package http_hdl
+package standard
 
 import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path"
 )
 
-const netIdParam = "n"
-
-func getNetworksH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func getNetworksH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, model.NetworksPath, func(gc *gin.Context) {
 		networks, err := a.GetNetworks(gc.Request.Context())
 		if err != nil {
 			_ = gc.Error(err)
@@ -36,8 +35,8 @@ func getNetworksH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func postNetworkH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func postNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodPost, model.NetworksPath, func(gc *gin.Context) {
 		network := model.Network{}
 		if err := gc.ShouldBindJSON(&network); err != nil {
 			_ = gc.Error(model.NewInvalidInputError(err))
@@ -52,9 +51,9 @@ func postNetworkH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func getNetworkH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
-		network, err := a.GetNetwork(gc.Request.Context(), gc.Param(netIdParam))
+func getNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, path.Join(model.NetworksPath, ":id"), func(gc *gin.Context) {
+		network, err := a.GetNetwork(gc.Request.Context(), gc.Param("id"))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -63,9 +62,9 @@ func getNetworkH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteNetworkH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
-		if err := a.RemoveNetwork(gc.Request.Context(), gc.Param(netIdParam)); err != nil {
+func deleteNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodDelete, path.Join(model.NetworksPath, ":id"), func(gc *gin.Context) {
+		if err := a.RemoveNetwork(gc.Request.Context(), gc.Param("id")); err != nil {
 			_ = gc.Error(err)
 			return
 		}

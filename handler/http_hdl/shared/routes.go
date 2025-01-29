@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 InfAI (CC SES)
+ * Copyright 2025 InfAI (CC SES)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package http_hdl
+package shared
 
 import (
+	gin_mw "github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
-func getSrvInfoH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
-		gc.JSON(http.StatusOK, a.GetSrvInfo(gc.Request.Context()))
-	}
+var Routes = gin_mw.Routes[lib.Api]{
+	getContainerLogH,
+	getJobsH,
+	getJobH,
+	patchJobCancelH,
+	getSrvInfoH,
 }

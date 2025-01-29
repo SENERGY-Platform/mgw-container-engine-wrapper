@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 InfAI (CC SES)
+ * Copyright 2025 InfAI (CC SES)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package http_hdl
+package standard
 
 import (
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path"
 )
-
-const imgIdParam = "i"
 
 type imagesQuery struct {
 	Name   string `form:"name"`
@@ -31,8 +31,8 @@ type imagesQuery struct {
 	Labels string `form:"labels"`
 }
 
-func getImagesH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func getImagesH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, model.ImagesPath, func(gc *gin.Context) {
 		query := imagesQuery{}
 		if err := gc.ShouldBindQuery(&query); err != nil {
 			_ = gc.Error(model.NewInvalidInputError(err))
@@ -41,7 +41,7 @@ func getImagesH(a lib.Api) gin.HandlerFunc {
 		filter := model.ImageFilter{
 			Name:   query.Name,
 			Tag:    query.Tag,
-			Labels: genLabels(parseStringSlice(query.Labels, ",")),
+			Labels: util.GenLabels(util.ParseStringSlice(query.Labels, ",")),
 		}
 		images, err := a.GetImages(gc.Request.Context(), filter)
 		if err != nil {
@@ -52,8 +52,8 @@ func getImagesH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func postImageH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
+func postImageH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodPost, model.ImagesPath, func(gc *gin.Context) {
 		req := model.ImageRequest{}
 		if err := gc.ShouldBindJSON(&req); err != nil {
 			_ = gc.Error(model.NewInvalidInputError(err))
@@ -68,9 +68,9 @@ func postImageH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func getImageH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
-		image, err := a.GetImage(gc.Request.Context(), gc.Param(imgIdParam))
+func getImageH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodGet, path.Join(model.ImagesPath, ":id"), func(gc *gin.Context) {
+		image, err := a.GetImage(gc.Request.Context(), gc.Param("id"))
 		if err != nil {
 			_ = gc.Error(err)
 			return
@@ -79,9 +79,9 @@ func getImageH(a lib.Api) gin.HandlerFunc {
 	}
 }
 
-func deleteImageH(a lib.Api) gin.HandlerFunc {
-	return func(gc *gin.Context) {
-		if err := a.RemoveImage(gc.Request.Context(), gc.Param(imgIdParam)); err != nil {
+func deleteImageH(a lib.Api) (string, string, gin.HandlerFunc) {
+	return http.MethodDelete, path.Join(model.ImagesPath, ":id"), func(gc *gin.Context) {
+		if err := a.RemoveImage(gc.Request.Context(), gc.Param("id")); err != nil {
 			_ = gc.Error(err)
 			return
 		}
