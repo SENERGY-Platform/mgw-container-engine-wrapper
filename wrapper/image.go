@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package api
+package wrapper
 
 import (
 	"context"
@@ -22,15 +22,15 @@ import (
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
-func (a *Api) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
+func (a *Wrapper) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	return a.ceHandler.ListImages(ctx, filter)
 }
 
-func (a *Api) GetImage(ctx context.Context, id string) (model.Image, error) {
+func (a *Wrapper) GetImage(ctx context.Context, id string) (model.Image, error) {
 	return a.ceHandler.ImageInfo(ctx, id)
 }
 
-func (a *Api) AddImage(ctx context.Context, img string) (string, error) {
+func (a *Wrapper) AddImage(ctx context.Context, img string) (string, error) {
 	return a.jobHandler.Create(ctx, fmt.Sprintf("add image '%s'", img), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ImagePull(ctx, img)
@@ -41,6 +41,6 @@ func (a *Api) AddImage(ctx context.Context, img string) (string, error) {
 	})
 }
 
-func (a *Api) RemoveImage(ctx context.Context, id string) error {
+func (a *Wrapper) RemoveImage(ctx context.Context, id string) error {
 	return a.ceHandler.ImageRemove(ctx, id)
 }

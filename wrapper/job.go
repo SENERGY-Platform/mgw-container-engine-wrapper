@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package api
+package wrapper
 
 import (
 	"context"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
+	job_hdl_lib "github.com/SENERGY-Platform/go-service-base/job-hdl/lib"
 )
 
-func (a *Api) GetNetworks(ctx context.Context) ([]model.Network, error) {
-	return a.ceHandler.ListNetworks(ctx)
+func (a *Wrapper) GetJobs(ctx context.Context, filter job_hdl_lib.JobFilter) ([]job_hdl_lib.Job, error) {
+	return a.jobHandler.List(ctx, filter)
 }
 
-func (a *Api) GetNetwork(ctx context.Context, id string) (model.Network, error) {
-	return a.ceHandler.NetworkInfo(ctx, id)
+func (a *Wrapper) GetJob(ctx context.Context, id string) (job_hdl_lib.Job, error) {
+	return a.jobHandler.Get(ctx, id)
 }
 
-func (a *Api) CreateNetwork(ctx context.Context, net model.Network) (string, error) {
-	return a.ceHandler.NetworkCreate(ctx, net)
-}
-
-func (a *Api) RemoveNetwork(ctx context.Context, id string) error {
-	return a.ceHandler.NetworkRemove(ctx, id)
+func (a *Wrapper) CancelJob(ctx context.Context, id string) error {
+	return a.jobHandler.Cancel(ctx, id)
 }

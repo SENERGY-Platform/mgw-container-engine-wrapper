@@ -30,40 +30,40 @@ type ContainerLogConf struct {
 	MaxFile int
 }
 
-type Docker struct {
+type Handler struct {
 	client     *client.Client
 	ctrLogConf ContainerLogConf
 }
 
-func New(c *client.Client, ctrLogConf ContainerLogConf) (*Docker, error) {
+func New(c *client.Client, ctrLogConf ContainerLogConf) (*Handler, error) {
 	if ctrLogConf.Driver != "" && !isValidLoggingDriver(ctrLogConf.Driver) {
 		return nil, errors.New("invalid logging driver: " + ctrLogConf.Driver)
 	}
-	return &Docker{
+	return &Handler{
 		client:     c,
 		ctrLogConf: ctrLogConf,
 	}, nil
 }
 
-func (d *Docker) ServerInfo(ctx context.Context, delay time.Duration) (map[string]string, error) {
-	err := d.waitForServer(ctx, delay)
+func (h *Handler) ServerInfo(ctx context.Context, delay time.Duration) (map[string]string, error) {
+	err := h.waitForServer(ctx, delay)
 	if err != nil {
 		return nil, err
 	}
 	info := map[string]string{}
-	srvVer, err := d.client.ServerVersion(ctx)
+	srvVer, err := h.client.ServerVersion(ctx)
 	if err != nil {
 		return info, err
 	}
 	for i := 0; i < len(srvVer.Components); i++ {
 		info[srvVer.Components[i].Name] = srvVer.Components[i].Version
 	}
-	info["api"] = d.client.ClientVersion()
+	info["api"] = h.client.ClientVersion()
 	return info, nil
 }
 
-func (d *Docker) waitForServer(ctx context.Context, delay time.Duration) error {
-	_, err := d.client.Ping(ctx)
+func (h *Handler) waitForServer(ctx context.Context, delay time.Duration) error {
+	_, err := h.client.Ping(ctx)
 	if err == nil {
 		return nil
 	} else {
@@ -78,7 +78,7 @@ func (d *Docker) waitForServer(ctx context.Context, delay time.Duration) error {
 	for {
 		select {
 		case <-ticker.C:
-			_, err = d.client.Ping(ctx)
+			_, err = h.client.Ping(ctx)
 			if err == nil {
 				return nil
 			} else {

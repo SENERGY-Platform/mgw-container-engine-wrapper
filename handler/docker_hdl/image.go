@@ -30,9 +30,9 @@ import (
 	"strings"
 )
 
-func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
+func (h *Handler) ListImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
 	var images []model.Image
-	il, err := d.client.ImageList(ctx, image.ListOptions{Filters: hdl_util.GenImageFilterArgs(filter)})
+	il, err := h.client.ImageList(ctx, image.ListOptions{Filters: hdl_util.GenImageFilterArgs(filter)})
 	if err != nil {
 		return images, model.NewInternalError(err)
 	}
@@ -48,7 +48,7 @@ func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]mo
 			Digests: is.RepoDigests,
 			Labels:  is.Labels,
 		}
-		if i, _, err := d.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
+		if i, _, err := h.client.ImageInspectWithRaw(ctx, is.ID); err != nil {
 			util.Logger.Errorf("inspecting image '%s' failed: %s", is.ID, err)
 		} else {
 			if ti, err := hdl_util.ParseTimestamp(i.Created); err != nil {
@@ -63,9 +63,9 @@ func (d *Docker) ListImages(ctx context.Context, filter model.ImageFilter) ([]mo
 	return images, nil
 }
 
-func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) {
+func (h *Handler) ImageInfo(ctx context.Context, id string) (model.Image, error) {
 	img := model.Image{}
-	i, _, err := d.client.ImageInspectWithRaw(ctx, id)
+	i, _, err := h.client.ImageInspectWithRaw(ctx, id)
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.Image{}, model.NewNotFoundError(err)
@@ -86,8 +86,8 @@ func (d *Docker) ImageInfo(ctx context.Context, id string) (model.Image, error) 
 	return img, nil
 }
 
-func (d *Docker) ImagePull(ctx context.Context, id string) error {
-	rc, err := d.client.ImagePull(ctx, id, image.PullOptions{})
+func (h *Handler) ImagePull(ctx context.Context, id string) error {
+	rc, err := h.client.ImagePull(ctx, id, image.PullOptions{})
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
@@ -113,8 +113,8 @@ func (d *Docker) ImagePull(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ImageRemove(ctx context.Context, id string) error {
-	if _, err := d.client.ImageRemove(ctx, id, image.RemoveOptions{}); err != nil {
+func (h *Handler) ImageRemove(ctx context.Context, id string) error {
+	if _, err := h.client.ImageRemove(ctx, id, image.RemoveOptions{}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -123,8 +123,8 @@ func (d *Docker) ImageRemove(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) PruneImages(ctx context.Context) error {
-	_, err := d.client.ImagesPrune(ctx, filters.Args{})
+func (h *Handler) PruneImages(ctx context.Context) error {
+	_, err := h.client.ImagesPrune(ctx, filters.Args{})
 	return err
 }
 

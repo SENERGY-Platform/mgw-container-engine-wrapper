@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package api
+package wrapper
 
 import (
 	"context"
@@ -23,23 +23,23 @@ import (
 	"io"
 )
 
-func (a *Api) GetContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
+func (a *Wrapper) GetContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
 	return a.ceHandler.ListContainers(ctx, filter)
 }
 
-func (a *Api) GetContainer(ctx context.Context, id string) (model.Container, error) {
+func (a *Wrapper) GetContainer(ctx context.Context, id string) (model.Container, error) {
 	return a.ceHandler.ContainerInfo(ctx, id)
 }
 
-func (a *Api) CreateContainer(ctx context.Context, container model.Container) (string, error) {
+func (a *Wrapper) CreateContainer(ctx context.Context, container model.Container) (string, error) {
 	return a.ceHandler.ContainerCreate(ctx, container)
 }
 
-func (a *Api) StartContainer(ctx context.Context, id string) error {
+func (a *Wrapper) StartContainer(ctx context.Context, id string) error {
 	return a.ceHandler.ContainerStart(ctx, id)
 }
 
-func (a *Api) StopContainer(ctx context.Context, id string) (string, error) {
+func (a *Wrapper) StopContainer(ctx context.Context, id string) (string, error) {
 	return a.jobHandler.Create(ctx, fmt.Sprintf("stop container '%s'", id), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ContainerStop(ctx, id)
@@ -50,7 +50,7 @@ func (a *Api) StopContainer(ctx context.Context, id string) (string, error) {
 	})
 }
 
-func (a *Api) RestartContainer(ctx context.Context, id string) (string, error) {
+func (a *Wrapper) RestartContainer(ctx context.Context, id string) (string, error) {
 	return a.jobHandler.Create(ctx, fmt.Sprintf("restart container '%s'", id), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ContainerRestart(ctx, id)
@@ -61,15 +61,15 @@ func (a *Api) RestartContainer(ctx context.Context, id string) (string, error) {
 	})
 }
 
-func (a *Api) RemoveContainer(ctx context.Context, id string, force bool) error {
+func (a *Wrapper) RemoveContainer(ctx context.Context, id string, force bool) error {
 	return a.ceHandler.ContainerRemove(ctx, id, force)
 }
 
-func (a *Api) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {
+func (a *Wrapper) GetContainerLog(ctx context.Context, id string, logOptions model.LogFilter) (io.ReadCloser, error) {
 	return a.ceHandler.ContainerLog(ctx, id, logOptions)
 }
 
-func (a *Api) ContainerExec(ctx context.Context, id string, exeConf model.ExecConfig) (string, error) {
+func (a *Wrapper) ContainerExec(ctx context.Context, id string, exeConf model.ExecConfig) (string, error) {
 	return a.jobHandler.Create(ctx, fmt.Sprintf("container execute '%+v'", exeConf), func(ctx context.Context, cf context.CancelFunc) (any, error) {
 		defer cf()
 		err := a.ceHandler.ContainerExec(ctx, id, exeConf)

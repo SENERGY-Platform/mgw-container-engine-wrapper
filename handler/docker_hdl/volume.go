@@ -25,9 +25,9 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
+func (h *Handler) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
 	var vols []model.Volume
-	vls, err := d.client.VolumeList(ctx, volume.ListOptions{Filters: hdl_util.GenVolumeFilterArgs(filter)})
+	vls, err := h.client.VolumeList(ctx, volume.ListOptions{Filters: hdl_util.GenVolumeFilterArgs(filter)})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
@@ -46,9 +46,9 @@ func (d *Docker) ListVolumes(ctx context.Context, filter model.VolumeFilter) ([]
 	return vols, nil
 }
 
-func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error) {
+func (h *Handler) VolumeInfo(ctx context.Context, id string) (model.Volume, error) {
 	vol := model.Volume{}
-	vl, err := d.client.VolumeInspect(ctx, id)
+	vl, err := h.client.VolumeInspect(ctx, id)
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.Volume{}, model.NewNotFoundError(err)
@@ -65,16 +65,16 @@ func (d *Docker) VolumeInfo(ctx context.Context, id string) (model.Volume, error
 	return vol, nil
 }
 
-func (d *Docker) VolumeCreate(ctx context.Context, vol model.Volume) (string, error) {
-	res, err := d.client.VolumeCreate(ctx, volume.CreateOptions{Name: vol.Name, Labels: vol.Labels})
+func (h *Handler) VolumeCreate(ctx context.Context, vol model.Volume) (string, error) {
+	res, err := h.client.VolumeCreate(ctx, volume.CreateOptions{Name: vol.Name, Labels: vol.Labels})
 	if err != nil {
 		return "", model.NewInternalError(err)
 	}
 	return res.Name, nil
 }
 
-func (d *Docker) VolumeRemove(ctx context.Context, id string, force bool) error {
-	if err := d.client.VolumeRemove(ctx, id, force); err != nil {
+func (h *Handler) VolumeRemove(ctx context.Context, id string, force bool) error {
+	if err := h.client.VolumeRemove(ctx, id, force); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}

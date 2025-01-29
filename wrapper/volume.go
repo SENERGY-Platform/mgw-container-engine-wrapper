@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package api
+package wrapper
 
 import (
 	"context"
-	job_hdl_lib "github.com/SENERGY-Platform/go-service-base/job-hdl/lib"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
-func (a *Api) GetJobs(ctx context.Context, filter job_hdl_lib.JobFilter) ([]job_hdl_lib.Job, error) {
-	return a.jobHandler.List(ctx, filter)
+func (a *Wrapper) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
+	return a.ceHandler.ListVolumes(ctx, filter)
 }
 
-func (a *Api) GetJob(ctx context.Context, id string) (job_hdl_lib.Job, error) {
-	return a.jobHandler.Get(ctx, id)
+func (a *Wrapper) CreateVolume(ctx context.Context, vol model.Volume) (string, error) {
+	return a.ceHandler.VolumeCreate(ctx, vol)
 }
 
-func (a *Api) CancelJob(ctx context.Context, id string) error {
-	return a.jobHandler.Cancel(ctx, id)
+func (a *Wrapper) GetVolume(ctx context.Context, id string) (model.Volume, error) {
+	return a.ceHandler.VolumeInfo(ctx, id)
+}
+
+func (a *Wrapper) RemoveVolume(ctx context.Context, id string, force bool) error {
+	return a.ceHandler.VolumeRemove(ctx, id, force)
 }

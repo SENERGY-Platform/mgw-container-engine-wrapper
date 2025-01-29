@@ -30,9 +30,9 @@ import (
 	"time"
 )
 
-func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
+func (h *Handler) ListContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
 	var csl []model.Container
-	cl, err := d.client.ContainerList(ctx, container.ListOptions{All: true, Filters: hdl_util.GenContainerFilterArgs(filter)})
+	cl, err := h.client.ContainerList(ctx, container.ListOptions{All: true, Filters: hdl_util.GenContainerFilterArgs(filter)})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
@@ -45,7 +45,7 @@ func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilte
 			Mounts:   hdl_util.ParseMountPoints(c.Mounts),
 			Networks: hdl_util.ParseEndpointSettings(c.NetworkSettings.Networks),
 		}
-		if ci, err := d.client.ContainerInspect(ctx, c.ID); err != nil {
+		if ci, err := h.client.ContainerInspect(ctx, c.ID); err != nil {
 			util.Logger.Errorf("inspecting container '%s' failed: %s", c.ID, err)
 		} else {
 			ctr.Name = hdl_util.ParseContainerName(ci.Name)
@@ -92,9 +92,9 @@ func (d *Docker) ListContainers(ctx context.Context, filter model.ContainerFilte
 	return csl, nil
 }
 
-func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container, error) {
+func (h *Handler) ContainerInfo(ctx context.Context, id string) (model.Container, error) {
 	ctr := model.Container{}
-	c, err := d.client.ContainerInspect(ctx, id)
+	c, err := h.client.ContainerInspect(ctx, id)
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.Container{}, model.NewNotFoundError(err)
@@ -150,7 +150,7 @@ func (d *Docker) ContainerInfo(ctx context.Context, id string) (model.Container,
 	return ctr, nil
 }
 
-func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (string, error) {
+func (h *Handler) ContainerCreate(ctx context.Context, ctrConf model.Container) (string, error) {
 	portMap, portSet, err := hdl_util.GenPortMap(ctrConf.Ports)
 	if err != nil {
 		return "", model.NewInvalidInputError(err)
@@ -189,19 +189,19 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 			Devices: dvs,
 		},
 	}
-	if d.ctrLogConf.Driver != "" {
+	if h.ctrLogConf.Driver != "" {
 		var cMap map[string]string
-		if d.ctrLogConf.MaxSize != "" || d.ctrLogConf.MaxFile > 0 {
+		if h.ctrLogConf.MaxSize != "" || h.ctrLogConf.MaxFile > 0 {
 			cMap = make(map[string]string)
-			if d.ctrLogConf.MaxSize != "" {
-				cMap["max-size"] = d.ctrLogConf.MaxSize
+			if h.ctrLogConf.MaxSize != "" {
+				cMap["max-size"] = h.ctrLogConf.MaxSize
 			}
-			if d.ctrLogConf.MaxFile > 0 {
-				cMap["max-file"] = strconv.FormatInt(int64(d.ctrLogConf.MaxFile), 10)
+			if h.ctrLogConf.MaxFile > 0 {
+				cMap["max-file"] = strconv.FormatInt(int64(h.ctrLogConf.MaxFile), 10)
 			}
 		}
 		hConfig.LogConfig = container.LogConfig{
-			Type:   d.ctrLogConf.Driver,
+			Type:   h.ctrLogConf.Driver,
 			Config: cMap,
 		}
 	}
@@ -217,17 +217,17 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 			},
 		}}
 	}
-	res, err := d.client.ContainerCreate(ctx, cConfig, hConfig, nConfig, nil, ctrConf.Name)
+	res, err := h.client.ContainerCreate(ctx, cConfig, hConfig, nConfig, nil, ctrConf.Name)
 	if err != nil {
 		return "", model.NewInternalError(err)
 	}
 	if len(ctrConf.Networks) > 1 {
 		for i := 1; i < len(ctrConf.Networks); i++ {
-			err := d.client.NetworkConnect(ctx, ctrConf.Networks[i].Name, res.ID, &network.EndpointSettings{
+			err := h.client.NetworkConnect(ctx, ctrConf.Networks[i].Name, res.ID, &network.EndpointSettings{
 				Aliases: ctrConf.Networks[i].DomainNames,
 			})
 			if err != nil {
-				err2 := d.ContainerRemove(ctx, res.ID, true)
+				err2 := h.ContainerRemove(ctx, res.ID, true)
 				if err2 != nil {
 					util.Logger.Errorf("removing container '%s' failed: %s", ctrConf.Name, err2)
 				}
@@ -241,8 +241,8 @@ func (d *Docker) ContainerCreate(ctx context.Context, ctrConf model.Container) (
 	return res.ID, nil
 }
 
-func (d *Docker) ContainerRemove(ctx context.Context, id string, force bool) error {
-	if err := d.client.ContainerRemove(ctx, id, container.RemoveOptions{Force: force}); err != nil {
+func (h *Handler) ContainerRemove(ctx context.Context, id string, force bool) error {
+	if err := h.client.ContainerRemove(ctx, id, container.RemoveOptions{Force: force}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -251,8 +251,8 @@ func (d *Docker) ContainerRemove(ctx context.Context, id string, force bool) err
 	return nil
 }
 
-func (d *Docker) ContainerStart(ctx context.Context, id string) error {
-	if err := d.client.ContainerStart(ctx, id, container.StartOptions{}); err != nil {
+func (h *Handler) ContainerStart(ctx context.Context, id string) error {
+	if err := h.client.ContainerStart(ctx, id, container.StartOptions{}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -261,8 +261,8 @@ func (d *Docker) ContainerStart(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ContainerStop(ctx context.Context, id string) error {
-	if err := d.client.ContainerStop(ctx, id, container.StopOptions{}); err != nil {
+func (h *Handler) ContainerStop(ctx context.Context, id string) error {
+	if err := h.client.ContainerStop(ctx, id, container.StopOptions{}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -271,8 +271,8 @@ func (d *Docker) ContainerStop(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
-	if err := d.client.ContainerRestart(ctx, id, container.StopOptions{}); err != nil {
+func (h *Handler) ContainerRestart(ctx context.Context, id string) error {
+	if err := h.client.ContainerRestart(ctx, id, container.StopOptions{}); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}
@@ -281,7 +281,7 @@ func (d *Docker) ContainerRestart(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFilter) (io.ReadCloser, error) {
+func (h *Handler) ContainerLog(ctx context.Context, id string, logOpt model.LogFilter) (io.ReadCloser, error) {
 	clo := container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
@@ -295,7 +295,7 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 	if logOpt.MaxLines > 0 {
 		clo.Tail = strconv.FormatInt(int64(logOpt.MaxLines), 10)
 	}
-	rc, err := d.client.ContainerLogs(ctx, id, clo)
+	rc, err := h.client.ContainerLogs(ctx, id, clo)
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return nil, model.NewNotFoundError(err)
@@ -305,8 +305,8 @@ func (d *Docker) ContainerLog(ctx context.Context, id string, logOpt model.LogFi
 	return &hdl_util.RCWrapper{ReadCloser: rc}, nil
 }
 
-func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.ExecConfig) error {
-	eConf, err := d.client.ContainerExecCreate(ctx, id, container.ExecOptions{
+func (h *Handler) ContainerExec(ctx context.Context, id string, execOpt model.ExecConfig) error {
+	eConf, err := h.client.ContainerExecCreate(ctx, id, container.ExecOptions{
 		Tty:          execOpt.Tty,
 		AttachStderr: true,
 		AttachStdout: true,
@@ -317,12 +317,12 @@ func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.Exe
 	if err != nil {
 		return model.NewInternalError(err)
 	}
-	eAttach, err := d.client.ContainerExecAttach(ctx, eConf.ID, container.ExecAttachOptions{Tty: execOpt.Tty})
+	eAttach, err := h.client.ContainerExecAttach(ctx, eConf.ID, container.ExecAttachOptions{Tty: execOpt.Tty})
 	if err != nil {
 		return model.NewInternalError(err)
 	}
 	defer eAttach.Close()
-	eRes, err := d.awaitContainerExec(ctx, eConf.ID, time.Millisecond*250)
+	eRes, err := h.awaitContainerExec(ctx, eConf.ID, time.Millisecond*250)
 	if err != nil {
 		return model.NewInternalError(err)
 	}
@@ -336,7 +336,7 @@ func (d *Docker) ContainerExec(ctx context.Context, id string, execOpt model.Exe
 	return nil
 }
 
-func (d *Docker) awaitContainerExec(ctx context.Context, execID string, delay time.Duration) (container.ExecInspect, error) {
+func (h *Handler) awaitContainerExec(ctx context.Context, execID string, delay time.Duration) (container.ExecInspect, error) {
 	ticker := time.NewTicker(delay)
 	defer ticker.Stop()
 	for {
@@ -344,7 +344,7 @@ func (d *Docker) awaitContainerExec(ctx context.Context, execID string, delay ti
 		case <-ctx.Done():
 			return container.ExecInspect{}, ctx.Err()
 		case <-ticker.C:
-			eRes, err := d.client.ContainerExecInspect(ctx, execID)
+			eRes, err := h.client.ContainerExecInspect(ctx, execID)
 			if err != nil {
 				return container.ExecInspect{}, err
 			}

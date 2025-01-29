@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package api
+package wrapper
 
 import (
 	"github.com/SENERGY-Platform/go-service-base/job-hdl"
 	"github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler"
 )
 
-type Api struct {
-	ceHandler  handler.ContainerEngineHandler
+type Wrapper struct {
+	ceHandler  ContainerEngineHandler
 	jobHandler job_hdl.JobHandler
 	srvInfoHdl srv_info_hdl.SrvInfoHandler
 }
 
-func New(ceHandler handler.ContainerEngineHandler, jobHandler job_hdl.JobHandler, srvInfoHandler srv_info_hdl.SrvInfoHandler) *Api {
-	return &Api{
+func New(ceHandler ContainerEngineHandler, jobHandler job_hdl.JobHandler, srvInfoHandler srv_info_hdl.SrvInfoHandler) *Wrapper {
+	return &Wrapper{
 		ceHandler:  ceHandler,
 		jobHandler: jobHandler,
 		srvInfoHdl: srvInfoHandler,

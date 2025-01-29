@@ -26,9 +26,9 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
+func (h *Handler) ListNetworks(ctx context.Context) ([]model.Network, error) {
 	var n []model.Network
-	nr, err := d.client.NetworkList(ctx, network.ListOptions{})
+	nr, err := h.client.NetworkList(ctx, network.ListOptions{})
 	if err != nil {
 		return nil, model.NewInternalError(err)
 	}
@@ -47,9 +47,9 @@ func (d *Docker) ListNetworks(ctx context.Context) ([]model.Network, error) {
 	return n, nil
 }
 
-func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, error) {
+func (h *Handler) NetworkInfo(ctx context.Context, id string) (model.Network, error) {
 	n := model.Network{}
-	nr, err := d.client.NetworkInspect(ctx, id, network.InspectOptions{})
+	nr, err := h.client.NetworkInspect(ctx, id, network.InspectOptions{})
 	if err != nil {
 		if client.IsErrNotFound(err) {
 			return model.Network{}, model.NewNotFoundError(err)
@@ -65,11 +65,11 @@ func (d *Docker) NetworkInfo(ctx context.Context, id string) (model.Network, err
 	return n, nil
 }
 
-func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, error) {
+func (h *Handler) NetworkCreate(ctx context.Context, net model.Network) (string, error) {
 	if _, ok := model.NetworkTypeMap[net.Type]; !ok {
 		return "", model.NewInvalidInputError(fmt.Errorf("invalid network type '%s'", net.Type))
 	}
-	res, err := d.client.NetworkCreate(ctx, net.Name, network.CreateOptions{
+	res, err := h.client.NetworkCreate(ctx, net.Name, network.CreateOptions{
 		Driver:     hdl_util.NetTypeRMap[net.Type],
 		Attachable: true,
 		IPAM: &network.IPAM{
@@ -85,8 +85,8 @@ func (d *Docker) NetworkCreate(ctx context.Context, net model.Network) (string, 
 	return res.ID, nil
 }
 
-func (d *Docker) NetworkRemove(ctx context.Context, id string) error {
-	if err := d.client.NetworkRemove(ctx, id); err != nil {
+func (h *Handler) NetworkRemove(ctx context.Context, id string) error {
+	if err := h.client.NetworkRemove(ctx, id); err != nil {
 		if client.IsErrNotFound(err) {
 			return model.NewNotFoundError(err)
 		}

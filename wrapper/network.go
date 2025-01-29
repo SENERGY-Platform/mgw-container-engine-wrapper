@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package api
+package wrapper
 
 import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
-func (a *Api) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
-	return a.ceHandler.ListVolumes(ctx, filter)
+func (a *Wrapper) GetNetworks(ctx context.Context) ([]model.Network, error) {
+	return a.ceHandler.ListNetworks(ctx)
 }
 
-func (a *Api) CreateVolume(ctx context.Context, vol model.Volume) (string, error) {
-	return a.ceHandler.VolumeCreate(ctx, vol)
+func (a *Wrapper) GetNetwork(ctx context.Context, id string) (model.Network, error) {
+	return a.ceHandler.NetworkInfo(ctx, id)
 }
 
-func (a *Api) GetVolume(ctx context.Context, id string) (model.Volume, error) {
-	return a.ceHandler.VolumeInfo(ctx, id)
+func (a *Wrapper) CreateNetwork(ctx context.Context, net model.Network) (string, error) {
+	return a.ceHandler.NetworkCreate(ctx, net)
 }
 
-func (a *Api) RemoveVolume(ctx context.Context, id string, force bool) error {
-	return a.ceHandler.VolumeRemove(ctx, id, force)
+func (a *Wrapper) RemoveNetwork(ctx context.Context, id string) error {
+	return a.ceHandler.NetworkRemove(ctx, id)
 }

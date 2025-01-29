@@ -27,11 +27,11 @@ import (
 	"github.com/SENERGY-Platform/go-service-base/srv-info-hdl"
 	sb_util "github.com/SENERGY-Platform/go-service-base/util"
 	"github.com/SENERGY-Platform/go-service-base/watchdog"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/api"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/docker_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/wrapper"
 	"github.com/docker/docker/client"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
@@ -140,9 +140,9 @@ func main() {
 		return requestid.Get(gc)
 	}), gin_mw.ErrorHandler(util.GetStatusCode, ", "), gin.Recovery())
 	httpHandler.UseRawPath = true
-	cewApi := api.New(dockerHandler, jobHandler, srvInfoHdl)
+	cew := wrapper.New(dockerHandler, jobHandler, srvInfoHdl)
 
-	http_hdl.SetRoutes(httpHandler, cewApi)
+	http_hdl.SetRoutes(httpHandler, cew)
 	util.Logger.Debugf("routes: %s", sb_util.ToJsonStr(http_hdl.GetRoutes(httpHandler)))
 
 	listener, err := sb_util.NewUnixListener(config.Socket.Path, os.Getuid(), config.Socket.GroupID, config.Socket.FileMode)
