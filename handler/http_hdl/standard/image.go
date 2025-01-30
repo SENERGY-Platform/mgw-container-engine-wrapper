@@ -31,6 +31,18 @@ type imagesQuery struct {
 	Labels string `form:"labels"`
 }
 
+// getImagesH godoc
+// @Summary Get images
+// @Description List all container images.
+// @Tags Images
+// @Produce	json
+// @Param name query string false "filter by name"
+// @Param tag query string false "filter by image tag"
+// @Param labels query string false "filter by labels (e.g. l1=v1,l2=v2,l3)"
+// @Success	200 {array} model.Image "images"
+// @Failure	400 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /images [get]
 func getImagesH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, model.ImagesPath, func(gc *gin.Context) {
 		query := imagesQuery{}
@@ -52,6 +64,18 @@ func getImagesH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// postImageH godoc
+// @Summary Add image
+// @Description Download a container image.
+// @Tags Images
+// @Accept json
+// @Produce	json,plain
+// @Param data body model.ImageRequest true "image data"
+// @Success	200 {string} string "job ID"
+// @Failure	400 {string} string "error message"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /images [post]
 func postImageH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPost, model.ImagesPath, func(gc *gin.Context) {
 		req := model.ImageRequest{}
@@ -59,15 +83,25 @@ func postImageH(a lib.Api) (string, string, gin.HandlerFunc) {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		id, err := a.AddImage(gc.Request.Context(), req.Image)
+		jID, err := a.AddImage(gc.Request.Context(), req.Image)
 		if err != nil {
 			_ = gc.Error(err)
 			return
 		}
-		gc.String(http.StatusOK, id)
+		gc.String(http.StatusOK, jID)
 	}
 }
 
+// getImageH godoc
+// @Summary Get image
+// @Description Get container image info.
+// @Tags Images
+// @Produce	json
+// @Param id path string true "image ID"
+// @Success	200 {object} model.Image "image data"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /images/{id} [get]
 func getImageH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, path.Join(model.ImagesPath, ":id"), func(gc *gin.Context) {
 		image, err := a.GetImage(gc.Request.Context(), gc.Param("id"))
@@ -79,6 +113,15 @@ func getImageH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// deleteImageH godoc
+// @Summary Delete image
+// @Description Remove a container image.
+// @Tags Images
+// @Param id path string true "image ID"
+// @Success	200
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /images/{id} [delete]
 func deleteImageH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, path.Join(model.ImagesPath, ":id"), func(gc *gin.Context) {
 		if err := a.RemoveImage(gc.Request.Context(), gc.Param("id")); err != nil {

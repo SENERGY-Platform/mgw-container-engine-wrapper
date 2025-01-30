@@ -36,6 +36,18 @@ type deleteContainerQuery struct {
 	Force bool `form:"force"`
 }
 
+// getContainersH godoc
+// @Summary Get containers
+// @Description List all containers.
+// @Tags Containers
+// @Produce	json
+// @Param name query string false "filter by name"
+// @Param state query string false "filter by state"
+// @Param labels query string false "filter by label (e.g.: l1=v1,l2=v2,l3)"
+// @Success	200 {array} model.Container "containers"
+// @Failure	400 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers [get]
 func getContainersH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, model.ContainersPath, func(c *gin.Context) {
 		query := containersQuery{}
@@ -62,6 +74,17 @@ func getContainersH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// postContainerH godoc
+// @Summary Create container
+// @Description Create a new container.
+// @Tags Containers
+// @Accept json
+// @Produce	plain
+// @Param data body model.Container true "container data"
+// @Success	200 {string} string "container ID"
+// @Failure	400 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers [post]
 func postContainerH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPost, model.ContainersPath, func(c *gin.Context) {
 		container := model.Container{}
@@ -78,6 +101,17 @@ func postContainerH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// deleteContainerH godoc
+// @Summary Delete container
+// @Description Remove a container
+// @Tags Containers
+// @Param id path string true "container ID"
+// @Param force query string false "force remove"
+// @Success	200
+// @Failure	400 {string} string "error message"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers/{id} [delete]
 func deleteContainerH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, path.Join(model.ContainersPath, ":id"), func(c *gin.Context) {
 		query := deleteContainerQuery{}
@@ -93,6 +127,16 @@ func deleteContainerH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// getContainerH godoc
+// @Summary Get container
+// @Description Get a container.
+// @Tags Containers
+// @Produce	json
+// @Param id path string true "container ID"
+// @Success	200 {object} model.Container "container data"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers/{id} [get]
 func getContainerH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, path.Join(model.ContainersPath, ":id"), func(c *gin.Context) {
 		container, err := a.GetContainer(c.Request.Context(), c.Param("id"))
@@ -104,6 +148,15 @@ func getContainerH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// patchContainerStartH godoc
+// @Summary Start container
+// @Description Start a container.
+// @Tags Containers
+// @Param id path string true "container ID"
+// @Success	200
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers/{id}/start [patch]
 func patchContainerStartH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPatch, path.Join(model.ContainersPath, ":id", model.ContainerStartPath), func(gc *gin.Context) {
 		err := a.StartContainer(gc.Request.Context(), gc.Param("id"))
@@ -115,6 +168,16 @@ func patchContainerStartH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// patchContainerStopH godoc
+// @Summary Stop container
+// @Description Stop a container.
+// @Tags Containers
+// @Produce	plain
+// @Param id path string true "container ID"
+// @Success	200 {string} string "job ID"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers/{id}/stop [patch]
 func patchContainerStopH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPatch, path.Join(model.ContainersPath, ":id", model.ContainerStopPath), func(gc *gin.Context) {
 		jID, err := a.StopContainer(gc.Request.Context(), gc.Param("id"))
@@ -126,6 +189,16 @@ func patchContainerStopH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// patchContainerRestartH godoc
+// @Summary Restart container
+// @Description Restart a container.
+// @Tags Containers
+// @Produce	plain
+// @Param id path string true "container ID"
+// @Success	200 {string} string " job ID"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers/{id}/restart [patch]
 func patchContainerRestartH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPatch, path.Join(model.ContainersPath, ":id", model.ContainerRestartPath), func(gc *gin.Context) {
 		jID, err := a.RestartContainer(gc.Request.Context(), gc.Param("id"))
@@ -137,6 +210,19 @@ func patchContainerRestartH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// patchContainerExecH godoc
+// @Summary Execute command
+// @Description Execute a command in a running container.
+// @Tags Containers
+// @Accept json
+// @Produce	plain
+// @Param id path string true "container ID"
+// @Param cmd body model.ExecConfig true "command data"
+// @Success	200 {string} string "job ID"
+// @Failure	400 {string} string "error message"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /containers/{id}/exec [patch]
 func patchContainerExecH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPatch, path.Join(model.ContainersPath, ":id", model.ContainerExecPath), func(gc *gin.Context) {
 		eConf := model.ExecConfig{}

@@ -32,6 +32,20 @@ type containerLogQuery struct {
 	Until    string `form:"until"`
 }
 
+// getContainerLogH godoc
+// @Summary Get container log
+// @Description Get a container's log.
+// @Tags Containers
+// @Produce	plain
+// @Param id path string true "container ID"
+// @Param max_lines query integer false "max num of lines"
+// @Param since query string false "RFC3339Nano timestamp"
+// @Param until query string false "RFC3339Nano timestamp"
+// @Success	200 {string} string "log"
+// @Failure	400 {string} string "error message"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /logs/{id} [get]
 func getContainerLogH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, path.Join(model.ContainerLogsPath, ":id"), func(c *gin.Context) {
 		query := containerLogQuery{}

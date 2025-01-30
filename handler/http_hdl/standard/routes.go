@@ -47,6 +47,13 @@ var routes = gin_mw.Routes[lib.Api]{
 	deleteVolumeH,
 }
 
+// SetRoutes
+// @title Container Engine Wrapper API
+// @version 0.16.0
+// @description Provides access to container engine functions.
+// @license.name Apache-2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @BasePath /
 func SetRoutes(e *gin.Engine, a lib.Api) error {
 	rg := e.Group("")
 	routes = append(routes, shared.Routes...)

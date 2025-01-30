@@ -33,6 +33,16 @@ type deleteVolumeQuery struct {
 	Force bool `form:"force"`
 }
 
+// getVolumesH godoc
+// @Summary Get volumes
+// @Description List all storage volumes.
+// @Tags Volumes
+// @Produce	json
+// @Param labels query string false "filter by label (e.g.: l1=v1,l2=v2,l3)"
+// @Success	200 {array} model.Volume "volumes"
+// @Failure	400 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /volumes [get]
 func getVolumesH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, model.VolumesPath, func(gc *gin.Context) {
 		query := volumesQuery{}
@@ -49,6 +59,17 @@ func getVolumesH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// postVolumeH godoc
+// @Summary Create volume
+// @Description Create a new storage volume.
+// @Tags Volumes
+// @Accept json
+// @Produce	plain
+// @Param data body model.Volume true "volume data"
+// @Success	200 {string} string "volume ID"
+// @Failure	400 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /volumes [post]
 func postVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPost, model.VolumesPath, func(gc *gin.Context) {
 		volume := model.Volume{}
@@ -65,6 +86,16 @@ func postVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// getVolumeH godoc
+// @Summary Get volume
+// @Description Get storage volume info.
+// @Tags Volumes
+// @Produce	json
+// @Param id path string true "volume ID"
+// @Success	200 {object} model.Volume "volume data"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /volumes/{id} [get]
 func getVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, path.Join(model.VolumesPath, ":id"), func(gc *gin.Context) {
 		volume, err := a.GetVolume(gc.Request.Context(), gc.Param("id"))
@@ -76,6 +107,17 @@ func getVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// deleteVolumeH godoc
+// @Summary Delete volume
+// @Description Remove a storage volume.
+// @Tags Volumes
+// @Param id path string true "volume ID"
+// @Param force query string false "force delete"
+// @Success	200
+// @Failure	400 {string} string "error message"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /volumes/{id} [delete]
 func deleteVolumeH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, path.Join(model.VolumesPath, ":id"), func(gc *gin.Context) {
 		query := deleteVolumeQuery{}

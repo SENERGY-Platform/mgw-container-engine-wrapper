@@ -27,6 +27,13 @@ import (
 
 var routes = gin_mw.Routes[lib.Api]{}
 
+// SetRoutes
+// @title Container Engine Wrapper restricted API
+// @version 0.16.0
+// @description Provides access to selected functions.
+// @license.name Apache-2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @BasePath /restricted
 func SetRoutes(e *gin.Engine, a lib.Api) error {
 	rg := e.Group(lib_model.RestrictedPath)
 	routes = append(routes, shared.Routes...)

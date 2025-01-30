@@ -24,6 +24,14 @@ import (
 	"path"
 )
 
+// getNetworksH godoc
+// @Summary Get networks
+// @Description List all container networks.
+// @Tags Networks
+// @Produce	json
+// @Success	200 {array} model.Network "networks"
+// @Failure	500 {string} string "error message"
+// @Router /networks [get]
 func getNetworksH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, model.NetworksPath, func(gc *gin.Context) {
 		networks, err := a.GetNetworks(gc.Request.Context())
@@ -35,6 +43,17 @@ func getNetworksH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// postNetworkH godoc
+// @Summary Create network
+// @Description Add a new container network.
+// @Tags Networks
+// @Accept json
+// @Produce	plain
+// @Param data body model.Network true "network data"
+// @Success	200 {string} string "network ID"
+// @Failure	400 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /networks [post]
 func postNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodPost, model.NetworksPath, func(gc *gin.Context) {
 		network := model.Network{}
@@ -51,6 +70,16 @@ func postNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// getNetworkH godoc
+// @Summary Get network
+// @Description Get a container network.
+// @Tags Networks
+// @Produce	json
+// @Param id path string true "network ID"
+// @Success	200 {object} model.Network "network info"
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /networks/{id} [get]
 func getNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodGet, path.Join(model.NetworksPath, ":id"), func(gc *gin.Context) {
 		network, err := a.GetNetwork(gc.Request.Context(), gc.Param("id"))
@@ -62,6 +91,15 @@ func getNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
 	}
 }
 
+// deleteNetworkH godoc
+// @Summary Delete network
+// @Description Remove a container network.
+// @Tags Networks
+// @Param id path string true "network ID"
+// @Success	200
+// @Failure	404 {string} string "error message"
+// @Failure	500 {string} string "error message"
+// @Router /networks/{id} [delete]
 func deleteNetworkH(a lib.Api) (string, string, gin.HandlerFunc) {
 	return http.MethodDelete, path.Join(model.NetworksPath, ":id"), func(gc *gin.Context) {
 		if err := a.RemoveNetwork(gc.Request.Context(), gc.Param("id")); err != nil {
