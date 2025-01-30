@@ -1,0 +1,1085 @@
+basePath: /
+definitions:
+  lib.Job:
+    properties:
+      canceled:
+        type: string
+      completed:
+        type: string
+      created:
+        type: string
+      description:
+        type: string
+      error:
+        $ref: '#/definitions/lib.JobErr'
+      id:
+        type: string
+      result: {}
+      started:
+        type: string
+    type: object
+  lib.JobErr:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  lib.MemStats:
+    properties:
+      alloc:
+        type: integer
+      alloc_total:
+        type: integer
+      gc_cycles:
+        type: integer
+      sys_total:
+        type: integer
+    type: object
+  lib.SrvInfo:
+    properties:
+      mem_stats:
+        $ref: '#/definitions/lib.MemStats'
+      name:
+        type: string
+      up_time:
+        $ref: '#/definitions/time.Duration'
+      version:
+        type: string
+    type: object
+  model.Container:
+    properties:
+      created:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/model.Device'
+        type: array
+      env_vars:
+        additionalProperties:
+          type: string
+        type: object
+      health:
+        $ref: '#/definitions/model.ContainerHealth'
+      id:
+        type: string
+      image:
+        type: string
+      image_id:
+        type: string
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      mounts:
+        items:
+          $ref: '#/definitions/model.Mount'
+        type: array
+      name:
+        type: string
+      networks:
+        items:
+          $ref: '#/definitions/model.ContainerNet'
+        type: array
+      ports:
+        items:
+          $ref: '#/definitions/model.Port'
+        type: array
+      run_config:
+        $ref: '#/definitions/model.RunConfig'
+      started:
+        type: string
+      state:
+        $ref: '#/definitions/model.ContainerState'
+    type: object
+  model.ContainerHealth:
+    enum:
+    - healthy
+    - unhealthy
+    - transitioning
+    type: string
+    x-enum-varnames:
+    - HealthyState
+    - UnhealthyState
+    - TransitionState
+  model.ContainerNet:
+    properties:
+      domain_names:
+        items:
+          type: string
+        type: array
+      gateway:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      ip_address:
+        items:
+          type: integer
+        type: array
+      mac_address:
+        type: string
+      name:
+        type: string
+    type: object
+  model.ContainerState:
+    enum:
+    - initialized
+    - running
+    - paused
+    - restarting
+    - removing
+    - stopped
+    - dead
+    type: string
+    x-enum-varnames:
+    - InitState
+    - RunningState
+    - PausedState
+    - RestartingState
+    - RemovingState
+    - StoppedState
+    - DeadState
+  model.Device:
+    properties:
+      read_only:
+        type: boolean
+      source:
+        type: string
+      target:
+        type: string
+    type: object
+  model.ExecConfig:
+    properties:
+      cmd:
+        items:
+          type: string
+        type: array
+      envVars:
+        additionalProperties:
+          type: string
+        type: object
+      tty:
+        type: boolean
+      workDir:
+        type: string
+    type: object
+  model.Image:
+    properties:
+      arch:
+        type: string
+      created:
+        type: string
+      digests:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      size:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  model.ImageRequest:
+    properties:
+      image:
+        type: string
+    type: object
+  model.Mount:
+    properties:
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      mode:
+        type: integer
+      read_only:
+        type: boolean
+      size:
+        type: integer
+      source:
+        type: string
+      target:
+        type: string
+      type:
+        $ref: '#/definitions/model.MountType'
+    type: object
+  model.MountType:
+    enum:
+    - bind
+    - volume
+    - tmpfs
+    type: string
+    x-enum-varnames:
+    - BindMount
+    - VolumeMount
+    - TmpfsMount
+  model.Network:
+    properties:
+      gateway:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      subnet:
+        $ref: '#/definitions/model.Subnet'
+      type:
+        $ref: '#/definitions/model.NetworkType'
+    type: object
+  model.NetworkType:
+    enum:
+    - bridge
+    - macvlan
+    - host
+    type: string
+    x-enum-varnames:
+    - BridgeNet
+    - MACVlanNet
+    - HostNet
+  model.Port:
+    properties:
+      bindings:
+        items:
+          $ref: '#/definitions/model.PortBinding'
+        type: array
+      number:
+        type: integer
+      protocol:
+        $ref: '#/definitions/model.PortType'
+    type: object
+  model.PortBinding:
+    properties:
+      interface:
+        items:
+          type: integer
+        type: array
+      number:
+        type: integer
+    type: object
+  model.PortType:
+    enum:
+    - tcp
+    - udp
+    - sctp
+    type: string
+    x-enum-varnames:
+    - TcpPort
+    - UdpPort
+    - SctpPort
+  model.RestartStrategy:
+    enum:
+    - never
+    - always
+    - not-stopped
+    - on-fail
+    type: string
+    x-enum-varnames:
+    - RestartNever
+    - RestartAlways
+    - RestartNotStopped
+    - RestartOnFail
+  model.RunConfig:
+    properties:
+      command:
+        items:
+          type: string
+        type: array
+      pseudo_tty:
+        type: boolean
+      remove_after_run:
+        type: boolean
+      restart_strategy:
+        $ref: '#/definitions/model.RestartStrategy'
+      retries:
+        type: integer
+      stop_signal:
+        type: string
+      stop_timeout:
+        $ref: '#/definitions/time.Duration'
+    type: object
+  model.Subnet:
+    properties:
+      bits:
+        type: integer
+      prefix:
+        items:
+          type: integer
+        type: array
+    type: object
+  model.Volume:
+    properties:
+      created:
+        type: string
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      name:
+        type: string
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+info:
+  contact: {}
+  description: Provides access to container engine functions.
+  license:
+    name: Apache-2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Container Engine Wrapper API
+  version: 0.16.0
+paths:
+  /containers:
+    get:
+      description: List all containers.
+      parameters:
+      - description: filter by name
+        in: query
+        name: name
+        type: string
+      - description: filter by state
+        in: query
+        name: state
+        type: string
+      - description: 'filter by label (e.g.: l1=v1,l2=v2,l3)'
+        in: query
+        name: labels
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: containers
+          schema:
+            items:
+              $ref: '#/definitions/model.Container'
+            type: array
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get containers
+      tags:
+      - Containers
+    post:
+      consumes:
+      - application/json
+      description: Create a new container.
+      parameters:
+      - description: container data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.Container'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: container ID
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Create container
+      tags:
+      - Containers
+  /containers/{id}:
+    delete:
+      description: Remove a container
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: force remove
+        in: query
+        name: force
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: error message
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Delete container
+      tags:
+      - Containers
+    get:
+      description: Get a container.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: container data
+          schema:
+            $ref: '#/definitions/model.Container'
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get container
+      tags:
+      - Containers
+  /containers/{id}/exec:
+    patch:
+      consumes:
+      - application/json
+      description: Execute a command in a running container.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: command data
+        in: body
+        name: cmd
+        required: true
+        schema:
+          $ref: '#/definitions/model.ExecConfig'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: job ID
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Execute command
+      tags:
+      - Containers
+  /containers/{id}/restart:
+    patch:
+      description: Restart a container.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: ' job ID'
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Restart container
+      tags:
+      - Containers
+  /containers/{id}/start:
+    patch:
+      description: Start a container.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Start container
+      tags:
+      - Containers
+  /containers/{id}/stop:
+    patch:
+      description: Stop a container.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: job ID
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Stop container
+      tags:
+      - Containers
+  /images:
+    get:
+      description: List all container images.
+      parameters:
+      - description: filter by name
+        in: query
+        name: name
+        type: string
+      - description: filter by image tag
+        in: query
+        name: tag
+        type: string
+      - description: filter by labels (e.g. l1=v1,l2=v2,l3)
+        in: query
+        name: labels
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: images
+          schema:
+            items:
+              $ref: '#/definitions/model.Image'
+            type: array
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get images
+      tags:
+      - Images
+    post:
+      consumes:
+      - application/json
+      description: Download a container image.
+      parameters:
+      - description: image data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.ImageRequest'
+      produces:
+      - application/json
+      - text/plain
+      responses:
+        "200":
+          description: job ID
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Add image
+      tags:
+      - Images
+  /images/{id}:
+    delete:
+      description: Remove a container image.
+      parameters:
+      - description: image ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Delete image
+      tags:
+      - Images
+    get:
+      description: Get container image info.
+      parameters:
+      - description: image ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: image data
+          schema:
+            $ref: '#/definitions/model.Image'
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get image
+      tags:
+      - Images
+  /info:
+    get:
+      description: Get basic service and runtime information.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: info
+          schema:
+            $ref: '#/definitions/lib.SrvInfo'
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get service info
+      tags:
+      - Info
+  /jobs:
+    get:
+      description: List all jobs.
+      parameters:
+      - description: status to filter by
+        enum:
+        - pending
+        - running
+        - canceled
+        - completed
+        - error
+        - ok
+        in: query
+        name: status
+        type: string
+      - description: sort in descending order
+        in: query
+        name: sort_desc
+        type: boolean
+      - description: list jobs since timestamp
+        in: query
+        name: since
+        type: string
+      - description: list jobs until timestamp
+        in: query
+        name: until
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: jobs
+          schema:
+            items:
+              $ref: '#/definitions/lib.Job'
+            type: array
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: List jobs
+      tags:
+      - Jobs
+  /jobs/{id}:
+    get:
+      description: Get a job.
+      parameters:
+      - description: job id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: job
+          schema:
+            $ref: '#/definitions/lib.Job'
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get job
+      tags:
+      - Jobs
+  /jobs/{id}/cancel:
+    patch:
+      description: Cancels a job.
+      parameters:
+      - description: job id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Cancel job
+      tags:
+      - Jobs
+  /logs/{id}:
+    get:
+      description: Get a container's log.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: max num of lines
+        in: query
+        name: max_lines
+        type: integer
+      - description: RFC3339Nano timestamp
+        in: query
+        name: since
+        type: string
+      - description: RFC3339Nano timestamp
+        in: query
+        name: until
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: log
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get container log
+      tags:
+      - Containers
+  /networks:
+    get:
+      description: List all container networks.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: networks
+          schema:
+            items:
+              $ref: '#/definitions/model.Network'
+            type: array
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get networks
+      tags:
+      - Networks
+    post:
+      consumes:
+      - application/json
+      description: Add a new container network.
+      parameters:
+      - description: network data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.Network'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: network ID
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Create network
+      tags:
+      - Networks
+  /networks/{id}:
+    delete:
+      description: Remove a container network.
+      parameters:
+      - description: network ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Delete network
+      tags:
+      - Networks
+    get:
+      description: Get a container network.
+      parameters:
+      - description: network ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: network info
+          schema:
+            $ref: '#/definitions/model.Network'
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get network
+      tags:
+      - Networks
+  /volumes:
+    get:
+      description: List all storage volumes.
+      parameters:
+      - description: 'filter by label (e.g.: l1=v1,l2=v2,l3)'
+        in: query
+        name: labels
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: volumes
+          schema:
+            items:
+              $ref: '#/definitions/model.Volume'
+            type: array
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get volumes
+      tags:
+      - Volumes
+    post:
+      consumes:
+      - application/json
+      description: Create a new storage volume.
+      parameters:
+      - description: volume data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.Volume'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: volume ID
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Create volume
+      tags:
+      - Volumes
+  /volumes/{id}:
+    delete:
+      description: Remove a storage volume.
+      parameters:
+      - description: volume ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: force delete
+        in: query
+        name: force
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: error message
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Delete volume
+      tags:
+      - Volumes
+    get:
+      description: Get storage volume info.
+      parameters:
+      - description: volume ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: volume data
+          schema:
+            $ref: '#/definitions/model.Volume'
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get volume
+      tags:
+      - Volumes
+swagger: "2.0"

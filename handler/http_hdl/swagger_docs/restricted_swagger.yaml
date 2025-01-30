@@ -1,0 +1,228 @@
+basePath: /restricted
+definitions:
+  lib.Job:
+    properties:
+      canceled:
+        type: string
+      completed:
+        type: string
+      created:
+        type: string
+      description:
+        type: string
+      error:
+        $ref: '#/definitions/lib.JobErr'
+      id:
+        type: string
+      result: {}
+      started:
+        type: string
+    type: object
+  lib.JobErr:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  lib.MemStats:
+    properties:
+      alloc:
+        type: integer
+      alloc_total:
+        type: integer
+      gc_cycles:
+        type: integer
+      sys_total:
+        type: integer
+    type: object
+  lib.SrvInfo:
+    properties:
+      mem_stats:
+        $ref: '#/definitions/lib.MemStats'
+      name:
+        type: string
+      up_time:
+        $ref: '#/definitions/time.Duration'
+      version:
+        type: string
+    type: object
+  time.Duration:
+    enum:
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    type: integer
+    x-enum-varnames:
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+info:
+  contact: {}
+  description: Provides access to selected functions.
+  license:
+    name: Apache-2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Container Engine Wrapper restricted API
+  version: 0.16.0
+paths:
+  /info:
+    get:
+      description: Get basic service and runtime information.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: info
+          schema:
+            $ref: '#/definitions/lib.SrvInfo'
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get service info
+      tags:
+      - Info
+  /jobs:
+    get:
+      description: List all jobs.
+      parameters:
+      - description: status to filter by
+        enum:
+        - pending
+        - running
+        - canceled
+        - completed
+        - error
+        - ok
+        in: query
+        name: status
+        type: string
+      - description: sort in descending order
+        in: query
+        name: sort_desc
+        type: boolean
+      - description: list jobs since timestamp
+        in: query
+        name: since
+        type: string
+      - description: list jobs until timestamp
+        in: query
+        name: until
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: jobs
+          schema:
+            items:
+              $ref: '#/definitions/lib.Job'
+            type: array
+        "400":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: List jobs
+      tags:
+      - Jobs
+  /jobs/{id}:
+    get:
+      description: Get a job.
+      parameters:
+      - description: job id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: job
+          schema:
+            $ref: '#/definitions/lib.Job'
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get job
+      tags:
+      - Jobs
+  /jobs/{id}/cancel:
+    patch:
+      description: Cancels a job.
+      parameters:
+      - description: job id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Cancel job
+      tags:
+      - Jobs
+  /logs/{id}:
+    get:
+      description: Get a container's log.
+      parameters:
+      - description: container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: max num of lines
+        in: query
+        name: max_lines
+        type: integer
+      - description: RFC3339Nano timestamp
+        in: query
+        name: since
+        type: string
+      - description: RFC3339Nano timestamp
+        in: query
+        name: until
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: log
+          schema:
+            type: string
+        "400":
+          description: error message
+          schema:
+            type: string
+        "404":
+          description: error message
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Get container log
+      tags:
+      - Containers
+swagger: "2.0"

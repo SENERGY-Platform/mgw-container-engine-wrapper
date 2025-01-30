@@ -19,9 +19,12 @@ package standard
 import (
 	gin_mw "github.com/SENERGY-Platform/gin-middleware"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl/shared"
+	_ "github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl/swagger_docs"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/util"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var routes = gin_mw.Routes[lib.Api]{
@@ -61,5 +64,6 @@ func SetRoutes(e *gin.Engine, a lib.Api) error {
 	if err != nil {
 		return err
 	}
+	rg.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler(), ginSwagger.InstanceName("standard")))
 	return nil
 }
