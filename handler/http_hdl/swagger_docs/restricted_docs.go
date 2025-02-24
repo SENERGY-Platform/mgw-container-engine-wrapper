@@ -351,7 +351,7 @@ const docTemplaterestricted = `{
 var SwaggerInforestricted = &swag.Spec{
 	Version:          "0.16.0",
 	Host:             "",
-	BasePath:         "/restricted",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Container Engine Wrapper restricted API",
 	Description:      "Provides access to selected functions.",

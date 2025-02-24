@@ -10,7 +10,7 @@
         },
         "version": "0.16.0"
     },
-    "basePath": "/restricted",
+    "basePath": "/",
     "paths": {
         "/info": {
             "get": {
