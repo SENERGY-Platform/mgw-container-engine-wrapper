@@ -18,7 +18,7 @@ package wrapper
 
 import (
 	"context"
-	srv_info_lib "github.com/SENERGY-Platform/go-service-base/srv-info-hdl/lib"
+	srv_info_lib "github.com/SENERGY-Platform/mgw-go-service-base/srv-info-hdl/lib"
 )
 
 func (a *Wrapper) GetSrvInfo(_ context.Context) srv_info_lib.SrvInfo {

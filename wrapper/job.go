@@ -18,7 +18,7 @@ package wrapper
 
 import (
 	"context"
-	job_hdl_lib "github.com/SENERGY-Platform/go-service-base/job-hdl/lib"
+	job_hdl_lib "github.com/SENERGY-Platform/mgw-go-service-base/job-hdl/lib"
 )
 
 func (a *Wrapper) GetJobs(ctx context.Context, filter job_hdl_lib.JobFilter) ([]job_hdl_lib.Job, error) {
