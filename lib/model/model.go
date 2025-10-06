@@ -113,21 +113,22 @@ type ContainerState = string
 type ContainerHealth = string
 
 type Container struct {
-	ID        string            `json:"id"`
-	Name      string            `json:"name"`
-	State     ContainerState    `json:"state"`
-	Health    *ContainerHealth  `json:"health"`
-	Created   time.Time         `json:"created"`
-	Started   *time.Time        `json:"started"`
-	Image     string            `json:"image"`
-	ImageID   string            `json:"image_id"`
-	EnvVars   map[string]string `json:"env_vars"`
-	Labels    map[string]string `json:"labels"`
-	Mounts    []Mount           `json:"mounts"`
-	Devices   []Device          `json:"devices"`
-	Ports     []Port            `json:"ports"`
-	Networks  []ContainerNet    `json:"networks"`
-	RunConfig RunConfig         `json:"run_config"`
+	ID                string            `json:"id"`
+	Name              string            `json:"name"`
+	State             ContainerState    `json:"state"`
+	Health            *ContainerHealth  `json:"health"`
+	Created           time.Time         `json:"created"`
+	Started           *time.Time        `json:"started"`
+	Image             string            `json:"image"`
+	ImageID           string            `json:"image_id"`
+	EnvVars           map[string]string `json:"env_vars"`
+	Labels            map[string]string `json:"labels"`
+	Mounts            []Mount           `json:"mounts"`
+	Devices           []Device          `json:"devices"`
+	DeviceCGroupRules []string          `json:"device_cgroup_rules"`
+	Ports             []Port            `json:"ports"`
+	Networks          []ContainerNet    `json:"networks"`
+	RunConfig         RunConfig         `json:"run_config"`
 }
 
 type ContainerNet struct {
