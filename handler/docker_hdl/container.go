@@ -186,7 +186,8 @@ func (h *Handler) ContainerCreate(ctx context.Context, ctrConf model.Container) 
 		AutoRemove:    ctrConf.RunConfig.RemoveAfterRun,
 		Mounts:        mts,
 		Resources: container.Resources{
-			Devices: dvs,
+			Devices:           dvs,
+			DeviceCgroupRules: ctrConf.DeviceCGroupRules,
 		},
 	}
 	if h.ctrLogConf.Driver != "" {
