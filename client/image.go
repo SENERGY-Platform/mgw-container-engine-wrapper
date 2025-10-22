@@ -20,10 +20,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
 func (c *Client) GetImages(ctx context.Context, filter model.ImageFilter) ([]model.Image, error) {
@@ -45,7 +46,7 @@ func (c *Client) GetImages(ctx context.Context, filter model.ImageFilter) ([]mod
 }
 
 func (c *Client) GetImage(ctx context.Context, id string) (model.Image, error) {
-	u, err := url.JoinPath(c.baseUrl, model.ImagesPath, id)
+	u, err := url.JoinPath(c.baseUrl, model.ImagesPath, url.PathEscape(id))
 	if err != nil {
 		return model.Image{}, err
 	}
@@ -80,7 +81,7 @@ func (c *Client) AddImage(ctx context.Context, img string) (jobId string, err er
 }
 
 func (c *Client) RemoveImage(ctx context.Context, id string) error {
-	u, err := url.JoinPath(c.baseUrl, model.ImagesPath, id)
+	u, err := url.JoinPath(c.baseUrl, model.ImagesPath, url.PathEscape(id))
 	if err != nil {
 		return err
 	}
