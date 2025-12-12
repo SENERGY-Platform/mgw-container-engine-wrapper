@@ -18,15 +18,16 @@ package util
 
 import (
 	"fmt"
+	"net"
+	"strconv"
+	"time"
+
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
-	"net"
-	"strconv"
-	"time"
 )
 
 func GenEnv(ev map[string]string) (env []string) {
@@ -151,6 +152,11 @@ func genLabelFilterArgs(fArgs *filters.Args, fLabels map[string]string) {
 
 func GenContainerFilterArgs(filter model.ContainerFilter) filters.Args {
 	fArgs := filters.NewArgs()
+	if len(filter.Ids) > 0 {
+		for _, id := range filter.Ids {
+			fArgs.Add("id", id)
+		}
+	}
 	if filter.Name != "" {
 		fArgs.Add("name", filter.Name)
 	}

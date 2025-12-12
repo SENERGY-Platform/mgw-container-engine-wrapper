@@ -141,6 +141,7 @@ type ContainerNet struct {
 }
 
 type ContainerFilter struct {
+	Ids    []string
 	Name   string
 	State  ContainerState
 	Labels map[string]string
