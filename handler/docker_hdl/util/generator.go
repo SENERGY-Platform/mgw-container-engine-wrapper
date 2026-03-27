@@ -157,8 +157,10 @@ func GenContainerFilterArgs(filter model.ContainerFilter) filters.Args {
 			fArgs.Add("id", id)
 		}
 	}
-	if filter.Name != "" {
-		fArgs.Add("name", filter.Name)
+	if len(filter.Names) > 0 {
+		for _, name := range filter.Names {
+			fArgs.Add("name", name)
+		}
 	}
 	if filter.State != "" {
 		fArgs.Add("status", StateRMap[filter.State])

@@ -18,16 +18,18 @@ package standard
 
 import (
 	"fmt"
+	"net/http"
+	"path"
+
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"path"
 )
 
 type containersQuery struct {
-	Name   string `form:"name"`
+	Ids    string `form:"ids"`
+	Names  string `form:"names"`
 	State  string `form:"state"`
 	Labels string `form:"labels"`
 }
@@ -55,7 +57,10 @@ func getContainersH(a lib.Api) (string, string, gin.HandlerFunc) {
 			_ = c.Error(model.NewInvalidInputError(err))
 			return
 		}
-		filter := model.ContainerFilter{Name: query.Name}
+		filter := model.ContainerFilter{
+			Ids:   util.ParseStringSlice(query.Ids, ","),
+			Names: util.ParseStringSlice(query.Names, ","),
+		}
 		if query.State != "" {
 			_, ok := model.ContainerStateMap[query.State]
 			if !ok {
