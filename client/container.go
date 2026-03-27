@@ -20,11 +20,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
 func (c *Client) GetContainers(ctx context.Context, filter model.ContainerFilter) ([]model.Container, error) {
@@ -153,8 +154,11 @@ func (c *Client) ContainerExec(ctx context.Context, id string, exeConf model.Exe
 
 func genGetContainersQuery(filter model.ContainerFilter) string {
 	var q []string
-	if filter.Name != "" {
-		q = append(q, "name="+filter.Name)
+	if len(filter.Ids) > 0 {
+		q = append(q, "ids="+strings.Join(filter.Ids, ","))
+	}
+	if len(filter.Names) > 0 {
+		q = append(q, "names="+strings.Join(filter.Names, ","))
 	}
 	if filter.State != "" {
 		q = append(q, "state="+filter.State)
