@@ -169,6 +169,7 @@ type Volume struct {
 }
 
 type VolumeFilter struct {
+	Names  []string
 	Labels map[string]string
 }
 

@@ -177,6 +177,11 @@ func GenImageFilterArgs(filter model.ImageFilter) filters.Args {
 
 func GenVolumeFilterArgs(filter model.VolumeFilter) filters.Args {
 	fArgs := filters.NewArgs()
+	if len(filter.Names) > 0 {
+		for _, name := range filter.Names {
+			fArgs.Add("name", name)
+		}
+	}
 	genLabelFilterArgs(&fArgs, filter.Labels)
 	return fArgs
 }
