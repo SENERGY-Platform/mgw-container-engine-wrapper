@@ -20,10 +20,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 )
 
 func (c *Client) GetVolumes(ctx context.Context, filter model.VolumeFilter) ([]model.Volume, error) {
@@ -95,6 +96,9 @@ func (c *Client) RemoveVolume(ctx context.Context, id string, force bool) error 
 
 func genVolumesQuery(filter model.VolumeFilter) string {
 	var q []string
+	if len(filter.Names) > 0 {
+		q = append(q, "names="+strings.Join(filter.Names, ","))
+	}
 	if len(filter.Labels) > 0 {
 		q = append(q, "labels="+genLabels(filter.Labels, "=", ","))
 	}
