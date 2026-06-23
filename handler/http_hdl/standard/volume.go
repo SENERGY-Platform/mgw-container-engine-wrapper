@@ -17,15 +17,17 @@
 package standard
 
 import (
+	"net/http"
+	"path"
+
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/handler/http_hdl/util"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib"
 	"github.com/SENERGY-Platform/mgw-container-engine-wrapper/lib/model"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"path"
 )
 
 type volumesQuery struct {
+	Names  string `form:"names"`
 	Labels string `form:"labels"`
 }
 
@@ -50,7 +52,13 @@ func getVolumesH(a lib.Api) (string, string, gin.HandlerFunc) {
 			_ = gc.Error(model.NewInvalidInputError(err))
 			return
 		}
-		volumes, err := a.GetVolumes(gc.Request.Context(), model.VolumeFilter{Labels: util.GenLabels(util.ParseStringSlice(query.Labels, ","))})
+		volumes, err := a.GetVolumes(
+			gc.Request.Context(),
+			model.VolumeFilter{
+				Names:  util.ParseStringSlice(query.Names, ","),
+				Labels: util.GenLabels(util.ParseStringSlice(query.Labels, ",")),
+			},
+		)
 		if err != nil {
 			_ = gc.Error(err)
 			return
