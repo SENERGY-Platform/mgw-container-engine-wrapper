@@ -47,10 +47,10 @@ var NetworkTypeMap = map[NetworkType]struct{}{
 }
 
 const (
-	RestartNever      RestartStrategy = "never"
+	RestartNever      RestartStrategy = "no"
 	RestartAlways     RestartStrategy = "always"
 	RestartNotStopped RestartStrategy = "not-stopped"
-	RestartOnFail     RestartStrategy = "on-fail"
+	RestartOnFail     RestartStrategy = "on-failure"
 )
 
 var RestartStrategyMap = map[RestartStrategy]struct{}{
