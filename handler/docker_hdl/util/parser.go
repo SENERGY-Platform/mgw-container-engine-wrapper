@@ -123,8 +123,9 @@ func ParseEnv(ev []string) (env map[string]string) {
 	if len(ev) > 0 {
 		env = make(map[string]string, len(ev))
 		for _, s := range ev {
-			p := strings.Split(s, "=")
-			env[p[0]] = p[1]
+			// Docker keeps an entry without "=" as given, and a value may itself contain "=".
+			k, v, _ := strings.Cut(s, "=")
+			env[k] = v
 		}
 	}
 	return
