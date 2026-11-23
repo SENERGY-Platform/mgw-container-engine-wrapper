@@ -85,6 +85,7 @@ func (h *Handler) ListContainers(ctx context.Context, filter model.ContainerFilt
 			if ci.State.Health != nil {
 				hs := hdl_util.GetConst(ci.State.Health.Status, hdl_util.HealthMap)
 				ctr.Health = &hs
+				ctr.HealthOutput = hdl_util.ParseHealthOutput(ci.State.Health)
 			}
 		}
 		csl = append(csl, ctr)
@@ -146,6 +147,7 @@ func (h *Handler) ContainerInfo(ctx context.Context, id string) (model.Container
 	if c.State.Health != nil {
 		hs := hdl_util.GetConst(c.State.Health.Status, hdl_util.HealthMap)
 		ctr.Health = &hs
+		ctr.HealthOutput = hdl_util.ParseHealthOutput(c.State.Health)
 	}
 	return ctr, nil
 }

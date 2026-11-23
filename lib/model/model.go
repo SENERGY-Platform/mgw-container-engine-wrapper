@@ -117,6 +117,7 @@ type Container struct {
 	Name              string            `json:"name"`
 	State             ContainerState    `json:"state"`
 	Health            *ContainerHealth  `json:"health"`
+	HealthOutput      *string           `json:"health_output"`
 	Created           time.Time         `json:"created"`
 	Started           *time.Time        `json:"started"`
 	Image             string            `json:"image"`

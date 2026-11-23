@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 func ParseEndpointSettings(endptSettings map[string]*network.EndpointSettings) (netInfo []model.ContainerNet) {
@@ -175,4 +176,26 @@ func ParseRestartPolicy(rp container.RestartPolicy) (strategy model.RestartStrat
 		retires = &rp.MaximumRetryCount
 	}
 	return
+}
+
+const maxHealthOutputLen = 1024
+
+// ParseHealthOutput returns the trimmed output of the newest health check run, cut to maxHealthOutputLen bytes on a rune boundary.
+func ParseHealthOutput(health *container.Health) *string {
+	if health == nil || len(health.Log) == 0 {
+		return nil
+	}
+	last := health.Log[len(health.Log)-1]
+	if last == nil {
+		return nil
+	}
+	out := strings.TrimSpace(last.Output)
+	if len(out) > maxHealthOutputLen {
+		cut := maxHealthOutputLen
+		for cut > 0 && !utf8.RuneStart(out[cut]) {
+			cut--
+		}
+		out = out[:cut]
+	}
+	return &out
 }

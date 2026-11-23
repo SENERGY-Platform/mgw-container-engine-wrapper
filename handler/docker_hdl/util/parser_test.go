@@ -17,7 +17,9 @@
 package util
 
 import (
+	"github.com/docker/docker/api/types/container"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -37,6 +39,35 @@ func TestParseEnv(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if got := ParseEnv(tc.in); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("ParseEnv(%q) = %v, want %v", tc.in, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestParseHealthOutput(t *testing.T) {
+	str := func(s string) *string { return &s }
+	res := func(out string) *container.HealthcheckResult { return &container.HealthcheckResult{Output: out} }
+	long := strings.Repeat("a", 2000)
+	// 'ä' is two bytes, so byte 1024 falls inside a rune when the prefix has an odd length
+	multi := "x" + strings.Repeat("ä", 1000)
+	tests := []struct {
+		name string
+		in   *container.Health
+		want *string
+	}{
+		{name: "no health check", in: nil, want: nil},
+		{name: "no log entry", in: &container.Health{}, want: nil},
+		{name: "empty output", in: &container.Health{Log: []*container.HealthcheckResult{res("")}}, want: str("")},
+		{name: "trimmed", in: &container.Health{Log: []*container.HealthcheckResult{res("  broken\n")}}, want: str("broken")},
+		{name: "newest entry wins", in: &container.Health{Log: []*container.HealthcheckResult{res("old"), res("new\nsecond line")}}, want: str("new\nsecond line")},
+		{name: "cut at limit", in: &container.Health{Log: []*container.HealthcheckResult{res(long)}}, want: str(long[:1024])},
+		{name: "cut on rune boundary", in: &container.Health{Log: []*container.HealthcheckResult{res(multi)}}, want: str("x" + strings.Repeat("ä", 511))},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := ParseHealthOutput(tc.in)
+			if (got == nil) != (tc.want == nil) || (got != nil && *got != *tc.want) {
+				t.Errorf("ParseHealthOutput() = %v, want %v", got, tc.want)
 			}
 		})
 	}
